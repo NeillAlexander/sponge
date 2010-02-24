@@ -7,18 +7,25 @@
    [org.apache.commons.httpclient HttpClient]
    [org.apache.commons.httpclient.methods PostMethod StringRequestEntity]])
 
+;; TODO: factor this out into a httpclient namespace
 (defn forward-request
   "Forward the soap request on to the configured host / port"
   [host port req]
   (let [xml (ds/slurp* (:body req)) 
         client (HttpClient.)
         post (PostMethod. (format "%s:%d%s" host port (:uri req)))]
+    ;; TODO: remove this
     (println req)
     (println (format "request = %s" xml))
+    ;; set up the request
     (.setRequestEntity post
                        (StringRequestEntity. xml "text/xml" "utf-8"))
     (.executeMethod client post)
+    ;; return the response
+    ;; TODO: return a response map like Ring expects with the actual
+    ;; status code etc
     (let [response (String. (.getResponseBody post))]
+      ;; TODO: handle this in a try / catch / finally
       (.releaseConnection post)
       response)))
 
