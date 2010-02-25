@@ -5,4 +5,5 @@
                  [ring "0.1.1-SNAPSHOT"]
                  [swank-clojure "1.1.0"]
                  [leiningen/lein-swank "1.1.0"]
-                 [commons-httpclient "3.1"]])
+                 [commons-httpclient "3.1"]
+                 [log4j "1.2.15"]])

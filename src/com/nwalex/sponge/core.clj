@@ -2,11 +2,12 @@
   (:require
     [ring.adapter.jetty :as jetty]
     [ring.middleware.reload :as reload]
-    [com.nwalex.sponge.http :as http]))
+    [com.nwalex.sponge.http :as http]
+    [clojure.contrib.logging :as log]))
 
 (defn handle-request [req]
   (let [response (http/forward-request "http://localhost" 8140 req)]    
-    (println (format "response = %s" response))
+    (log/info (format "response = %s" response))
     {:status  200
      :headers {"Content-Type" "text/xml;charset=utf-8"}
      :body    response}))
