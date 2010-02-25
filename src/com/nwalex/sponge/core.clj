@@ -44,7 +44,7 @@
 (defn start
   "Start and return instance of server"
   []
-  (jetty/run-jetty with-reload-app {:port 8080 :join false}))
+  (jetty/run-jetty with-reload-app {:port 8139 :join false}))
 
 (defn stop [server]
   (.stop server))
