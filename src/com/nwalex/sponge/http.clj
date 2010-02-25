@@ -12,11 +12,14 @@
         post (PostMethod. address)]
     (.setRequestEntity post
                        (StringRequestEntity. text "text/xml" "utf-8"))
-    (.executeMethod client post)
-    (let [response (String. (.getResponseBody post))]
-      ;; TODO: handle this in a try / catch / finally
-      (.releaseConnection post)
-      response)))
+    (try
+     (do
+       (.executeMethod client post)
+       (let [response (String. (.getResponseBody post))]
+         response))
+     (finally
+      (do
+        (.releaseConnection post))))))
 
 (defn forward-request
   "Forward the soap request on to the configured host / port"

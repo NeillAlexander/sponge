@@ -32,3 +32,4 @@
     (.stop responder)
     (is (not (.isRunning sponge)))
     (is (not (.isRunning responder)))))
+
