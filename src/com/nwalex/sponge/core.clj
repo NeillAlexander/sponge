@@ -30,7 +30,10 @@
 
 (defn -main [& args]
   (cmd-line/with-command-line args
-    "mrtj branch [--rc"
+    "sponge --port [listening_port] --target [target server url]"
     [[port "Specify the port to listen on"]
-     [target "The full address to forward requests onto"]]    
-    (start (Integer/parseInt port) target)))
+     [target "The full address to forward requests onto"]]
+    (try
+     (start (Integer/parseInt port) target)
+     (catch NumberFormatException ex
+       (println (format "Invalid port number: %s" port))))))
