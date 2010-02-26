@@ -25,8 +25,7 @@
   [target req]
   (let [xml (ds/slurp* (:body req)) 
         address (format "%s%s" target (:uri req))]
-    (log/info (format "request = %s" xml))
-    (log/info (format "send to address %s" address))
+    (log/info (format "Sending request to: %s" address))
     (send-request xml address)))
 
 

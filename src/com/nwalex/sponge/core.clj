@@ -9,7 +9,7 @@
 
 (defn handle-request [target req]
   (let [response (http/forward-request target req)]    
-    (log/info (format "response = %s" response))
+    (log/info (format "Read response from: %s" target))
     {:status  200
      :headers {"Content-Type" "text/xml;charset=utf-8"}
      :body    response}))
