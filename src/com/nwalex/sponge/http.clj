@@ -16,11 +16,9 @@
     (try
      (do
        (.executeMethod client post)
-       (let [response (String. (.getResponseBody post))]
-         response))
+       (String. (.getResponseBody post)))
      (finally
-      (do
-        (.releaseConnection post))))))
+      (.releaseConnection post)))))
 
 (defn forward-request
   "Forward the soap request on to the configured host / port"

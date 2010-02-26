@@ -27,7 +27,7 @@
         responder (start-app pong-app 8140)]
     (is (.isRunning sponge))
     (is (.isRunning responder))
-    (is (= "pong\n\n" (http/send-request "hello" "http://localhost:8139")))
+    (is (.startsWith (http/send-request "hello" "http://localhost:8139") "pong"))
     (.stop sponge)
     (.stop responder)
     (is (not (.isRunning sponge)))
