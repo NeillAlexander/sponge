@@ -22,9 +22,9 @@
 
 (defn forward-request
   "Forward the soap request on to the configured host / port"
-  [host port req]
+  [target req]
   (let [xml (ds/slurp* (:body req)) 
-        address (format "%s:%d%s" host port (:uri req))]
+        address (format "%s%s" target (:uri req))]
     (log/info (format "request = %s" xml))
     (log/info (format "send to address %s" address))
     (send-request xml address)))

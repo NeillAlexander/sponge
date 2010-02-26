@@ -3,24 +3,34 @@
     [ring.adapter.jetty :as jetty]
     [ring.middleware.reload :as reload]
     [com.nwalex.sponge.http :as http]
-    [clojure.contrib.logging :as log]))
+    [clojure.contrib.logging :as log]
+    [clojure.contrib.command-line :as cmd-line])
+  (:gen-class :main true :name com.nwalex.sponge.Sponge))
 
-(defn handle-request [req]
-  (let [response (http/forward-request "http://localhost" 8140 req)]    
+(defn handle-request [target req]
+  (let [response (http/forward-request target req)]    
     (log/info (format "response = %s" response))
     {:status  200
      :headers {"Content-Type" "text/xml;charset=utf-8"}
      :body    response}))
 
-(defn app [req]
-  (handle-request req))
+(defn app [target req]
+  (handle-request target req))
 
-(def with-reload-app (reload/wrap-reload app '(com.nwalex.sponge.core))) 
+(defn with-reload-app [target]
+  (reload/wrap-reload #(app target %1) '(com.nwalex.sponge.core))) 
 
 (defn start
   "Start and return instance of server"
-  []
-  (jetty/run-jetty with-reload-app {:port 8139 :join false}))
+  [port target]
+  (jetty/run-jetty (with-reload-app target) {:port port :join false}))
 
 (defn stop [server]
   (.stop server))
+
+(defn -main [& args]
+  (cmd-line/with-command-line args
+    "mrtj branch [--rc"
+    [[port "Specify the port to listen on"]
+     [target "The full address to forward requests onto"]]    
+    (start (Integer/parseInt port) target)))

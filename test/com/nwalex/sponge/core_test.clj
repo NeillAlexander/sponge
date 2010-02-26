@@ -23,7 +23,7 @@
 
 
 (deftest test-server
-  (let [sponge (sponge/start)
+  (let [sponge (sponge/start 8139 "http://localhost:8140")
         responder (start-app pong-app 8140)]
     (is (.isRunning sponge))
     (is (.isRunning responder))
