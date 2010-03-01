@@ -22,15 +22,19 @@
 (defn start-app [app-fn port]
   (jetty/run-jetty app-fn {:port port :join false}))
 
+(defmacro with-server
+  "Starts up a sponge server and responder, executes the body, then stops them again"
+  [server & body]
+  `(let [server# ~server
+         responder# (start-app pong-app 8150)]
+     (is (server/running? server#))
+     (is (.isRunning responder#))
+     (do ~@body)
+     (server/stop server#)
+     (.stop responder#)
+     (is (not (server/running? server#)))
+     (is (not (.isRunning responder#)))))
 
 (deftest test-server
-  (let [server (core/-main "--port" "8149" "--target" "http://localhost:8150")
-        responder (start-app pong-app 8150)]
-    (is (server/running? server))
-    (is (.isRunning responder))
-    (is (.startsWith (http/send-request "hello" "http://localhost:8149") "pong"))
-    (server/stop server)
-    (.stop responder)
-    (is (not (server/running? server)))
-    (is (not (.isRunning responder)))))
-
+  (with-server (core/-main "--port" "8149" "--target" "http://localhost:8150")
+    (is (.startsWith (http/send-request "hello" "http://localhost:8149") "pong"))))

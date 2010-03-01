@@ -19,16 +19,20 @@
   (reload/wrap-reload #(app target %1) '(com.nwalex.sponge.core)))
 
 (defn make-server
-  "Create an instance of the Sponge server"
-  [port target]
-  {:port port :target target :jetty nil})
+  "Create an instance of the Sponge server. Options are as follows:
+  :request-handlers  [f1 f2 ... fx]
+  :response-handlers [f1 f2 ... fx]"
+  [port target & opts]
+  (let [opts-map (apply array-map opts)]
+    {:port port :target target :jetty nil
+     :request-handlers (:request-handlers opts-map)
+     :response-handlers (:response-handlers opts-map)}))
 
-(defn start
-  [server]
+(defn start [server]
   (assoc server :jetty (jetty/run-jetty
-                  (with-reload-app
-                    (:target server))
-                  {:port (:port server) :join false})))
+                        (with-reload-app
+                          (:target server))
+                        {:port (:port server) :join false})))
 
 (defn stop [server]
   (.stop (:jetty server)))
