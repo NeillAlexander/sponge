@@ -23,11 +23,11 @@
 
 
 (deftest test-server
-  (let [sponge (sponge/start 8139 "http://localhost:8140")
-        responder (start-app pong-app 8140)]
+  (let [sponge (sponge/start 8149 "http://localhost:8150")
+        responder (start-app pong-app 8150)]
     (is (.isRunning sponge))
     (is (.isRunning responder))
-    (is (.startsWith (http/send-request "hello" "http://localhost:8139") "pong"))
+    (is (.startsWith (http/send-request "hello" "http://localhost:8149") "pong"))
     (.stop sponge)
     (.stop responder)
     (is (not (.isRunning sponge)))

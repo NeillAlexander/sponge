@@ -1,24 +1,17 @@
 (ns com.nwalex.sponge.http
-  (:import
-   [org.apache.commons.httpclient HttpClient]
-   [org.apache.commons.httpclient.methods PostMethod StringRequestEntity])
   (:require
    [clojure.contrib.duck-streams :as ds]
-   [clojure.contrib.logging :as log]))
+   [clojure.contrib.logging :as log]
+   [clojure.contrib.http.agent :as http]))
 
 (defn send-request
-  "Creates a PostMethod setting the body to text, and sends to address"
+  "Sends a http request to address with text as the body"
   [text address]
-  (let [client (HttpClient.)
-        post (PostMethod. address)]
-    (.setRequestEntity post
-                       (StringRequestEntity. text "text/xml" "utf-8"))
-    (try
-     (do
-       (.executeMethod client post)
-       (String. (.getResponseBody post)))
-     (finally
-      (.releaseConnection post)))))
+  (http/string
+   (http/http-agent address
+                    :method "POST"
+                    :body text
+                    :headers {"Content-Type", "text/xml; charset=utf-8"})))
 
 (defn forward-request
   "Forward the soap request on to the configured host / port"

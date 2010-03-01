@@ -5,7 +5,7 @@
                  [ring "0.1.1-SNAPSHOT"]
                  [swank-clojure "1.1.0"]
                  [leiningen/lein-swank "1.1.0"]
-                 [commons-httpclient "3.1"]
+                 [commons-logging "1.1.1"]
                  [log4j "1.2.15"]]
   :namespaces (com.nwalex.sponge.core)
   :main com.nwalex.sponge.Sponge
