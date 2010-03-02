@@ -5,7 +5,7 @@
    [clojure.contrib.command-line :as cmd-line])
   (:gen-class :main true :name com.nwalex.sponge.Sponge))
 
-(defn- configure-log4j []
+(defn configure-log4j []
   (let [props (java.util.Properties.)]
     (doto props
       (.setProperty "log4j.rootLogger" "INFO, A1")

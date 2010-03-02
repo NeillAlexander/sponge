@@ -7,12 +7,20 @@
 
 (defn- handle-request [server req]
   (loop [rh (first (:request-handlers server))
-         other-rh (rest (:request-handlers server))]
+         other-rh (rest (:request-handlers server))
+         request req]
     ;; TODO: finish this logic off
-    (let [response (rh server req)]
-      (if (:return response)
-        (:return response)
-        (recur (first other-rh) (rest other-rh))))))
+    (log/info "Processing request...")
+    (let [response (rh server request)]
+      (cond
+       (:return response) (do
+                            (log/info "Returning response...")
+                            (:return response))
+       (:continue response) (do
+                              (log/info "Continuing...")
+                              (recur (first other-rh) (rest other-rh) (:continue response)))
+       (:abort response) (println "got abort")
+       :else (throw (IllegalStateException. ":return / :continue / :abort not found"))))))
 
 (defn- app [server req]  
   (handle-request server req))

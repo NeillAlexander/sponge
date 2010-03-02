@@ -6,7 +6,8 @@
                  [swank-clojure "1.1.0"]
                  [leiningen/lein-swank "1.1.0"]
                  [commons-logging "1.1.1"]
-                 [log4j "1.2.15"]]
+                 [log4j "1.2.15"]
+                 [commons-httpclient "3.1"]]
   :namespaces (com.nwalex.sponge.core)
   :main com.nwalex.sponge.Sponge
   )
