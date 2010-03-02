@@ -1,6 +1,8 @@
 (ns com.nwalex.sponge.server
   (:require
    [com.nwalex.sponge.http :as http]
+   [com.nwalex.sponge.datastore :as ds]
+   [com.nwalex.sponge.filters :as filters]
    [clojure.contrib.logging :as log]
    [ring.adapter.jetty :as jetty]
    [ring.middleware.reload :as reload]))
@@ -51,22 +53,6 @@
 (defn- with-reload-app [server]
   (reload/wrap-reload #(app server %1) '(com.nwalex.sponge.core)))
 
-(defn- forwarding-request-filter
-  "This is the default filter, the last one in the list of request filters"
-  [server exchange key]
-  (log/info "In forwarding-request-filter")
-  (let [req (:request exchange)
-        response (http/forward-request (:target server) req)]    
-    (log/info (format "Read response from: %s" (:target server)))    
-    {:return (assoc exchange :response
-                    {:status  200
-                     :headers {"Content-Type" "text/xml;charset=utf-8"}
-                     :body    response})}))
-
-(defn- returning-response-filter
-  [server exchange key]
-  {:return exchange})
-
 (defn make-server
   "Create an instance of the Sponge server. Options are as follows:
   :request-filters  [f1 f2 ... fx]
@@ -76,10 +62,12 @@
     {:port port :target target :jetty nil
      :request-filters (conj
                         (vec (:request-filters opts-map))
-                        forwarding-request-filter)
+                        filters/forwarding-request-filter)
      :response-filters (conj
-                         (vec (:response-filters opts-map))
-                         returning-response-filter)}))
+                        (vec (:response-filters opts-map))
+                        filters/datastore-filter
+                        filters/returning-response-filter)
+     :datastore (ds/make-datastore)}))
 
 (defn start [server]
   (assoc server :jetty (jetty/run-jetty
