@@ -64,17 +64,42 @@
     (is (= 4 (count (:request-handlers server))))
     (is (= 3 (count (:response-handlers server))))))
 
+(defn- cont [flag-atom server req]
+  (swap! flag-atom (fn [old] true))
+  {:continue req})
+
 (deftest test-continue
-  (let [called (atom false)]    
-    (letfn [(cont1
-             [server req]
-             (swap! called (fn [old] true))
-             {:continue req})]
-      (let [server (server/make-server
+  (let [called1 (atom false)
+        called2 (atom false)
+        called3 (atom false)
+        cont1 (partial cont called1)
+        cont2 (partial cont called2)
+        cont3 (partial cont called3)
+        server (server/make-server
                     8149
                     "http://localhost:8150"
-                    :request-handlers [cont1])]
-        (with-responder server
-          (is (.startsWith (http/send-request
-                            "hello" "http://localhost:8149") "pong"))
-          (is @called))))))
+                    :request-handlers [cont1 cont2 cont3])]    
+    (with-responder server
+      (is (.startsWith (http/send-request
+                        "hello" "http://localhost:8149") "pong"))
+      (is @called1)
+      (is @called2)
+      (is @called3))))
+
+(defn- abort [flag-atom server req]
+  (swap! flag-atom (fn [old] true))
+  {:abort req})
+
+(deftest test-abort
+  (let [called1 (atom false)
+        called2 (atom false)
+        abort1 (partial abort called1)
+        abort2 (partial abort called2)
+        server (server/make-server
+                    8149
+                    "http://localhost:8150"
+                    :request-handlers [abort1 abort2])]
+    (with-responder server
+      (http/send-request "hello" "http://localhost:8149")
+      (is @called1)
+      (is (not @called2)))))
