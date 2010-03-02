@@ -47,7 +47,9 @@
                         {:port (:port server) :join false})))
 
 (defn stop [server]
-  (.stop (:jetty server)))
+  (if (:jetty server) (.stop (:jetty server))))
 
 (defn running? [server]
-  (.isRunning (:jetty server)))
+  (if (:jetty server)
+    (.isRunning (:jetty server))
+    false))

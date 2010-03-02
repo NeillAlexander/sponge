@@ -25,19 +25,25 @@
 (defmacro with-responder
   "Starts up a sponge server and responder, executes the body, then stops them again"
   [server & body]
-  `(let [server# ~server
+  `(let [server# (if (not (server/running? ~server))
+                   (server/start ~server)
+                   ~server)
          responder# (start-app pong-app 8150)]
      (is (server/running? server#))
      (is (.isRunning responder#))
-     (do ~@body)
-     (server/stop server#)
-     (.stop responder#)
-     (is (not (server/running? server#)))
-     (is (not (.isRunning responder#)))))
+     (try
+      (do ~@body)
+      (finally
+       (do
+         (server/stop server#)
+         (.stop responder#)
+         (is (not (server/running? server#)))
+         (is (not (.isRunning responder#))))))))
 
 (deftest test-server
-  (with-responder (core/-main "--port" "8149" "--target" "http://localhost:8150")
-    (is (.startsWith (http/send-request "hello" "http://localhost:8149") "pong"))))
+  (let [server (core/-main "--port" "8149" "--target" "http://localhost:8150")]
+    (with-responder server
+      (is (.startsWith (http/send-request "hello" "http://localhost:8149") "pong")))))
 
 (deftest make-server-test-no-handlers
   (let [server (server/make-server 8747 "addr")]
@@ -54,3 +60,8 @@
     (is (= "addr" (:target server)))
     (is (= 4 (count (:request-handlers server))))
     (is (= 3 (count (:response-handlers server))))))
+
+(deftest test-continue
+  (let [server (server/make-server 8149 "http://localhost:8150")]    
+    (with-responder server
+      (is true))))
