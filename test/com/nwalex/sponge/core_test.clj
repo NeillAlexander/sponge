@@ -45,8 +45,10 @@
   (let [server (core/-main "--port" "8149"
                            "--target" "http://localhost:8150")]
     (with-responder server
-      (is (.startsWith (http/send-request
-                        "hello" "http://localhost:8149") "pong")))))
+      (let [response (http/send-request
+                      "hello" "http://localhost:8149")]
+        (log/info (format "test-server response = %s" response))
+        (is (.startsWith response "pong"))))))
 
 (deftest make-server-test-no-filters
   (let [server (server/make-server 8747 "addr")]
@@ -64,9 +66,9 @@
     (is (= 4 (count (:request-filters server))))
     (is (= 4 (count (:response-filters server))))))
 
-(defn- cont [flag-atom server req]
+(defn- cont [flag-atom server exchange key]
   (swap! flag-atom (fn [old] true))
-  {:continue req})
+  {:continue exchange})
 
 (deftest test-continue
   (let [called1 (atom false)
@@ -86,9 +88,9 @@
       (is @called2)
       (is @called3))))
 
-(defn- abort [flag-atom server req]
+(defn- abort [flag-atom server exchange key]
   (swap! flag-atom (fn [old] true))
-  {:abort req})
+  {:abort exchange})
 
 (deftest test-abort
   (let [called1 (atom false)

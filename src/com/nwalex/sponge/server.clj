@@ -7,21 +7,21 @@
 
 (defn- process-filters
   "Factors out the functionality common to request / response filters"
-  [filters str server req-res]
-  (loop [rh (first filters)
-         other-rh (rest filters)
-         arg req-res]
-    (log/info (format "Processing %s..." str))
-    (let [result (rh server arg)]
+  [filters server exchange exchange-key]
+  (loop [exchange-filter (first filters)
+         remaining-filters (rest filters)
+         filter-arg exchange]
+    (log/info (format "Processing %s..." exchange-key))
+    (let [result (exchange-filter server filter-arg exchange-key)]
       ;; check the responses to determine whether to continue etc
       (cond
        (:return result) (do
-                          (log/info (format "Returning %s..." str))
-                            (:return result))
+                          (log/info (format "Returning %s..." exchange-key))
+                          (:return result))
        (:continue result) (do
                               (log/info "Continuing...")
-                              (recur (first other-rh)
-                                     (rest other-rh)
+                              (recur (first remaining-filters)
+                                     (rest remaining-filters)
                                      (:continue result)))
        (:abort result) (do
                            (log/info "Aborting...")
@@ -31,16 +31,19 @@
 
 (defn- process-request
   "Processes the request passing it through the configured filters"
-  [server req]
-  (process-filters (:request-filters server) "request" server req))
+  [server exchange]
+  (process-filters (:request-filters server) server exchange :request))
 
 (defn- process-response
-  [server response]
-  (process-filters (:response-filters server) "response" server response))
+  [server exchange]
+  (process-filters (:response-filters server) server exchange :response))
 
-(defn- handle-request  
+(defn- handle-request
+  "This is the entry point for the Ring requests"
   [server req]
-  (process-response server (process-request server req)))
+  (let [exchange {:request req :response nil}
+        response (process-response server (process-request server exchange))]
+    (:response response)))
 
 (defn- app [server req]  
   (handle-request server req))
@@ -50,18 +53,19 @@
 
 (defn- forwarding-request-filter
   "This is the default filter, the last one in the list of request filters"
-  [server req]
+  [server exchange key]
   (log/info "In forwarding-request-filter")
-  (let [response (http/forward-request (:target server) req)]    
-    (log/info (format "Read response from: %s" (:target server)))
-    {:return
-     {:status  200
-      :headers {"Content-Type" "text/xml;charset=utf-8"}
-      :body    response}}))
+  (let [req (:request exchange)
+        response (http/forward-request (:target server) req)]    
+    (log/info (format "Read response from: %s" (:target server)))    
+    {:return (assoc exchange :response
+                    {:status  200
+                     :headers {"Content-Type" "text/xml;charset=utf-8"}
+                     :body    response})}))
 
 (defn- returning-response-filter
-  [server response]
-  {:return response})
+  [server exchange key]
+  {:return exchange})
 
 (defn make-server
   "Create an instance of the Sponge server. Options are as follows:
