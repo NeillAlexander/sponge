@@ -5,11 +5,11 @@
    [ring.adapter.jetty :as jetty]
    [ring.middleware.reload :as reload]))
 
-(defn- process-handlers
-  "Factors out the functionality common to request / response handlers"
-  [handlers str server req-res]
-  (loop [rh (first handlers)
-         other-rh (rest handlers)
+(defn- process-filters
+  "Factors out the functionality common to request / response filters"
+  [filters str server req-res]
+  (loop [rh (first filters)
+         other-rh (rest filters)
          arg req-res]
     (log/info (format "Processing %s..." str))
     (let [result (rh server arg)]
@@ -30,13 +30,13 @@
                      ":return / :continue / :abort not found"))))))
 
 (defn- process-request
-  "Processes the request passing it through the configured handlers"
+  "Processes the request passing it through the configured filters"
   [server req]
-  (process-handlers (:request-handlers server) "request" server req))
+  (process-filters (:request-filters server) "request" server req))
 
 (defn- process-response
   [server response]
-  (process-handlers (:response-handlers server) "response" server response))
+  (process-filters (:response-filters server) "response" server response))
 
 (defn- handle-request  
   [server req]
@@ -48,10 +48,10 @@
 (defn- with-reload-app [server]
   (reload/wrap-reload #(app server %1) '(com.nwalex.sponge.core)))
 
-(defn- forwarding-request-handler
-  "This is the default handler, the last one in the list of request handlers"
+(defn- forwarding-request-filter
+  "This is the default filter, the last one in the list of request filters"
   [server req]
-  (log/info "In forwarding-request-handler")
+  (log/info "In forwarding-request-filter")
   (let [response (http/forward-request (:target server) req)]    
     (log/info (format "Read response from: %s" (:target server)))
     {:return
@@ -59,23 +59,23 @@
       :headers {"Content-Type" "text/xml;charset=utf-8"}
       :body    response}}))
 
-(defn- returning-response-handler
+(defn- returning-response-filter
   [server response]
   {:return response})
 
 (defn make-server
   "Create an instance of the Sponge server. Options are as follows:
-  :request-handlers  [f1 f2 ... fx]
-  :response-handlers [f1 f2 ... fx]"
+  :request-filters  [f1 f2 ... fx]
+  :response-filters [f1 f2 ... fx]"
   [port target & opts]
   (let [opts-map (apply array-map opts)]
     {:port port :target target :jetty nil
-     :request-handlers (conj
-                        (vec (:request-handlers opts-map))
-                        forwarding-request-handler)
-     :response-handlers (conj
-                         (vec (:response-handlers opts-map))
-                         returning-response-handler)}))
+     :request-filters (conj
+                        (vec (:request-filters opts-map))
+                        forwarding-request-filter)
+     :response-filters (conj
+                         (vec (:response-filters opts-map))
+                         returning-response-filter)}))
 
 (defn start [server]
   (assoc server :jetty (jetty/run-jetty

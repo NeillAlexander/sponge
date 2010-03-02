@@ -48,21 +48,21 @@
       (is (.startsWith (http/send-request
                         "hello" "http://localhost:8149") "pong")))))
 
-(deftest make-server-test-no-handlers
+(deftest make-server-test-no-filters
   (let [server (server/make-server 8747 "addr")]
     (is (= 8747 (:port server)))
     (is (= "addr" (:target server)))
-    (is (= 1 (count (:request-handlers server))))
-    (is (= 1 (count (:response-handlers server))))))
+    (is (= 1 (count (:request-filters server))))
+    (is (= 1 (count (:response-filters server))))))
 
-(deftest make-server-test-with-handlers
+(deftest make-server-test-with-filters
   (let [server (server/make-server 8747 "addr"
-                                   :request-handlers '[a b c]
-                                   :response-handlers '[d e f])]
+                                   :request-filters '[a b c]
+                                   :response-filters '[d e f])]
     (is (= 8747 (:port server)))
     (is (= "addr" (:target server)))
-    (is (= 4 (count (:request-handlers server))))
-    (is (= 4 (count (:response-handlers server))))))
+    (is (= 4 (count (:request-filters server))))
+    (is (= 4 (count (:response-filters server))))))
 
 (defn- cont [flag-atom server req]
   (swap! flag-atom (fn [old] true))
@@ -78,7 +78,7 @@
         server (server/make-server
                     8149
                     "http://localhost:8150"
-                    :request-handlers [cont1 cont2 cont3])]    
+                    :request-filters [cont1 cont2 cont3])]    
     (with-responder server
       (is (.startsWith (http/send-request
                         "hello" "http://localhost:8149") "pong"))
@@ -98,7 +98,7 @@
         server (server/make-server
                     8149
                     "http://localhost:8150"
-                    :request-handlers [abort1 abort2])]
+                    :request-filters [abort1 abort2])]
     (with-responder server
       (http/send-request "hello" "http://localhost:8149")
       (is @called1)
