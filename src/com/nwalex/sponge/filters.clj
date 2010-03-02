@@ -13,7 +13,7 @@
 (defn datastore-filter
   "Stores the exchanges for future reference"
   [server exchange key]
-  (ds/add-exchange (:datastore server) exchange)
+  (ds/add-exchange server exchange)
   {:continue exchange})
 
 (defn forwarding-request-filter

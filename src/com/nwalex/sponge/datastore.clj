@@ -1,10 +1,10 @@
 (ns com.nwalex.sponge.datastore)
 
-(defn make-datastore []
-  (ref []))
+(defn make-datastore [server]
+  (assoc server :datastore (agent [])))
 
-(defn add-exchange [datastore exchange]
-  (dosync (commute datastore conj exchange)))
+(defn add-exchange [server exchange]
+  (send-off (:datastore server) conj exchange))
 
-(defn get-exchanges [datastore]
-  (deref datastore))
+(defn get-exchanges [server]
+  (deref (:datastore server)))

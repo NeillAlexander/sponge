@@ -58,16 +58,16 @@
   :request-filters  [f1 f2 ... fx]
   :response-filters [f1 f2 ... fx]"
   [port target & opts]
-  (let [opts-map (apply array-map opts)]
-    {:port port :target target :jetty nil
+  (let [opts-map (apply array-map opts)
+        server {:port port :target target :jetty nil
      :request-filters (conj
                         (vec (:request-filters opts-map))
                         filters/forwarding-request-filter)
      :response-filters (conj
                         (vec (:response-filters opts-map))
                         filters/datastore-filter
-                        filters/returning-response-filter)
-     :datastore (ds/make-datastore)}))
+                        filters/returning-response-filter)}]
+    (ds/make-datastore server)))
 
 (defn start [server]
   (assoc server :jetty (jetty/run-jetty
