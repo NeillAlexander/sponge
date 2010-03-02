@@ -42,17 +42,13 @@
          (is (not (.isRunning responder#))))))))
 
 (deftest test-server
-  (core/configure-log4j)
   (let [server (core/-main "--port" "8149"
                            "--target" "http://localhost:8150")]
     (with-responder server
-      (println "Checking response for test-server")
       (is (.startsWith (http/send-request
-                        "hello" "http://localhost:8149") "pong"))
-      (println "Done on the server"))))
+                        "hello" "http://localhost:8149") "pong")))))
 
 (deftest make-server-test-no-handlers
-  (core/configure-log4j)
   (let [server (server/make-server 8747 "addr")]
     (is (= 8747 (:port server)))
     (is (= "addr" (:target server)))
@@ -60,7 +56,6 @@
     (is (= 0 (count (:response-handlers server))))))
 
 (deftest make-server-test-with-handlers
-  (core/configure-log4j)
   (let [server (server/make-server 8747 "addr"
                                    :request-handlers '[a b c]
                                    :response-handlers '[d e f])]
@@ -70,7 +65,6 @@
     (is (= 3 (count (:response-handlers server))))))
 
 (deftest test-continue
-  (core/configure-log4j)
   (let [called (atom false)]    
     (letfn [(cont1
              [server req]
