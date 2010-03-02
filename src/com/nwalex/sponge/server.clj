@@ -5,26 +5,42 @@
    [ring.adapter.jetty :as jetty]
    [ring.middleware.reload :as reload]))
 
-(defn- handle-request [server req]
-  (loop [rh (first (:request-handlers server))
-         other-rh (rest (:request-handlers server))
-         request req]
-    (log/info "Processing request...")
-    (let [response (rh server request)]
+(defn- process-handlers
+  "Factors out the functionality common to request / response handlers"
+  [handlers str server req-res]
+  (loop [rh (first handlers)
+         other-rh (rest handlers)
+         arg req-res]
+    (log/info (format "Processing %s..." str))
+    (let [result (rh server arg)]
+      ;; check the responses to determine whether to continue etc
       (cond
-       (:return response) (do
-                            (log/info "Returning response...")
-                            (:return response))
-       (:continue response) (do
+       (:return result) (do
+                          (log/info (format "Returning %s..." str))
+                            (:return result))
+       (:continue result) (do
                               (log/info "Continuing...")
                               (recur (first other-rh)
                                      (rest other-rh)
-                                     (:continue response)))
-       (:abort response) (do
+                                     (:continue result)))
+       (:abort result) (do
                            (log/info "Aborting...")
                            (throw (RuntimeException. "Request aborted")))
        :else (throw (IllegalStateException.
                      ":return / :continue / :abort not found"))))))
+
+(defn- process-request
+  "Processes the request passing it through the configured handlers"
+  [server req]
+  (process-handlers (:request-handlers server) "request" server req))
+
+(defn- process-response
+  [server response]
+  (process-handlers (:response-handlers server) "response" server response))
+
+(defn- handle-request  
+  [server req]
+  (process-response server (process-request server req)))
 
 (defn- app [server req]  
   (handle-request server req))
@@ -43,6 +59,10 @@
       :headers {"Content-Type" "text/xml;charset=utf-8"}
       :body    response}}))
 
+(defn- returning-response-handler
+  [server response]
+  {:return response})
+
 (defn make-server
   "Create an instance of the Sponge server. Options are as follows:
   :request-handlers  [f1 f2 ... fx]
@@ -50,8 +70,12 @@
   [port target & opts]
   (let [opts-map (apply array-map opts)]
     {:port port :target target :jetty nil
-     :request-handlers (conj (vec (:request-handlers opts-map)) forwarding-request-handler)
-     :response-handlers (vec (:response-handlers opts-map))}))
+     :request-handlers (conj
+                        (vec (:request-handlers opts-map))
+                        forwarding-request-handler)
+     :response-handlers (conj
+                         (vec (:response-handlers opts-map))
+                         returning-response-handler)}))
 
 (defn start [server]
   (assoc server :jetty (jetty/run-jetty
