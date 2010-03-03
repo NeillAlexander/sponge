@@ -7,7 +7,7 @@
    [com.nwalex.sponge.datastore :as ds]
    [clojure.contrib.logging :as log]
    [clojure.contrib.command-line :as cmd-line]
-   [swank.swank :as swank])
+   )
   (:gen-class :main true :name com.nwalex.sponge.Sponge)) 
 
 (declare *server*)
@@ -18,15 +18,19 @@
 (defn- start-repl
   "Start the server wrapped in a repl. Use this to embed swank in your code."
   ([port]
-     (let [stop (atom false)]
-       (repl :read (fn [rprompt rexit]
-                     (if @stop rexit
-                         (do (swap! stop (fn [_] true))
-                             `(do (swank/ignore-protocol-version nil)
-                                  (swank/start-server "slime-port.txt"
-                                                :encoding "iso-latin-1-unix"
-                                                :port ~port)))))
-             :need-prompt #(identity false))))
+     ;; had to do this using eval because of bug when pre-compiling
+     ;; (or something). This way means we still have the functionality
+     ;; but don't have slow compile time or strange hanging on --help
+     (eval (let [stop (atom false)]
+             (require 'swank.swank)
+             (repl :read (fn [rprompt rexit]
+                           (if @stop rexit
+                               (do (swap! stop (fn [_] true))
+                                   `(do (swank.swank/ignore-protocol-version nil)
+                                        (swank.swank/start-server "slime-port.txt"
+                                                            :encoding "iso-latin-1-unix"
+                                                            :port ~port)))))
+                   :need-prompt #(identity false)))))
   ([] (start-repl 4005)))
 
 (defn -main [& args]  
