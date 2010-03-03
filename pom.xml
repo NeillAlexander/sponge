@@ -25,8 +25,8 @@
   </repositories>
 
   <modules>
-    <module>sponge-server</module>
-    <module>sponge-gui</module>
+    <module>server</module>
+    <module>gui</module>
   </modules>
 
   <dependencies>
