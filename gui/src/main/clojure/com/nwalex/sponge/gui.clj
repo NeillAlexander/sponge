@@ -5,9 +5,11 @@
 
 (declare action-map)
 
+;; the currently running server
 (def current-server (atom nil))
+(def gui-frame (atom nil))
 
-(defn- update-server [old new]
+(defn- set-new-atom [old new]
   new)
 
 (defn- toggle-action [action]
@@ -18,19 +20,20 @@
   (toggle-action (:start-server action-map)))
 
 (defn- start-server []
-  (swap! current-server update-server
+  (swap! current-server set-new-atom
          (server/start (server/make-server
                         8139
                         "http://localhost:8141")))
   (toggle-started))
 
-(defn- stop-server []
-  (println "Stopping server...")
+(defn- stop-server []  
   (server/stop @current-server)
   (toggle-started)
-  (swap! current-server update-server nil))
+  (swap! current-server set-new-atom nil))
 
-(defn- configure [])
+(defn- configure []
+  (doto (com.nwalex.sponge.gui.ConfigurationDialog. @gui-frame true)
+    (.setVisible true)))
 
 (defn- exit [])
 
@@ -53,6 +56,7 @@
                      (getExitAction [] (:exit action-map))))
 
 (defn -main [& args]
-  (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)
-    (.setVisible true)
-    (.setTitle "Sponge")))
+  (swap! gui-frame set-new-atom
+         (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)
+           (.setVisible true)
+           (.setTitle "Sponge"))))
