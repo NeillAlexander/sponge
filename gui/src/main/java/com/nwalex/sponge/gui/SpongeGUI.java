@@ -85,7 +85,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   }// </editor-fold>//GEN-END:initComponents
 
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
-        System.exit(0);
+        this.dispose();
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
 
