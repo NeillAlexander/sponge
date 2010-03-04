@@ -13,14 +13,25 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Start Server"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="startServerMenuItemActionPerformed"/>
-              </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="startServerMenuItem.setAction(controller.getStartServerAction());"/>
+              </AuxValues>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="stopServerMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Stop Server"/>
+              </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="stopServerMenuItem.setAction(controller.getStopServerAction());"/>
+              </AuxValues>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="configureMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Configure..."/>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="configureMenuItem.setAction(controller.getConfigureAction());"/>
+              </AuxValues>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="exitMenuItem">
               <Properties>
@@ -29,6 +40,9 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exitMenuItemActionPerformed"/>
               </Events>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="exitMenuItem.setAction(controller.getExitAction());"/>
+              </AuxValues>
             </MenuItem>
           </SubComponents>
         </Menu>

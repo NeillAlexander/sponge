@@ -37,20 +37,23 @@ public class SpongeGUI extends javax.swing.JFrame {
     menuBar = new javax.swing.JMenuBar();
     serverMenu = new javax.swing.JMenu();
     startServerMenuItem = new javax.swing.JMenuItem();
+    startServerMenuItem.setAction(controller.getStartServerAction());
+    stopServerMenuItem = new javax.swing.JMenuItem();
+    stopServerMenuItem.setAction(controller.getStopServerAction());
     configureMenuItem = new javax.swing.JMenuItem();
+    configureMenuItem.setAction(controller.getConfigureAction());
     exitMenuItem = new javax.swing.JMenuItem();
+    exitMenuItem.setAction(controller.getExitAction());
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
     serverMenu.setText("Server");
 
     startServerMenuItem.setText("Start Server");
-    startServerMenuItem.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        startServerMenuItemActionPerformed(evt);
-      }
-    });
     serverMenu.add(startServerMenuItem);
+
+    stopServerMenuItem.setText("Stop Server");
+    serverMenu.add(stopServerMenuItem);
 
     configureMenuItem.setText("Configure...");
     serverMenu.add(configureMenuItem);
@@ -85,10 +88,6 @@ public class SpongeGUI extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
-    private void startServerMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startServerMenuItemActionPerformed
-        controller.startServer(8139, "http://localhost:8140");
-    }//GEN-LAST:event_startServerMenuItemActionPerformed
-
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem configureMenuItem;
@@ -96,6 +95,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenuBar menuBar;
   private javax.swing.JMenu serverMenu;
   private javax.swing.JMenuItem startServerMenuItem;
+  private javax.swing.JMenuItem stopServerMenuItem;
   // End of variables declaration//GEN-END:variables
 
 }
