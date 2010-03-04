@@ -17,9 +17,12 @@ package com.nwalex.sponge.gui;
  */
 public class ConfigurationDialog extends javax.swing.JDialog {
 
+  private final ConfigurationDialogController controller;
+
     /** Creates new form ConfigurationDialog */
-    public ConfigurationDialog(java.awt.Frame parent, boolean modal) {
+    public ConfigurationDialog(java.awt.Frame parent, boolean modal, ConfigurationDialogController controller) {
         super(parent, modal);
+        this.controller = controller;
         initComponents();
     }
 
@@ -36,7 +39,7 @@ public class ConfigurationDialog extends javax.swing.JDialog {
     targetFieldLabel = new javax.swing.JLabel();
     portField = new javax.swing.JTextField();
     targetField = new javax.swing.JTextField();
-    jButton1 = new javax.swing.JButton();
+    cancelButton = new javax.swing.JButton();
     okButton = new javax.swing.JButton();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -47,6 +50,7 @@ public class ConfigurationDialog extends javax.swing.JDialog {
     targetFieldLabel.setText("Target");
 
     portField.setText("8139");
+    portField.setText(Integer.toString(controller.getCurrentPort()));
     portField.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         portFieldActionPerformed(evt);
@@ -54,15 +58,26 @@ public class ConfigurationDialog extends javax.swing.JDialog {
     });
 
     targetField.setText("http://localhost:8141");
+    targetField.setText(controller.getCurrentTarget());
     targetField.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         targetFieldActionPerformed(evt);
       }
     });
 
-    jButton1.setText("Cancel");
+    cancelButton.setText("Cancel");
+    cancelButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        cancelButtonActionPerformed(evt);
+      }
+    });
 
     okButton.setText("Ok");
+    okButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        okButtonActionPerformed(evt);
+      }
+    });
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
@@ -82,11 +97,11 @@ public class ConfigurationDialog extends javax.swing.JDialog {
           .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
             .addComponent(okButton)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(jButton1)))
+            .addComponent(cancelButton)))
         .addContainerGap())
     );
 
-    layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton1, okButton});
+    layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, okButton});
 
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,7 +116,7 @@ public class ConfigurationDialog extends javax.swing.JDialog {
           .addComponent(targetField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-          .addComponent(jButton1)
+          .addComponent(cancelButton)
           .addComponent(okButton))
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
@@ -117,25 +132,18 @@ public class ConfigurationDialog extends javax.swing.JDialog {
     // TODO add your handling code here:
   }//GEN-LAST:event_targetFieldActionPerformed
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                ConfigurationDialog dialog = new ConfigurationDialog(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+  private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+    controller.setConfiguration(Integer.parseInt(portField.getText()), targetField.getText());
+    this.dispose();
+  }//GEN-LAST:event_okButtonActionPerformed
+
+  private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+    this.dispose();
+  }//GEN-LAST:event_cancelButtonActionPerformed
+
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JButton jButton1;
+  private javax.swing.JButton cancelButton;
   private javax.swing.JButton okButton;
   private javax.swing.JTextField portField;
   private javax.swing.JLabel portFieldLabel;

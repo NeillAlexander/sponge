@@ -11,5 +11,5 @@ public interface SpongeGUIController {
   public Action getStartServerAction();
   public Action getStopServerAction();
   public Action getConfigureAction();
-  public Action getExitAction();
+  public Action getExitAction();  
 }
