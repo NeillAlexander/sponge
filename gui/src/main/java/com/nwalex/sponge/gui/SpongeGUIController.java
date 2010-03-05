@@ -16,4 +16,6 @@ public interface SpongeGUIController {
   public Action getStartReplAction();
 
   public TableModel getExchangeTableModel();
+
+  public String getDisplayDataForRow(int row);
 }

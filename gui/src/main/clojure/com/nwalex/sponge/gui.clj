@@ -30,13 +30,15 @@
 
 (def exchange-store (atom []))
 
+(defn- get-value-at [row col]
+  ((@exchange-store row) (if (= 0 col) :type :body)))
+
 (def exchange-table-model
      (proxy [javax.swing.table.AbstractTableModel] []
        (getColumnCount [] 2)
        (getColumnName [i] (if (= i 0) "Type" "Body"))
        (getRowCount [] (count @exchange-store))
-       (getValueAt [row col]
-                   ((@exchange-store row) (if (= 0 col) :type :body)))))
+       (getValueAt [row col] (get-value-at row col))))
 
 (defn- display-exchange-filter [server exchange key]
   (swap! exchange-store conj
@@ -96,7 +98,8 @@
        (getConfigureAction [] (:configure action-map))
        (getExitAction [] (:exit action-map))
        (getExchangeTableModel [] exchange-table-model)
-       (getStartReplAction [] (:start-repl action-map))))
+       (getStartReplAction [] (:start-repl action-map))
+       (getDisplayDataForRow [row] (get-value-at row 1))))
 
 (defn -main [& args]
   (swap! gui-frame set-new-atom
