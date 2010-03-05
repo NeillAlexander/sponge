@@ -9,6 +9,18 @@
   <packaging>pom</packaging>
   <name>Sponge parent</name>
 
+  <scm>
+    <connection>scm:svn:https://svn.nwalex.com/repos/main/sponge/trunk</connection>
+  </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>nwalex-releases</id>
+      <name>nwalex-releases</name>
+      <url>scp://nwalex.com:23230/home/nwalex/public_html/m2.nwalex.com/public/releases</url>
+    </repository>
+  </distributionManagement>
+
   <repositories>
     <repository>
       <id>clojure</id>
