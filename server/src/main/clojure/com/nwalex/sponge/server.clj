@@ -66,14 +66,14 @@
                         (vec (:request-filters opts-map))
                         filters/forwarding-request-filter)
      :response-filters (conj
-                        (vec (:response-filters opts-map))
-                        filters/datastore-filter
+                        (vec (:response-filters opts-map))    
                         filters/returning-response-filter)}]
-    (ds/make-datastore server)))
+    server))
 
 (defn start [server]
   (assoc server :jetty (jetty/run-jetty
-                        (with-reload-app server)
+                        ;;(with-reload-app server)
+                        (partial app server)
                         {:port (:port server) :join false})))
 
 (defn stop [server]

@@ -3,7 +3,8 @@
    [org.apache.commons.httpclient HttpClient]
    [org.apache.commons.httpclient.methods PostMethod StringRequestEntity])
   (:require   
-   [clojure.contrib.logging :as log]))
+   [clojure.contrib.logging :as log]
+   [clojure.contrib.duck-streams :as duck]))
 
 (defn send-request
   "Creates a PostMethod setting the body to text, and sends to address"
@@ -15,7 +16,7 @@
     (try
      (do
        (.executeMethod client post)
-       (String. (.getResponseBody post)))
+       (duck/slurp* (.getResponseBodyAsStream post)))
      (finally
       (.releaseConnection post)))))
 

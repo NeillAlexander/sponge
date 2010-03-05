@@ -73,7 +73,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     replMenuItem = new javax.swing.JMenuItem();
     replMenuItem.setAction(controller.getStartReplAction());
 
-    setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+    setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
     exchangeTable.setModel(controller.getExchangeTableModel());
     exchangeTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
