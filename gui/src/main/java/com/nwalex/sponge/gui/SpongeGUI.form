@@ -46,6 +46,21 @@
             </MenuItem>
           </SubComponents>
         </Menu>
+        <Menu class="javax.swing.JMenu" name="replMenu">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Repl"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="replMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Start Repl"/>
+              </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="replMenuItem.setAction(controller.getStartReplAction());"/>
+              </AuxValues>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
       </SubComponents>
     </Menu>
   </NonVisualComponents>

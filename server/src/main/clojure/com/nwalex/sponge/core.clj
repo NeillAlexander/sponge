@@ -15,7 +15,7 @@
 (defn get-server []
   *server*)
 
-(defn- start-repl
+(defn start-repl
   "Start the server wrapped in a repl. Use this to embed swank in your code."
   ([port]
      ;; had to do this using eval because of bug when pre-compiling

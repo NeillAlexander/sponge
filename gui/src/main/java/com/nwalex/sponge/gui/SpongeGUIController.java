@@ -13,6 +13,7 @@ public interface SpongeGUIController {
   public Action getStopServerAction();
   public Action getConfigureAction();
   public Action getExitAction();
+  public Action getStartReplAction();
 
   public TableModel getExchangeTableModel();
 }

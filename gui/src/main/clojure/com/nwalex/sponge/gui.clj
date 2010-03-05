@@ -28,8 +28,22 @@
   (toggle-action (:start-server action-map))
   (toggle-action (:configure action-map)))
 
+(def exchange-store (atom []))
+
+(def exchange-table-model
+     (proxy [javax.swing.table.AbstractTableModel] []
+       (getColumnCount [] 2)
+       (getColumnName [i] (if (= i 0) "Type" "Body"))
+       (getRowCount [] (count @exchange-store))
+       (getValueAt [row col]
+                   ((@exchange-store row) (if (= 0 col) :type :body)))))
+
 (defn- display-exchange-filter [server exchange key]
-  (println (format "Ready to display exchange for %s" key)))
+  (swap! exchange-store conj
+         {:type (if (= :request key) "Request" "Response")
+          :body (:body (key exchange))})
+  (.fireTableDataChanged exchange-table-model)
+  {:continue exchange})
 
 (defn- start-server []
   (swap! current-server set-new-atom
@@ -45,6 +59,10 @@
   (toggle-started)
   (swap! current-server set-new-atom nil))
 
+(defn- start-repl []
+  (core/start-repl 4006)
+  (toggle-action (:start-repl action-map)))
+
 (def config-controller
      (proxy [com.nwalex.sponge.gui.ConfigurationDialogController] []
        (setConfiguration [port target] (set-config port target))
@@ -56,25 +74,20 @@
     (.setLocationRelativeTo @gui-frame)
     (.setVisible true)))
 
-(defn- exit [])
+(defn- exit []
+  (System/exit 1))
 
 (defn- make-action [name f enabled]
   (doto (proxy [javax.swing.AbstractAction] [name]
           (actionPerformed [event] (f)))
     (.setEnabled enabled)))
 
-(def exchange-table-model
-     (proxy [javax.swing.table.AbstractTableModel] []
-       (getColumnCount [] 2)
-       (getColumnName [i] (if (= i 0) "Type" "Body"))
-       (getRowCount [] 1)
-       (getValueAt [row col] "Test")))
-
 (def action-map
      {:start-server (make-action "Start Server" start-server true)
       :stop-server (make-action "Stop Server" stop-server false)
       :configure (make-action "Configure" configure true)
-      :exit (make-action "Exit" exit true)})
+      :exit (make-action "Exit" exit true)
+      :start-repl (make-action "Start Repl" start-repl true)})
 
 (def sponge-controller
      (proxy [com.nwalex.sponge.gui.SpongeGUIController] []
@@ -82,7 +95,8 @@
        (getStopServerAction [] (:stop-server action-map))
        (getConfigureAction [] (:configure action-map))
        (getExitAction [] (:exit action-map))
-       (getExchangeTableModel [] exchange-table-model)))
+       (getExchangeTableModel [] exchange-table-model)
+       (getStartReplAction [] (:start-repl action-map))))
 
 (defn -main [& args]
   (swap! gui-frame set-new-atom

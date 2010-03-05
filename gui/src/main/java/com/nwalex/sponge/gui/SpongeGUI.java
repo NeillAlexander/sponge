@@ -46,6 +46,9 @@ public class SpongeGUI extends javax.swing.JFrame {
     configureMenuItem.setAction(controller.getConfigureAction());
     exitMenuItem = new javax.swing.JMenuItem();
     exitMenuItem.setAction(controller.getExitAction());
+    replMenu = new javax.swing.JMenu();
+    replMenuItem = new javax.swing.JMenuItem();
+    replMenuItem.setAction(controller.getStartReplAction());
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -73,6 +76,13 @@ public class SpongeGUI extends javax.swing.JFrame {
 
     menuBar.add(serverMenu);
 
+    replMenu.setText("Repl");
+
+    replMenuItem.setText("Start Repl");
+    replMenu.add(replMenuItem);
+
+    menuBar.add(replMenu);
+
     setJMenuBar(menuBar);
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -98,9 +108,10 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenuItem configureMenuItem;
   private javax.swing.JTable exchangeTable;
   private javax.swing.JMenuItem exitMenuItem;
-  private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JMenuBar menuBar;
+  private javax.swing.JMenu replMenu;
+  private javax.swing.JMenuItem replMenuItem;
   private javax.swing.JMenu serverMenu;
   private javax.swing.JMenuItem startServerMenuItem;
   private javax.swing.JMenuItem stopServerMenuItem;
