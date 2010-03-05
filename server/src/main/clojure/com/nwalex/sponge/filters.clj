@@ -23,10 +23,7 @@
   (let [req (:request exchange)
         response (http/forward-request (:target server) req)]    
     (log/info (format "Read response from: %s" (:target server)))    
-    {:return (assoc exchange :response
-                    {:status  200
-                     :headers {"Content-Type" "text/xml;charset=utf-8"}
-                     :body    response})}))
+    {:return (assoc exchange :response response)}))
 
 (defn returning-response-filter
   "Identity filter - just returns the exchange"

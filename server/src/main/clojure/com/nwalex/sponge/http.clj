@@ -15,8 +15,10 @@
                        (StringRequestEntity. text "text/xml" "utf-8"))
     (try
      (do
-       (.executeMethod client post)
-       (duck/slurp* (.getResponseBodyAsStream post)))
+       (.executeMethod client post)       
+       {:status (.getStatusCode post)
+        :headers {"Content-Type" "text/xml; charset=utf-8"}
+        :body (duck/slurp* (.getResponseBodyAsStream post))})
      (finally
       (.releaseConnection post)))))
 
