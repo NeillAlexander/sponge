@@ -28,11 +28,16 @@
   (toggle-action (:start-server action-map))
   (toggle-action (:configure action-map)))
 
+(defn- display-exchange-filter [server exchange key]
+  (println (format "Ready to display exchange for %s" key)))
+
 (defn- start-server []
   (swap! current-server set-new-atom
          (server/start (server/make-server
                         @port
-                        @target)))
+                        @target
+                        :request-filters [display-exchange-filter]
+                        :response-filters [display-exchange-filter])))
   (toggle-started))
 
 (defn- stop-server []  
