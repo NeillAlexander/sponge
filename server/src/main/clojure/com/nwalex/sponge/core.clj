@@ -8,7 +8,7 @@
    [clojure.contrib.logging :as log]
    [clojure.contrib.command-line :as cmd-line]
    )
-  (:gen-class :main true :name com.nwalex.sponge.Sponge)) 
+  (:gen-class :main true :name com.nwalex.sponge.Server)) 
 
 (declare *server*)
 

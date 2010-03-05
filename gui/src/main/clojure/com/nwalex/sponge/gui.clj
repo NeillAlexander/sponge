@@ -1,7 +1,8 @@
 (ns com.nwalex.sponge.gui
   (:require
    [com.nwalex.sponge.server :as server]
-   [com.nwalex.sponge.core :as core]))
+   [com.nwalex.sponge.core :as core])
+  (:gen-class :main true :name com.nwalex.sponge.Client))
 
 (declare action-map)
 
@@ -17,8 +18,7 @@
 (defn- set-config [new-port new-target]
   (dosync
    (commute port set-new-atom new-port)
-   (commute target set-new-atom new-target))
-  (println (format "New config = %d %s" @port @target)))
+   (commute target set-new-atom new-target)))
 
 (defn- toggle-action [action]
   (.setEnabled action (not (.isEnabled action))))
