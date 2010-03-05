@@ -58,6 +58,13 @@
           (actionPerformed [event] (f)))
     (.setEnabled enabled)))
 
+(def exchange-table-model
+     (proxy [javax.swing.table.AbstractTableModel] []
+       (getColumnCount [] 2)
+       (getColumnName [i] (if (= i 0) "Type" "Body"))
+       (getRowCount [] 1)
+       (getValueAt [row col] "Test")))
+
 (def action-map
      {:start-server (make-action "Start Server" start-server true)
       :stop-server (make-action "Stop Server" stop-server false)
@@ -69,7 +76,8 @@
        (getStartServerAction [] (:start-server action-map))
        (getStopServerAction [] (:stop-server action-map))
        (getConfigureAction [] (:configure action-map))
-       (getExitAction [] (:exit action-map))))
+       (getExitAction [] (:exit action-map))
+       (getExchangeTableModel [] exchange-table-model)))
 
 (defn -main [& args]
   (swap! gui-frame set-new-atom

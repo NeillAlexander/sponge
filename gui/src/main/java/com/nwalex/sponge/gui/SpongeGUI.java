@@ -34,6 +34,8 @@ public class SpongeGUI extends javax.swing.JFrame {
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
+    jScrollPane2 = new javax.swing.JScrollPane();
+    exchangeTable = new javax.swing.JTable();
     menuBar = new javax.swing.JMenuBar();
     serverMenu = new javax.swing.JMenu();
     startServerMenuItem = new javax.swing.JMenuItem();
@@ -46,6 +48,9 @@ public class SpongeGUI extends javax.swing.JFrame {
     exitMenuItem.setAction(controller.getExitAction());
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+    exchangeTable.setModel(controller.getExchangeTableModel());
+    jScrollPane2.setViewportView(exchangeTable);
 
     serverMenu.setText("Server");
 
@@ -74,11 +79,11 @@ public class SpongeGUI extends javax.swing.JFrame {
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 400, Short.MAX_VALUE)
+      .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
     );
     layout.setVerticalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 279, Short.MAX_VALUE)
+      .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
     );
 
     pack();
@@ -91,7 +96,10 @@ public class SpongeGUI extends javax.swing.JFrame {
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem configureMenuItem;
+  private javax.swing.JTable exchangeTable;
   private javax.swing.JMenuItem exitMenuItem;
+  private javax.swing.JScrollPane jScrollPane1;
+  private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JMenuBar menuBar;
   private javax.swing.JMenu serverMenu;
   private javax.swing.JMenuItem startServerMenuItem;
