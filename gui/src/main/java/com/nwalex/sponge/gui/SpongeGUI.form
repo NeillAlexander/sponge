@@ -116,7 +116,7 @@
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="    exchangeTable.getSelectionModel().addListSelectionListener(&#xd;&#xa;            new ListSelectionListener() {&#xd;&#xa;&#xd;&#xa;              public void valueChanged(ListSelectionEvent e) {&#xd;&#xa;                if (e.getValueIsAdjusting()) {&#xd;&#xa;                  return;&#xd;&#xa;                }&#xd;&#xa;&#xd;&#xa;                ListSelectionModel rowSM = (ListSelectionModel) e.getSource();&#xd;&#xa;                int selectedIndex = rowSM.getMinSelectionIndex();&#xd;&#xa;                displayArea.setText(controller.getDisplayDataForRow(selectedIndex));         &#xd;&#xa;              }&#xd;&#xa;            });"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="    exchangeTable.getSelectionModel().addListSelectionListener(&#xd;&#xa;            new ListSelectionListener() {&#xd;&#xa;&#xd;&#xa;              public void valueChanged(ListSelectionEvent e) {&#xd;&#xa;                if (e.getValueIsAdjusting()) {&#xd;&#xa;                  return;&#xd;&#xa;                }&#xd;&#xa;&#xd;&#xa;                ListSelectionModel rowSM = (ListSelectionModel) e.getSource();&#xd;&#xa;                int selectedIndex = rowSM.getMinSelectionIndex();&#xd;&#xa;&#xd;&#xa;                if (selectedIndex &gt; -1) {&#xd;&#xa;                  displayArea.setText(prettyPrint(controller.getDisplayDataForRow(selectedIndex))); &#xd;&#xa;                  displayArea.setCaretPosition(0);&#xd;&#xa;                }&#xd;&#xa;              }&#xd;&#xa;            });"/>
           </AuxValues>
         </Component>
       </SubComponents>
@@ -133,6 +133,7 @@
             <Property name="columns" type="int" value="20"/>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="rows" type="int" value="5"/>
+            <Property name="autoscrolls" type="boolean" value="false"/>
           </Properties>
         </Component>
       </SubComponents>

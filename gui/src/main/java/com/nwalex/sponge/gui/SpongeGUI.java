@@ -10,9 +10,13 @@
  */
 package com.nwalex.sponge.gui;
 
+import java.io.StringWriter;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.dom4j.DocumentHelper;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
 /**
  *
@@ -26,6 +30,21 @@ public class SpongeGUI extends javax.swing.JFrame {
   public SpongeGUI(SpongeGUIController controller) {
     this.controller = controller;
     initComponents();
+  }
+
+  public String prettyPrint(final String xml) {
+    final StringWriter sw;
+
+    try {
+      final OutputFormat format = OutputFormat.createPrettyPrint();
+      final org.dom4j.Document document = DocumentHelper.parseText(xml);
+      sw = new StringWriter();
+      final XMLWriter writer = new XMLWriter(sw, format);
+      writer.write(document);
+    } catch (Exception e) {
+      throw new RuntimeException("Error pretty printing xml:\n" + xml, e);
+    }
+    return sw.toString();
   }
 
   /** This method is called from within the constructor to
@@ -68,7 +87,11 @@ public class SpongeGUI extends javax.swing.JFrame {
 
           ListSelectionModel rowSM = (ListSelectionModel) e.getSource();
           int selectedIndex = rowSM.getMinSelectionIndex();
-          displayArea.setText(controller.getDisplayDataForRow(selectedIndex));         
+
+          if (selectedIndex > -1) {
+            displayArea.setText(prettyPrint(controller.getDisplayDataForRow(selectedIndex))); 
+            displayArea.setCaretPosition(0);
+          }
         }
       });
       jScrollPane2.setViewportView(exchangeTable);
@@ -76,6 +99,7 @@ public class SpongeGUI extends javax.swing.JFrame {
       displayArea.setColumns(20);
       displayArea.setEditable(false);
       displayArea.setRows(5);
+      displayArea.setAutoscrolls(false);
       jScrollPane1.setViewportView(displayArea);
 
       serverMenu.setText("Server");
@@ -127,7 +151,7 @@ public class SpongeGUI extends javax.swing.JFrame {
       pack();
     }// </editor-fold>//GEN-END:initComponents
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
-          this.dispose();
+      this.dispose();
     }//GEN-LAST:event_exitMenuItemActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem configureMenuItem;
