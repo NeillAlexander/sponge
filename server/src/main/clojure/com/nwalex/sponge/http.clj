@@ -2,8 +2,7 @@
   (:import
    [org.apache.commons.httpclient HttpClient]
    [org.apache.commons.httpclient.methods PostMethod StringRequestEntity])
-  (:require
-   [clojure.contrib.duck-streams :as ds]
+  (:require   
    [clojure.contrib.logging :as log]))
 
 (defn send-request
@@ -23,7 +22,7 @@
 (defn forward-request
   "Forward the soap request on to the configured host / port"
   [target req]
-  (let [xml (ds/slurp* (:body req)) 
+  (let [xml (:body req) 
         address (format "%s%s" target (:uri req))]
     (log/info (format "Sending request to: %s" address))
     (send-request xml address)))

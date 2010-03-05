@@ -4,6 +4,7 @@
    [com.nwalex.sponge.datastore :as ds]
    [com.nwalex.sponge.filters :as filters]
    [clojure.contrib.logging :as log]
+   [clojure.contrib.duck-streams :as duck]
    [ring.adapter.jetty :as jetty]
    [ring.middleware.reload :as reload]))
 
@@ -42,8 +43,9 @@
 
 (defn- handle-request
   "This is the entry point for the Ring requests"
-  [server req]
-  (let [exchange {:request req :response nil}
+  [server request]
+  (let [req (assoc request :body (duck/slurp* (:body request)))
+        exchange {:request req :response nil}
         response (process-response server (process-request server exchange))]
     (:response response)))
 
