@@ -14,5 +14,6 @@ That way multiple projects can share the same settings (useful for formatting ru
 Any value defined here will override the pom.xml file value but is only applicable to the current project.
 -->
         <org-netbeans-modules-maven-jaxws._5f_C_5f_globalweather_2e_asmx>http://www.webservicex.net/globalweather.asmx?WSDL</org-netbeans-modules-maven-jaxws._5f_C_5f_globalweather_2e_asmx>
+        <org-netbeans-modules-maven-jaxws._5f_C_5f_DictService_2e_asmx>http://services.aonaware.com/DictService/DictService.asmx?WSDL</org-netbeans-modules-maven-jaxws._5f_C_5f_DictService_2e_asmx>
     </properties>
 </project-shared-configuration>

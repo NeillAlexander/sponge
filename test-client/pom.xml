@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>sponge</artifactId>
@@ -12,106 +12,72 @@
   <version>0.1-SNAPSHOT</version>
   <name>test-client</name>
   <url>http://maven.apache.org</url>
-    <build>
-        <resources>
-            <resource>
-                <targetPath>META-INF</targetPath>
-                <directory>src</directory>
-                <includes/>
-            </resource>
-        </resources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxws-maven-plugin</artifactId>
-                <version>1.10</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>wsimport</goal>
-                        </goals>
-                        <configuration>
-                            <wsdlFiles>
-                                <wsdlFile>www.webservicex.net/globalweather.asmx.wsdl</wsdlFile>
-                            </wsdlFiles>
-                            <staleFile>${project.build.directory}/jaxws/stale/globalweather.asmx.stale</staleFile>
-                        </configuration>
-                        <id>wsimport-generate-globalweather.asmx</id>
-                        <phase>generate-sources</phase>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>javax.xml</groupId>
-                        <artifactId>webservices-api</artifactId>
-                        <version>1.4</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <sourceDestDir>${project.build.directory}/generated-sources/jaxws-wsimport</sourceDestDir>
-                    <xnocompile>true</xnocompile>
-                    <verbose>true</verbose>
-                    <extension>true</extension>
-                    <catalog>${basedir}/src/jax-ws-catalog.xml</catalog>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <repositories>
-        <repository>
-            <url>http://download.java.net/maven/2</url>
-            <id>metro</id>
-            <layout>default</layout>
-            <name>Repository for library[metro]</name>
-        </repository>
-    </repositories>
-    <dependencies>
+  <build>
+    <resources>
+      <resource>
+        <targetPath>META-INF</targetPath>
+        <directory>src</directory>
+        <includes/>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <repositories>
+    <repository>
+      <url>http://download.java.net/maven/2</url>
+      <id>metro</id>
+      <layout>default</layout>
+      <name>Repository for library[metro]</name>
+    </repository>
+  </repositories>
+  <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-        <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>webservices-rt</artifactId>
-            <version>1.4</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <artifactId>log4j</artifactId>
-            <groupId>log4j</groupId>
-            <type>jar</type>
-            <version>1.2.15</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jms</artifactId>
-                    <groupId>javax.jms</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jmxri</artifactId>
-                    <groupId>com.sun.jmx</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jmxtools</artifactId>
-                    <groupId>com.sun.jdmk</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>mail</artifactId>
-                    <groupId>javax.mail</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-    </dependencies>
+    <dependency>
+      <groupId>com.sun.xml.ws</groupId>
+      <artifactId>webservices-rt</artifactId>
+      <version>1.4</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <artifactId>log4j</artifactId>
+      <groupId>log4j</groupId>
+      <type>jar</type>
+      <version>1.2.15</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>jms</artifactId>
+          <groupId>javax.jms</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jmxri</artifactId>
+          <groupId>com.sun.jmx</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jmxtools</artifactId>
+          <groupId>com.sun.jdmk</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>mail</artifactId>
+          <groupId>javax.mail</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
 </project>
 
 
