@@ -7,6 +7,9 @@
 (def #^{:private true} target-store (ref "http://localhost:8141"))
 (def #^{:private true} exchange-store (atom []))
 
+(def #^{:private true} id-store
+     (atom (java.util.concurrent.atomic.AtomicLong.)))
+
 (defn- set-new-atom [old new]
   new)
 
@@ -39,8 +42,15 @@
 (defn config []
   {:port @port-store :target @target-store})
 
+(defn- assign-id-to [exchange]
+  (if (:id exchange)
+    exchange
+    (assoc exchange :id (.getAndIncrement @id-store))))
+
 (defn add-exchange! [server exchange key]
-  (swap! exchange-store conj
-         {:type (if (= :request key) "Request" "Response")
-          :body (:body (key exchange))})
-  (.fireTableDataChanged exchange-table-model))
+  (let [exchange-with-id (assign-id-to exchange)]
+    (swap! exchange-store conj
+           {:type (if (= :request key) "Request" "Response")
+            :body (:body (key exchange))})
+    (.fireTableDataChanged exchange-table-model)
+    exchange-with-id))
