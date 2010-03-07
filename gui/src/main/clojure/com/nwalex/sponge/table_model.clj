@@ -9,16 +9,37 @@
 (def #^{:private true} id-store
      (atom (java.util.concurrent.atomic.AtomicLong.)))
 
+(def #^{:private true} columns ["Status" "Namespace" "URL" "Soap Method"
+                                "Start" "End" "Elapsed Time (ms)"])
+
 (def #^{:private true} exchange-table-model
      (proxy [javax.swing.table.AbstractTableModel] []
-       (getColumnCount [] 2)
-       (getColumnName [i] (if (= i 0) "Type" "Body"))
+       (getColumnCount [] (count columns))
+       (getColumnName [i] (columns i))
        (getRowCount [] (count @data-id-store))
        (getValueAt [row col] (get-value-at row col))))
 
+(defn- calc-status-from [data]
+  (if (:response data) "Done" "Requesting..."))
+
+(defn- format-date [time-ms]
+  (if time-ms
+    (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss.SSS")
+             (java.util.Date. time-ms))
+    "n/a"))
+
 (defn get-value-at [row col]
   (let [data (@table-data-store (@data-id-store row))]
-    (if (= 0 col) "Exchange" "Other")))
+    (cond
+     (= col 0) (calc-status-from data)
+     (= col 1) "Ns here"
+     (= col 2) "URL here"
+     (= col 3) "soapy"
+     (= col 4) (format-date (:started data))
+     (= col 5) (format-date (:ended data))
+     (= col 6) (if (:ended data)
+                 (- (:ended data) (:started data))
+                 "n/a"))))
 
 (defn get-data-for-row [row key]
   (let [data-id (@data-id-store row)]
@@ -34,8 +55,11 @@
   [exchange key]
   (let [data (if (@table-data-store (:id exchange))
                (@table-data-store (:id exchange))               
-               {:id (:id exchange)})]
-    (assoc data key (key exchange))))
+               {:id (:id exchange)})
+        time-key (if (= :request key) :started :ended)]
+    (assoc data
+      key (key exchange)
+      time-key (System/currentTimeMillis))))
 
 (defn- not-already-saved [data]
   (not (@table-data-store (:id data))))
