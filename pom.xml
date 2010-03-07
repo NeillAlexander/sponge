@@ -34,6 +34,10 @@
       <id>clojars</id>
       <url>http://clojars.org/repo/</url>
     </repository>
+    <repository>
+      <id>nwalex-third-party</id>
+      <url>http://m2.nwalex.com/third-party</url>
+    </repository>
   </repositories>
 
   <modules>
