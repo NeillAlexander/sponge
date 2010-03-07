@@ -3,7 +3,8 @@
    [com.nwalex.sponge.gui-state :as state]
    [com.nwalex.sponge.server :as server]
    [com.nwalex.sponge.core :as core]
-   [com.nwalex.sponge.gui-filters :as filters]))
+   [com.nwalex.sponge.gui-filters :as filters]
+   [com.nwalex.sponge.table-model :as model]))
 
 (declare action-map config-controller)
 
@@ -66,9 +67,9 @@
        (getStopServerAction [] (:stop-server action-map))
        (getConfigureAction [] (:configure action-map))
        (getExitAction [] (:exit action-map))
-       (getExchangeTableModel [] state/exchange-table-model)
+       (getExchangeTableModel [] (model/get-table-model))
        (getStartReplAction [] (:start-repl action-map))
-       (getDisplayDataForRow [row] (state/get-value-at row 1))))
+       (getDisplayDataForRow [row] (model/get-value-at row 1))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)
