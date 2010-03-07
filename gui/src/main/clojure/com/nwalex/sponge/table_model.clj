@@ -5,6 +5,7 @@
 (declare get-value-at)
 
 (def #^{:private true} exchange-store (atom []))
+(def #^{:private true} table-data-store (atom {}))
 (def #^{:private true} id-store
      (atom (java.util.concurrent.atomic.AtomicLong.)))
 
@@ -16,18 +17,33 @@
        (getValueAt [row col] (get-value-at row col))))
 
 (defn get-value-at [row col]
-  ((@exchange-store row) (if (= 0 col) :type :body)))
+  (let [data (@table-data-store (@exchange-store row))]
+    (if (= 0 col) "Exchange" "Other")))
 
 (defn- assign-id-to [exchange]
   (if (:id exchange)
     exchange
     (assoc exchange :id (.getAndIncrement @id-store))))
 
+(defn- make-table-data
+  "Create the map structure for all the data"
+  [exchange key]  
+  (let [data (if (@table-data-store (:id exchange))
+               (@table-data-store (:id exchange))               
+               {:id (:id exchange)})]
+    (assoc data key {:body (key exchange)})))
+
+(defn- add-entry
+  [table-data]
+  (swap! exchange-store conj (:id table-data))
+  (swap! table-data-store assoc :id table-data))
+
 (defn add-exchange! [server exchange key]
   (let [exchange-with-id (assign-id-to exchange)]
+    (add-entry (make-table-data exchange-with-id key))
     (swap! exchange-store conj
            {:type (if (= :request key) "Request" "Response")
-            :body (:body (key exchange))})
+            :body (:body (key exchange-with-id))})
     (swing/do-swing
      (.fireTableDataChanged exchange-table-model))
     exchange-with-id))
