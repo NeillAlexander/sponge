@@ -16,7 +16,7 @@
     <dependency>
       <groupId>ring</groupId>
       <artifactId>ring</artifactId>
-      <version>0.1.1-SNAPSHOT</version>
+      <version>0.1.1-NWALEX</version>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>
