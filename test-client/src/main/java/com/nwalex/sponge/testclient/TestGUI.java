@@ -14,6 +14,7 @@ import com.aonaware.services.webservices.Definition;
 import com.aonaware.services.webservices.DictService;
 import com.aonaware.services.webservices.DictServiceSoap;
 import com.aonaware.services.webservices.WordDefinition;
+import javax.swing.SwingUtilities;
 import javax.xml.ws.BindingProvider;
 
 /**
@@ -96,26 +97,37 @@ public class TestGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_viaSpongeTextBoxActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-      DictService ds = new DictService();
 
-      DictServiceSoap soapService = ds.getDictServiceSoap12();
+      new Thread(new Runnable() {
 
-      if (viaSpongeTextBox.isSelected()) {
-        // configure sponge to point to http://services.aonaware.com
-        ((javax.xml.ws.BindingProvider) soapService).getRequestContext()
-                .put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                "http://localhost:8139//DictService/DictService.asmx");
-      }
+        @Override
+        public void run() {
+          DictService ds = new DictService();
 
-      WordDefinition wd = soapService.define(wordField.getText());
+          DictServiceSoap soapService = ds.getDictServiceSoap12();
 
-      String text = "";
-      for (Definition definition : wd.getDefinitions().getDefinition()) {
-        text += definition.getWordDefinition() + "\n";
-      }
+          if (viaSpongeTextBox.isSelected()) {
+            // configure sponge to point to http://services.aonaware.com
+            ((javax.xml.ws.BindingProvider) soapService).getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                    "http://localhost:8139//DictService/DictService.asmx");
+          }
 
-      responseArea.setText(text);
-      responseArea.setCaretPosition(0);
+          WordDefinition wd = soapService.define(wordField.getText());
+
+          final StringBuilder text = new StringBuilder("");
+          for (Definition definition : wd.getDefinitions().getDefinition()) {
+            text.append(definition.getWordDefinition()).append("\n");
+          }
+
+          SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+              responseArea.setText(text.toString());
+              responseArea.setCaretPosition(0);
+            }
+          });
+        }
+      }).start();
     }//GEN-LAST:event_jButton1ActionPerformed
 
   /**
