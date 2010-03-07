@@ -137,6 +137,7 @@
             </Property>
           </Properties>
           <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="exchangeTable = new JXTable(controller.getExchangeTableModel());"/>
             <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="    exchangeTable.getSelectionModel().addListSelectionListener(&#xd;&#xa;            new ListSelectionListener() {&#xd;&#xa;&#xd;&#xa;              public void valueChanged(ListSelectionEvent e) {&#xd;&#xa;                if (e.getValueIsAdjusting()) {&#xd;&#xa;                  return;&#xd;&#xa;                }&#xd;&#xa;&#xd;&#xa;                ListSelectionModel rowSM = (ListSelectionModel) e.getSource();&#xd;&#xa;                int selectedIndex = rowSM.getMinSelectionIndex();&#xd;&#xa;&#xd;&#xa;                if (selectedIndex &gt; -1) {&#xd;&#xa;                  requestTextArea.setText(prettyPrint(controller.getRequestDataForRow(selectedIndex))); &#xd;&#xa;                  requestTextArea.setCaretPosition(0);&#xd;&#xa;&#xd;&#xa;                  responseArea.setText(prettyPrint(controller.getResponseDataForRow(selectedIndex))); &#xd;&#xa;                  responseArea.setCaretPosition(0);&#xd;&#xa;                }&#xd;&#xa;              }&#xd;&#xa;            });"/>
           </AuxValues>
         </Component>

@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.jdesktop.swingx.JXTable;
 
 /**
  *
@@ -56,7 +57,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   private void initComponents() {
 
     jScrollPane2 = new javax.swing.JScrollPane();
-    exchangeTable = new javax.swing.JTable();
+    exchangeTable = exchangeTable = new JXTable(controller.getExchangeTableModel());
     jScrollPane1 = new javax.swing.JScrollPane();
     requestTextArea = new javax.swing.JTextArea();
     jScrollPane3 = new javax.swing.JScrollPane();
