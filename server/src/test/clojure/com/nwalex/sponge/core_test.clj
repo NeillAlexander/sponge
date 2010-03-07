@@ -49,7 +49,7 @@
       (let [response (http/send-request
                       "hello" "http://localhost:8149")]
         (log/info (format "test-server response = %s" response))
-        (is (.startsWith response "pong"))))))
+        (is (.startsWith (:body response) "pong"))))))
 
 (deftest make-server-test-no-filters
   (let [server (server/make-server 8747 "addr")]
@@ -83,8 +83,9 @@
                     "http://localhost:8150"
                     :request-filters [cont1 cont2 cont3])]    
     (with-responder server
-      (is (.startsWith (http/send-request
-                        "hello" "http://localhost:8149") "pong"))
+      (is (.startsWith (:body (http/send-request
+                               "hello" "http://localhost:8149"))
+                       "pong"))
       (is @called1)
       (is @called2)
       (is @called3))))

@@ -15,7 +15,9 @@
   "Convert the headers to the map that Ring expects"
   [post]
   (let [content-type-header (.getResponseHeader post "content-type")]
-    (reduce extract-header-value "" (.getElements content-type-header))))
+    (if content-type-header
+      (reduce extract-header-value "" (.getElements content-type-header))
+      "text/xml; charset=utf-8")))
 
 (defn send-request
   "Creates a PostMethod setting the body to text, and sends to address"
