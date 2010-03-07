@@ -53,7 +53,8 @@
       :stop-server (make-action "Stop Server" stop-server false)
       :configure (make-action "Configure" configure true)
       :exit (make-action "Exit" exit true)
-      :start-repl (make-action "Start Repl" start-repl true)})
+      :start-repl (make-action "Start Repl" start-repl true)
+      :clear-all (make-action "Clear All" model/clear true)})
 
 (def config-controller
      (proxy [com.nwalex.sponge.gui.ConfigurationDialogController] []
@@ -70,7 +71,8 @@
        (getExchangeTableModel [] (model/get-table-model))
        (getStartReplAction [] (:start-repl action-map))
        (getRequestDataForRow [row] (model/get-data-for-row row :request))
-       (getResponseDataForRow [row] (model/get-data-for-row row :response))))
+       (getResponseDataForRow [row] (model/get-data-for-row row :response))
+       (getClearAllAction [] (:clear-all action-map))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)

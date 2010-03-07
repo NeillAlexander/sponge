@@ -8,8 +8,8 @@
 
 (declare get-value-at)
 
-(def #^{:private true} data-id-store (atom []))
-(def #^{:private true} table-data-store (atom {}))
+(def #^{:private true} data-id-store (ref []))
+(def #^{:private true} table-data-store (ref {}))
 (def #^{:private true} id-store
      (atom (java.util.concurrent.atomic.AtomicLong.)))
 
@@ -85,17 +85,27 @@
 (defn- add-entry
   [table-data]
   ;; only add the id once (on request)
-  (if (not-already-saved table-data)
-    (swap! data-id-store conj (:id table-data)))
-  ;; but always update the data store
-  (swap! table-data-store assoc (:id table-data) table-data))
+  (dosync 
+   (if (not-already-saved table-data)
+     (commute data-id-store conj (:id table-data)))
+   ;; but always update the data store
+   (commute table-data-store assoc (:id table-data) table-data)))
+
+(defn- notify-data-changed []
+  (swing/do-swing
+     (.fireTableDataChanged exchange-table-model)))
 
 (defn add-exchange! [server exchange key]
   (let [exchange-with-id (assign-id-to exchange)]
     (add-entry (make-table-data exchange-with-id key))
-    (swing/do-swing
-     (.fireTableDataChanged exchange-table-model))
+    (notify-data-changed)
     exchange-with-id))
 
 (defn get-table-model []
   exchange-table-model)
+
+(defn clear []
+  (dosync
+   (ref-set data-id-store [])
+   (ref-set table-data-store {}))
+  (notify-data-changed))

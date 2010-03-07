@@ -71,6 +71,8 @@ public class SpongeGUI extends javax.swing.JFrame {
     configureMenuItem.setAction(controller.getConfigureAction());
     exitMenuItem = new javax.swing.JMenuItem();
     exitMenuItem.setAction(controller.getExitAction());
+    jMenu1 = new javax.swing.JMenu();
+    clearAllMenuItem = new javax.swing.JMenuItem();
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
     replMenuItem.setAction(controller.getStartReplAction());
@@ -132,6 +134,14 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       menuBar.add(serverMenu);
 
+      jMenu1.setText("View");
+
+      clearAllMenuItem.setText("Clear All");
+      clearAllMenuItem.setAction(controller.getClearAllAction());
+      jMenu1.add(clearAllMenuItem);
+
+      menuBar.add(jMenu1);
+
       replMenu.setText("Repl");
 
       replMenuItem.setText("Start Repl");
@@ -167,9 +177,11 @@ public class SpongeGUI extends javax.swing.JFrame {
       this.dispose();
     }//GEN-LAST:event_exitMenuItemActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JMenuItem clearAllMenuItem;
   private javax.swing.JMenuItem configureMenuItem;
   private javax.swing.JTable exchangeTable;
   private javax.swing.JMenuItem exitMenuItem;
+  private javax.swing.JMenu jMenu1;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JScrollPane jScrollPane3;
