@@ -4,7 +4,7 @@
 
 (declare get-value-at)
 
-(def #^{:private true} exchange-store (atom []))
+(def #^{:private true} data-id-store (atom []))
 (def #^{:private true} table-data-store (atom {}))
 (def #^{:private true} id-store
      (atom (java.util.concurrent.atomic.AtomicLong.)))
@@ -13,15 +13,16 @@
      (proxy [javax.swing.table.AbstractTableModel] []
        (getColumnCount [] 2)
        (getColumnName [i] (if (= i 0) "Type" "Body"))
-       (getRowCount [] (count @exchange-store))
+       (getRowCount [] (count @data-id-store))
        (getValueAt [row col] (get-value-at row col))))
 
 (defn get-value-at [row col]
-  (let [data (@table-data-store (@exchange-store row))]
+  (let [data (@table-data-store (@data-id-store row))]
     (if (= 0 col) "Exchange" "Other")))
 
 (defn get-data-for-row [row key]
-  (format "<data>Data for <row>row %d %s</row> here</data>" row key))
+  (let [data-id (@data-id-store row)]
+    (:body (key (@table-data-store data-id)))))
 
 (defn- assign-id-to [exchange]
   (if (:id exchange)
@@ -30,16 +31,22 @@
 
 (defn- make-table-data
   "Create the map structure for all the data"
-  [exchange key]  
+  [exchange key]
   (let [data (if (@table-data-store (:id exchange))
                (@table-data-store (:id exchange))               
                {:id (:id exchange)})]
-    (assoc data key {:body (key exchange)})))
+    (assoc data key (key exchange))))
+
+(defn- not-already-saved [data]
+  (not (@table-data-store (:id data))))
 
 (defn- add-entry
   [table-data]
-  (swap! exchange-store conj (:id table-data))
-  (swap! table-data-store assoc :id table-data))
+  ;; only add the id once (on request)
+  (if (not-already-saved table-data)
+    (swap! data-id-store conj (:id table-data)))
+  ;; but always update the data store
+  (swap! table-data-store assoc (:id table-data) table-data))
 
 (defn add-exchange! [server exchange key]
   (let [exchange-with-id (assign-id-to exchange)]
