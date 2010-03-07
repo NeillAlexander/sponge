@@ -4,7 +4,7 @@
 (def #^{:private true} current-server-store (atom nil))
 (def #^{:private true} gui-frame-store (atom nil))
 (def #^{:private true} port-store (ref 8139))
-(def #^{:private true} target-store (ref "http://localhost:8141"))
+(def #^{:private true} target-store (ref "http://services.aonaware.com"))
 
 (defn- set-new-atom [old new]
   new)

@@ -69,7 +69,8 @@
        (getExitAction [] (:exit action-map))
        (getExchangeTableModel [] (model/get-table-model))
        (getStartReplAction [] (:start-repl action-map))
-       (getDisplayDataForRow [row] (model/get-value-at row 1))))
+       (getRequestDataForRow [row] (model/get-data-for-row row :request))
+       (getResponseDataForRow [row] (model/get-data-for-row row :response))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)

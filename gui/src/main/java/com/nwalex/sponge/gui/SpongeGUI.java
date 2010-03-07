@@ -58,7 +58,9 @@ public class SpongeGUI extends javax.swing.JFrame {
     jScrollPane2 = new javax.swing.JScrollPane();
     exchangeTable = new javax.swing.JTable();
     jScrollPane1 = new javax.swing.JScrollPane();
-    displayArea = new javax.swing.JTextArea();
+    requestTextArea = new javax.swing.JTextArea();
+    jScrollPane3 = new javax.swing.JScrollPane();
+    responseArea = new javax.swing.JTextArea();
     menuBar = new javax.swing.JMenuBar();
     serverMenu = new javax.swing.JMenu();
     startServerMenuItem = new javax.swing.JMenuItem();
@@ -89,18 +91,25 @@ public class SpongeGUI extends javax.swing.JFrame {
           int selectedIndex = rowSM.getMinSelectionIndex();
 
           if (selectedIndex > -1) {
-            displayArea.setText(prettyPrint(controller.getDisplayDataForRow(selectedIndex))); 
-            displayArea.setCaretPosition(0);
+            requestTextArea.setText(prettyPrint(controller.getRequestDataForRow(selectedIndex))); 
+            requestTextArea.setCaretPosition(0);
+
+            responseArea.setText(prettyPrint(controller.getResponseDataForRow(selectedIndex))); 
+            responseArea.setCaretPosition(0);
           }
         }
       });
       jScrollPane2.setViewportView(exchangeTable);
 
-      displayArea.setColumns(20);
-      displayArea.setEditable(false);
-      displayArea.setRows(5);
-      displayArea.setAutoscrolls(false);
-      jScrollPane1.setViewportView(displayArea);
+      requestTextArea.setColumns(20);
+      requestTextArea.setEditable(false);
+      requestTextArea.setRows(5);
+      jScrollPane1.setViewportView(requestTextArea);
+
+      responseArea.setColumns(20);
+      responseArea.setEditable(false);
+      responseArea.setRows(5);
+      jScrollPane3.setViewportView(responseArea);
 
       serverMenu.setText("Server");
 
@@ -136,16 +145,20 @@ public class SpongeGUI extends javax.swing.JFrame {
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
-        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+        .addGroup(layout.createSequentialGroup()
+          .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+          .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE))
+        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
       );
       layout.setVerticalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
         .addGroup(layout.createSequentialGroup()
-          .addContainerGap()
-          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-          .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
+          .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)))
       );
 
       pack();
@@ -155,14 +168,16 @@ public class SpongeGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem configureMenuItem;
-  private javax.swing.JTextArea displayArea;
   private javax.swing.JTable exchangeTable;
   private javax.swing.JMenuItem exitMenuItem;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
+  private javax.swing.JScrollPane jScrollPane3;
   private javax.swing.JMenuBar menuBar;
   private javax.swing.JMenu replMenu;
   private javax.swing.JMenuItem replMenuItem;
+  private javax.swing.JTextArea requestTextArea;
+  private javax.swing.JTextArea responseArea;
   private javax.swing.JMenu serverMenu;
   private javax.swing.JMenuItem startServerMenuItem;
   private javax.swing.JMenuItem stopServerMenuItem;

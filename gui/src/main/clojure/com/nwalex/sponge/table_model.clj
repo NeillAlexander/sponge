@@ -20,6 +20,9 @@
   (let [data (@table-data-store (@exchange-store row))]
     (if (= 0 col) "Exchange" "Other")))
 
+(defn get-data-for-row [row key]
+  (format "<data>Data for <row>row %d %s</row> here</data>" row key))
+
 (defn- assign-id-to [exchange]
   (if (:id exchange)
     exchange
@@ -41,9 +44,6 @@
 (defn add-exchange! [server exchange key]
   (let [exchange-with-id (assign-id-to exchange)]
     (add-entry (make-table-data exchange-with-id key))
-    (swap! exchange-store conj
-           {:type (if (= :request key) "Request" "Response")
-            :body (:body (key exchange-with-id))})
     (swing/do-swing
      (.fireTableDataChanged exchange-table-model))
     exchange-with-id))
