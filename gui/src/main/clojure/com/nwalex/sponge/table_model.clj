@@ -1,6 +1,10 @@
 (ns com.nwalex.sponge.table-model
   (:require
-   [clojure.contrib.swing-utils :as swing]))
+   [clojure.contrib.swing-utils :as swing]
+   [clojure.contrib.zip-filter :as zipf]
+   [clojure.contrib.zip-filter.xml :as zipfx]
+   [clojure.zip :as zip]
+   [clojure.xml :as xml]))
 
 (declare get-value-at)
 
@@ -20,7 +24,7 @@
        (getValueAt [row col] (get-value-at row col))))
 
 (defn- calc-status-from [data]
-  (if (:response data) "Done" "Requesting..."))
+  (if (:response data) (:status (:response data)) "Requesting..."))
 
 (defn- format-date [time-ms]
   (if time-ms
@@ -28,13 +32,27 @@
              (java.util.Date. time-ms))
     "n/a"))
 
+;; this is a bit hacky and may break!! Relying on the fact that
+;; always have xmlns in the body and that the soap method is the
+;; name of the first child of the body. Otherwise will need smarter
+;; xml parsing here
+(defn- parse-soap [request]
+  (let [zipped (zip/xml-zip (xml/parse (java.io.ByteArrayInputStream.
+                                        (.getBytes (:body request)))))]
+    {:namespace (:xmlns (:attrs
+                           (first (:content (first (:content (first zipped)))))))
+     :soap-method (.substring (str
+                            (:tag (first (:content
+                                          (first (:content (first zipped))))))) 1)}))
+
 (defn get-value-at [row col]
-  (let [data (@table-data-store (@data-id-store row))]
+  ;; see the columns vector above
+  (let [data (@table-data-store (@data-id-store row))]    
     (cond
      (= col 0) (calc-status-from data)
-     (= col 1) "Ns here"
-     (= col 2) "URL here"
-     (= col 3) "soapy"
+     (= col 1) (:namespace (parse-soap (:request data)))
+     (= col 2) (:uri (:request data))
+     (= col 3) (:soap-method (parse-soap (:request data)))
      (= col 4) (format-date (:started data))
      (= col 5) (format-date (:ended data))
      (= col 6) (if (:ended data)
