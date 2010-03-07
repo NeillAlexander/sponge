@@ -1,4 +1,6 @@
-(ns com.nwalex.sponge.gui-state)
+(ns com.nwalex.sponge.gui-state
+  (:require
+   [clojure.contrib.swing-utils :as swing]))
 
 ;; the currently running server
 (def #^{:private true} current-server-store (atom nil))
@@ -52,5 +54,6 @@
     (swap! exchange-store conj
            {:type (if (= :request key) "Request" "Response")
             :body (:body (key exchange))})
-    (.fireTableDataChanged exchange-table-model)
+    (swing/do-swing
+     (.fireTableDataChanged exchange-table-model))
     exchange-with-id))
