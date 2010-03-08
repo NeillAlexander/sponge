@@ -103,11 +103,11 @@ public class SpongeGUI extends javax.swing.JFrame {
     replMenuItem.setAction(controller.getStartReplAction());
 
     attachLabelItem.setAction(controller.getLabelExchangeAction());
-    attachLabelItem.setText("jMenuItem2");
+    attachLabelItem.setText("Attach Label...");
     tablePopup.add(attachLabelItem);
 
     deleteLabelItem.setAction(controller.getDeleteLabelAction());
-    deleteLabelItem.setText("jMenuItem2");
+    deleteLabelItem.setText("Delete Label");
     tablePopup.add(deleteLabelItem);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);

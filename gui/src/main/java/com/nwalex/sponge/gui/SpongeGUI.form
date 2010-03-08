@@ -13,7 +13,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="controller.getLabelExchangeAction()" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="jMenuItem2"/>
+            <Property name="text" type="java.lang.String" value="Attach Label..."/>
           </Properties>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="deleteLabelItem">
@@ -21,7 +21,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="controller.getDeleteLabelAction()" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="jMenuItem2"/>
+            <Property name="text" type="java.lang.String" value="Delete Label"/>
           </Properties>
         </MenuItem>
       </SubComponents>
