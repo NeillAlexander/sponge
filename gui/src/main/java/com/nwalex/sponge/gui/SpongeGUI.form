@@ -28,6 +28,37 @@
     </Container>
     <Menu class="javax.swing.JMenuBar" name="menuBar">
       <SubComponents>
+        <Menu class="javax.swing.JMenu" name="jMenu1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="File"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="loadMenuItem">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="controller.getLoadAction()" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Load Session..."/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="saveMenuItem">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="controller.getSaveAction()" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Save Session"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="saveAsMenuItem">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="controller.getSaveAsAction()" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Save Session As..."/>
+              </Properties>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
         <Menu class="javax.swing.JMenu" name="serverMenu">
           <Properties>
             <Property name="text" type="java.lang.String" value="Server"/>

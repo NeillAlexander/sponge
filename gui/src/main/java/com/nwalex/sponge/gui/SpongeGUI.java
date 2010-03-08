@@ -85,6 +85,10 @@ public class SpongeGUI extends javax.swing.JFrame {
     jScrollPane3 = new javax.swing.JScrollPane();
     responseArea = new javax.swing.JTextArea();
     menuBar = new javax.swing.JMenuBar();
+    jMenu1 = new javax.swing.JMenu();
+    loadMenuItem = new javax.swing.JMenuItem();
+    saveMenuItem = new javax.swing.JMenuItem();
+    saveAsMenuItem = new javax.swing.JMenuItem();
     serverMenu = new javax.swing.JMenu();
     startServerMenuItem = new javax.swing.JMenuItem();
     startServerMenuItem.setAction(controller.getStartServerAction());
@@ -150,6 +154,22 @@ public class SpongeGUI extends javax.swing.JFrame {
       responseArea.setEditable(false);
       responseArea.setRows(5);
       jScrollPane3.setViewportView(responseArea);
+
+      jMenu1.setText("File");
+
+      loadMenuItem.setAction(controller.getLoadAction());
+      loadMenuItem.setText("Load Session...");
+      jMenu1.add(loadMenuItem);
+
+      saveMenuItem.setAction(controller.getSaveAction());
+      saveMenuItem.setText("Save Session");
+      jMenu1.add(saveMenuItem);
+
+      saveAsMenuItem.setAction(controller.getSaveAsAction());
+      saveAsMenuItem.setText("Save Session As...");
+      jMenu1.add(saveAsMenuItem);
+
+      menuBar.add(jMenu1);
 
       serverMenu.setText("Server");
 
@@ -232,15 +252,19 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenu deleteLabelMenuItem;
   private javax.swing.JTable exchangeTable;
   private javax.swing.JMenuItem exitMenuItem;
+  private javax.swing.JMenu jMenu1;
   private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JScrollPane jScrollPane3;
+  private javax.swing.JMenuItem loadMenuItem;
   private javax.swing.JMenuBar menuBar;
   private javax.swing.JMenu replMenu;
   private javax.swing.JMenuItem replMenuItem;
   private javax.swing.JTextArea requestTextArea;
   private javax.swing.JTextArea responseArea;
+  private javax.swing.JMenuItem saveAsMenuItem;
+  private javax.swing.JMenuItem saveMenuItem;
   private javax.swing.JMenu serverMenu;
   private javax.swing.JMenuItem startServerMenuItem;
   private javax.swing.JMenuItem stopServerMenuItem;

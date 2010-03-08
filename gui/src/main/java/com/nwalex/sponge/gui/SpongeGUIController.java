@@ -17,6 +17,9 @@ public interface SpongeGUIController {
   public Action getClearAllAction();
   public Action getLabelExchangeAction();
   public Action getDeleteLabelAction();
+  public Action getLoadAction();
+  public Action getSaveAction();
+  public Action getSaveAsAction();
 
   public TableModel getExchangeTableModel();
 

@@ -4,7 +4,9 @@
    [com.nwalex.sponge.server :as server]
    [com.nwalex.sponge.core :as core]
    [com.nwalex.sponge.gui-filters :as filters]
-   [com.nwalex.sponge.table-model :as model]))
+   [com.nwalex.sponge.table-model :as model]
+   [com.nwalex.sponge.session :as session]
+   ))
 
 (declare action-map config-controller label-controller)
 
@@ -69,7 +71,10 @@
       :start-repl (make-action "Start Repl" start-repl true)
       :clear-all (make-action "Clear All" model/clear true)
       :label-action (make-action "Attach Label..." do-label false)
-      :delete-label (make-action "Delete Label" delete-label false)})
+      :delete-label (make-action "Delete Label" delete-label false)
+      :load (make-action "Load Session..." session/load-session false)
+      :save (make-action "Save Session" session/save-session false)
+      :save-as (make-action "Save Session As..." session/save-session-as true)})
 
 (def label-controller
      (proxy [com.nwalex.sponge.gui.LabelDialogController] []
@@ -95,7 +100,10 @@
        (getClearAllAction [] (:clear-all action-map))
        (getLabelExchangeAction [] (:label-action action-map))
        (setSelectedRow [row] (update-row row))
-       (getDeleteLabelAction [] (:delete-label action-map))))
+       (getDeleteLabelAction [] (:delete-label action-map))
+       (getLoadAction [] (:load action-map))
+       (getSaveAction [] (:save action-map))
+       (getSaveAsAction [] (:save-as action-map))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)

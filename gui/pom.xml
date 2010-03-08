@@ -52,6 +52,43 @@
       <version>1.6</version>
       <type>jar</type>
     </dependency>
+    <dependency>
+      <artifactId>sponge-server</artifactId>
+      <groupId>com.nwalex</groupId>
+      <type>jar</type>
+      <version>0.2.0-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>clj-html</artifactId>
+          <groupId>clj-html</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>clj-stacktrace</artifactId>
+          <groupId>clj-stacktrace</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>clojure</artifactId>
+          <groupId>org.clojure</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>clojure</artifactId>
+      <version>1.1.0</version>
+    </dependency>
+    <dependency>
+      <artifactId>clojure-contrib</artifactId>
+      <groupId>org.clojure</groupId>
+      <type>jar</type>
+      <version>1.1.0</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>clojure</artifactId>
+          <groupId>org.clojure</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -88,6 +125,7 @@
     </plugins>
   </build>
 </project>
+
 
 
 

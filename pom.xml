@@ -88,6 +88,12 @@
       <groupId>swank-clojure</groupId>
       <artifactId>swank-clojure</artifactId>
       <version>1.1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.clojure</groupId>
+          <artifactId>clojure</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 

@@ -16,6 +16,16 @@
       <groupId>ring</groupId>
       <artifactId>ring</artifactId>
       <version>0.1.1-NWALEX</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>clj-html</artifactId>
+          <groupId>clj-html</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>clj-stacktrace</artifactId>
+          <groupId>clj-stacktrace</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>
@@ -57,4 +67,5 @@
     </plugins>
   </build>
 </project>
+
 
