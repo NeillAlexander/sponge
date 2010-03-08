@@ -10,7 +10,12 @@
  */
 package com.nwalex.sponge.gui;
 
+import java.awt.event.KeyEvent;
 import java.io.StringWriter;
+import javax.swing.InputMap;
+import javax.swing.JFrame;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -33,6 +38,14 @@ public class SpongeGUI extends javax.swing.JFrame {
   public SpongeGUI(SpongeGUIController controller) {
     this.controller = controller;
     initComponents();
+
+    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+    // set up the key handlers
+    exchangeTable.getActionMap().put("LABEL_EX", controller.getLabelExchangeAction());
+    InputMap im = exchangeTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    KeyStroke lStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L, 0);
+    im.put(lStroke, "LABEL_EX");
   }
 
   public String prettyPrint(final String xml) {
@@ -79,6 +92,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     exitMenuItem = new javax.swing.JMenuItem();
     exitMenuItem.setAction(controller.getExitAction());
     jMenu1 = new javax.swing.JMenu();
+    attachLabelMenuItem = new javax.swing.JMenuItem();
     clearAllMenuItem = new javax.swing.JMenuItem();
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
@@ -112,6 +126,7 @@ public class SpongeGUI extends javax.swing.JFrame {
           }
         }
       });
+
       jScrollPane2.setViewportView(exchangeTable);
 
       requestTextArea.setColumns(20);
@@ -145,7 +160,11 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       menuBar.add(serverMenu);
 
-      jMenu1.setText("View");
+      jMenu1.setText("Action");
+
+      attachLabelMenuItem.setText("Attach Label...");
+      attachLabelMenuItem.setAction(controller.getLabelExchangeAction());
+      jMenu1.add(attachLabelMenuItem);
 
       clearAllMenuItem.setText("Clear All");
       clearAllMenuItem.setAction(controller.getClearAllAction());
@@ -187,7 +206,9 @@ public class SpongeGUI extends javax.swing.JFrame {
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
       this.dispose();
     }//GEN-LAST:event_exitMenuItemActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JMenuItem attachLabelMenuItem;
   private javax.swing.JMenuItem clearAllMenuItem;
   private javax.swing.JMenuItem configureMenuItem;
   private javax.swing.JTable exchangeTable;
