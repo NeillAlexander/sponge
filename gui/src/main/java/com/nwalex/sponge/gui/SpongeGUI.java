@@ -18,6 +18,8 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.decorator.Highlighter;
+import org.jdesktop.swingx.decorator.HighlighterFactory;
 
 /**
  *
@@ -56,8 +58,12 @@ public class SpongeGUI extends javax.swing.JFrame {
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
+    tablePopup = new javax.swing.JPopupMenu();
+    tablePopup.add(controller.getLabelExchangeAction());
     jScrollPane2 = new javax.swing.JScrollPane();
-    exchangeTable = exchangeTable = new JXTable(controller.getExchangeTableModel());
+    exchangeTable = new JXTable(controller.getExchangeTableModel());
+    ((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});
+    ((JXTable) exchangeTable).setColumnControlVisible(true);
     jScrollPane1 = new javax.swing.JScrollPane();
     requestTextArea = new javax.swing.JTextArea();
     jScrollPane3 = new javax.swing.JScrollPane();
@@ -81,6 +87,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
     exchangeTable.setModel(controller.getExchangeTableModel());
+    exchangeTable.setComponentPopupMenu(tablePopup);
     exchangeTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
     exchangeTable.getSelectionModel().addListSelectionListener(
       new ListSelectionListener() {
@@ -93,7 +100,10 @@ public class SpongeGUI extends javax.swing.JFrame {
           ListSelectionModel rowSM = (ListSelectionModel) e.getSource();
           int selectedIndex = rowSM.getMinSelectionIndex();
 
-          if (selectedIndex > -1) {
+          controller.setSelectedRow(selectedIndex);
+
+          if (selectedIndex > -1) {                  
+
             requestTextArea.setText(prettyPrint(controller.getRequestDataForRow(selectedIndex))); 
             requestTextArea.setCaretPosition(0);
 
@@ -194,5 +204,6 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenu serverMenu;
   private javax.swing.JMenuItem startServerMenuItem;
   private javax.swing.JMenuItem stopServerMenuItem;
+  private javax.swing.JPopupMenu tablePopup;
   // End of variables declaration//GEN-END:variables
 }

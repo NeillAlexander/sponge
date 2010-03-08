@@ -15,9 +15,12 @@ public interface SpongeGUIController {
   public Action getExitAction();
   public Action getStartReplAction();
   public Action getClearAllAction();
+  public Action getLabelExchangeAction();
 
   public TableModel getExchangeTableModel();
 
   public String getRequestDataForRow(int row);
   public String getResponseDataForRow(int row);
+
+  public void setSelectedRow(int row);
 }

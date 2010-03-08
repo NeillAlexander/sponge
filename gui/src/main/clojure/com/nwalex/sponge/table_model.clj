@@ -14,7 +14,7 @@
      (atom (java.util.concurrent.atomic.AtomicLong.)))
 
 (def #^{:private true} columns ["Status" "Namespace" "URL" "Soap Method"
-                                "Start" "End" "Elapsed Time (ms)"])
+                                "Start" "End" "Time (ms)" "Label"])
 
 (def #^{:private true} exchange-table-model
      (proxy [javax.swing.table.AbstractTableModel] []
@@ -45,11 +45,14 @@
                             (:tag (first (:content
                                           (first (:content (first zipped))))))) 1)}))
 
+(defn- get-table-data-for-row [row]
+  (@table-data-store (@data-id-store row)))
+
 (defn get-value-at [row col]
   ;; see the columns vector above
-  (let [data (@table-data-store (@data-id-store row))]    
+  (let [data (get-table-data-for-row row)]    
     (cond
-     (= col 0) (calc-status-from data)
+     (= col 0) (calc-status-from data)     
      (= col 1) (:namespace (parse-soap (:request data)))
      (= col 2) (:uri (:request data))
      (= col 3) (:soap-method (parse-soap (:request data)))
@@ -57,7 +60,8 @@
      (= col 5) (format-date (:ended data))
      (= col 6) (if (:ended data)
                  (- (:ended data) (:started data))
-                 "n/a"))))
+                 "n/a")
+     (= col 7) (if (:label data) (:label data) ""))))
 
 (defn get-data-for-row [row key]
   (let [data-id (@data-id-store row)]
@@ -104,8 +108,19 @@
 (defn get-table-model []
   exchange-table-model)
 
-(defn clear []
+(defn clear [event]
   (dosync
    (ref-set data-id-store [])
    (ref-set table-data-store {}))
   (notify-data-changed))
+
+(defn set-label-on-row [label row]
+  (let [table-data (get-table-data-for-row row)]
+    (dosync
+     (commute table-data-store assoc (:id table-data)
+              (assoc table-data :label label)))
+    (notify-data-changed)))
+
+(defn get-label-for-row [row]
+  (let [data (get-table-data-for-row row)]
+    (if (:label data) (:label data) "")))

@@ -6,11 +6,11 @@
    [com.nwalex.sponge.gui-filters :as filters]
    [com.nwalex.sponge.table-model :as model]))
 
-(declare action-map config-controller)
+(declare action-map config-controller label-controller)
 
 (defn- make-action [name f enabled]
   (doto (proxy [javax.swing.AbstractAction] [name]
-          (actionPerformed [event] (f)))
+          (actionPerformed [event] (f event)))
     (.setEnabled enabled)))
 
 (defn- toggle-action [action]
@@ -21,12 +21,12 @@
   (toggle-action (:start-server action-map))
   (toggle-action (:configure action-map)))
 
-(defn- stop-server []  
+(defn- stop-server [event]  
   (server/stop (state/current-server))
   (toggle-started)
   (state/set-current-server! nil))
 
-(defn- start-server []
+(defn- start-server [event]
   (let [config (state/config)]
     (state/set-current-server! (server/start
                                 (server/make-server
@@ -36,17 +36,26 @@
                                  :response-filters [filters/display-exchange-filter]))))
   (toggle-started))
 
-(defn- start-repl []
+(defn- start-repl [event]
   (core/start-repl 4006)
   (toggle-action (:start-repl action-map)))
 
-(defn- exit []
+(defn- exit [event]
   (System/exit 1))
 
-(defn- configure []
+(defn- configure [event]
   (doto (com.nwalex.sponge.gui.ConfigurationDialog. (state/gui) true config-controller)
     (.setLocationRelativeTo (state/gui))
     (.setVisible true)))
+
+(defn- do-label [event]
+  (doto (com.nwalex.sponge.gui.LabelDialog. (state/gui) true label-controller)
+    (.setLocationRelativeTo (state/gui))
+    (.setVisible true)))
+
+(defn- update-row [row]
+  (state/set-current-row! row)
+  (.setEnabled (:label-action action-map) (state/row-selected)))
 
 (def action-map
      {:start-server (make-action "Start Server" start-server true)
@@ -54,7 +63,13 @@
       :configure (make-action "Configure" configure true)
       :exit (make-action "Exit" exit true)
       :start-repl (make-action "Start Repl" start-repl true)
-      :clear-all (make-action "Clear All" model/clear true)})
+      :clear-all (make-action "Clear All" model/clear true)
+      :label-action (make-action "Attach label..." do-label false)})
+
+(def label-controller
+     (proxy [com.nwalex.sponge.gui.LabelDialogController] []
+       (setLabel [label] (model/set-label-on-row label (state/current-row)))
+       (getCurrentLabel [] (model/get-label-for-row (state/current-row)))))
 
 (def config-controller
      (proxy [com.nwalex.sponge.gui.ConfigurationDialogController] []
@@ -72,7 +87,9 @@
        (getStartReplAction [] (:start-repl action-map))
        (getRequestDataForRow [row] (model/get-data-for-row row :request))
        (getResponseDataForRow [row] (model/get-data-for-row row :response))
-       (getClearAllAction [] (:clear-all action-map))))
+       (getClearAllAction [] (:clear-all action-map))
+       (getLabelExchangeAction [] (:label-action action-map))
+       (setSelectedRow [row] (update-row row))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)
