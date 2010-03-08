@@ -124,3 +124,6 @@
 (defn get-label-for-row [row]
   (let [data (get-table-data-for-row row)]
     (if (:label data) (:label data) "")))
+
+(defn delete-label-on-row [row]
+  (set-label-on-row nil row))

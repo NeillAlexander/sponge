@@ -36,16 +36,18 @@ public class SpongeGUI extends javax.swing.JFrame {
 
   /** Creates new form SpongeGUI */
   public SpongeGUI(SpongeGUIController controller) {
-    this.controller = controller;
+    this.controller = controller;    
     initComponents();
 
-    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+    setExtendedState(JFrame.MAXIMIZED_BOTH);
 
     // set up the key handlers
     exchangeTable.getActionMap().put("LABEL_EX", controller.getLabelExchangeAction());
+    exchangeTable.getActionMap().put("DELETE_LABEL", controller.getDeleteLabelAction());
+
     InputMap im = exchangeTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-    KeyStroke lStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L, 0);
-    im.put(lStroke, "LABEL_EX");
+    im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0), "LABEL_EX");
+    im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "DELETE_LABEL");
   }
 
   public String prettyPrint(final String xml) {
@@ -72,7 +74,8 @@ public class SpongeGUI extends javax.swing.JFrame {
   private void initComponents() {
 
     tablePopup = new javax.swing.JPopupMenu();
-    tablePopup.add(controller.getLabelExchangeAction());
+    attachLabelItem = new javax.swing.JMenuItem();
+    deleteLabelItem = new javax.swing.JMenuItem();
     jScrollPane2 = new javax.swing.JScrollPane();
     exchangeTable = new JXTable(controller.getExchangeTableModel());
     ((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});
@@ -91,12 +94,21 @@ public class SpongeGUI extends javax.swing.JFrame {
     configureMenuItem.setAction(controller.getConfigureAction());
     exitMenuItem = new javax.swing.JMenuItem();
     exitMenuItem.setAction(controller.getExitAction());
-    jMenu1 = new javax.swing.JMenu();
+    deleteLabelMenuItem = new javax.swing.JMenu();
     attachLabelMenuItem = new javax.swing.JMenuItem();
+    jMenuItem1 = new javax.swing.JMenuItem();
     clearAllMenuItem = new javax.swing.JMenuItem();
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
     replMenuItem.setAction(controller.getStartReplAction());
+
+    attachLabelItem.setAction(controller.getLabelExchangeAction());
+    attachLabelItem.setText("jMenuItem2");
+    tablePopup.add(attachLabelItem);
+
+    deleteLabelItem.setAction(controller.getDeleteLabelAction());
+    deleteLabelItem.setText("jMenuItem2");
+    tablePopup.add(deleteLabelItem);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -160,17 +172,21 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       menuBar.add(serverMenu);
 
-      jMenu1.setText("Action");
+      deleteLabelMenuItem.setText("Action");
 
       attachLabelMenuItem.setText("Attach Label...");
       attachLabelMenuItem.setAction(controller.getLabelExchangeAction());
-      jMenu1.add(attachLabelMenuItem);
+      deleteLabelMenuItem.add(attachLabelMenuItem);
+
+      jMenuItem1.setAction(controller.getDeleteLabelAction());
+      jMenuItem1.setText("Delete Label");
+      deleteLabelMenuItem.add(jMenuItem1);
 
       clearAllMenuItem.setText("Clear All");
       clearAllMenuItem.setAction(controller.getClearAllAction());
-      jMenu1.add(clearAllMenuItem);
+      deleteLabelMenuItem.add(clearAllMenuItem);
 
-      menuBar.add(jMenu1);
+      menuBar.add(deleteLabelMenuItem);
 
       replMenu.setText("Repl");
 
@@ -208,12 +224,15 @@ public class SpongeGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JMenuItem attachLabelItem;
   private javax.swing.JMenuItem attachLabelMenuItem;
   private javax.swing.JMenuItem clearAllMenuItem;
   private javax.swing.JMenuItem configureMenuItem;
+  private javax.swing.JMenuItem deleteLabelItem;
+  private javax.swing.JMenu deleteLabelMenuItem;
   private javax.swing.JTable exchangeTable;
   private javax.swing.JMenuItem exitMenuItem;
-  private javax.swing.JMenu jMenu1;
+  private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JScrollPane jScrollPane3;

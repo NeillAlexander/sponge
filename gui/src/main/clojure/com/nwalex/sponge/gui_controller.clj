@@ -53,9 +53,13 @@
     (.setLocationRelativeTo (state/gui))
     (.setVisible true)))
 
+(defn- delete-label [event]
+  (model/delete-label-on-row (state/current-row)))
+
 (defn- update-row [row]
   (state/set-current-row! row)
-  (.setEnabled (:label-action action-map) (state/row-selected)))
+  (.setEnabled (:label-action action-map) (state/row-selected))
+  (.setEnabled (:delete-label action-map) (state/row-selected)))
 
 (def action-map
      {:start-server (make-action "Start Server" start-server true)
@@ -64,7 +68,8 @@
       :exit (make-action "Exit" exit true)
       :start-repl (make-action "Start Repl" start-repl true)
       :clear-all (make-action "Clear All" model/clear true)
-      :label-action (make-action "Attach label..." do-label false)})
+      :label-action (make-action "Attach Label..." do-label false)
+      :delete-label (make-action "Delete Label" delete-label false)})
 
 (def label-controller
      (proxy [com.nwalex.sponge.gui.LabelDialogController] []
@@ -89,7 +94,8 @@
        (getResponseDataForRow [row] (model/get-data-for-row row :response))
        (getClearAllAction [] (:clear-all action-map))
        (getLabelExchangeAction [] (:label-action action-map))
-       (setSelectedRow [row] (update-row row))))
+       (setSelectedRow [row] (update-row row))
+       (getDeleteLabelAction [] (:delete-label action-map))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)
