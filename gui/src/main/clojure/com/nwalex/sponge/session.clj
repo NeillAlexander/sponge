@@ -20,12 +20,13 @@
 (defn load-session [event]
   (let [file (choose-file "Load")]
     (if file
-      (io/with-in-reader file
-        (let [persistence-map (read *in*)]          
+      (with-open [in (java.io.PushbackReader.
+                      (io/reader (java.util.zip.GZIPInputStream.
+                                  (java.io.FileInputStream. file))))]
+        (let [persistence-map (read in)]          
           (state/load-from-persistence-map (:gui-state persistence-map))
           (model/load-from-persistence-map (:table-model persistence-map))
-          (compare-and-set! session-file @session-file file))   
-        (log/info "Done"))
+          (compare-and-set! session-file @session-file file)))      
       (log/info "No file chosen"))))
 
 (defn- save-session-to-file [file]
