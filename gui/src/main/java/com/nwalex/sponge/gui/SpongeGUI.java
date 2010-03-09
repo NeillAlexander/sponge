@@ -10,6 +10,8 @@
  */
 package com.nwalex.sponge.gui;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.KeyEvent;
 import javax.swing.InputMap;
 import javax.swing.JFrame;
@@ -19,8 +21,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.decorator.ColorHighlighter;
+import org.jdesktop.swingx.decorator.ComponentAdapter;
+import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
+import org.jdesktop.swingx.decorator.PatternPredicate;
 
 /**
  *
@@ -32,7 +38,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
   /** Creates new form SpongeGUI */
   public SpongeGUI(SpongeGUIController controller) {
-    this.controller = controller;    
+    this.controller = controller;
     initComponents();
 
     setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -46,6 +52,11 @@ public class SpongeGUI extends javax.swing.JFrame {
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0), "LABEL_EX");
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "DELETE_LABEL");
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "DEFAULT_RESPONSE");
+
+    // add highlighter to table
+    ((JXTable) exchangeTable).addHighlighter(new ColorHighlighter(
+            new PatternPredicate("R", 7),
+            new Color(213, 234, 212), Color.BLACK));
   }
 
   /** This method is called from within the constructor to
@@ -230,7 +241,6 @@ public class SpongeGUI extends javax.swing.JFrame {
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
       this.dispose();
     }//GEN-LAST:event_exitMenuItemActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem attachLabelItem;
   private javax.swing.JMenuItem attachLabelMenuItem;
