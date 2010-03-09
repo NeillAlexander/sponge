@@ -30,11 +30,14 @@
 
 (defn- save-session-to-file [file]
   (if file
-    (let [persistence-map {}]
+    (let [persistence-map (assoc {}
+                            :gui-state (state/get-persistence-map)
+                            :table-model (model/get-persistence-map))]
       (log/info (format "Ready to save in file %s" file))
-      (io/spit file (assoc persistence-map
-                      :gui-state (state/get-persistence-map)
-                      :table-model (model/get-persistence-map)))
+      (with-open [out (io/writer (java.io.BufferedOutputStream.
+                                  (java.util.zip.GZIPOutputStream.
+                                   (java.io.FileOutputStream. file))))]
+        (.write out (str persistence-map)))      
       (compare-and-set! session-file @session-file file)
       (log/info "Done"))      
     (log/info "No file chosen")))
