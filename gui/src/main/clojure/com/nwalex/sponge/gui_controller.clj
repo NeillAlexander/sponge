@@ -64,6 +64,10 @@
   (.setEnabled (:label-action action-map) (state/row-selected))
   (.setEnabled (:delete-label action-map) (state/row-selected)))
 
+(defn- wrap-session-action [f event]
+  (f event)
+  (.setEnabled (:save action-map) (session/has-file)))
+
 (def action-map
      {:start-server (make-action "Start Server" start-server true)
       :stop-server (make-action "Stop Server" stop-server false)
@@ -73,9 +77,12 @@
       :clear-all (make-action "Clear All" model/clear true)
       :label-action (make-action "Attach Label..." do-label false)
       :delete-label (make-action "Delete Label" delete-label false)
-      :load (make-action "Load Session..." session/load-session true)
+      :load (make-action "Load Session..."
+                         #(wrap-session-action session/load-session %1) true)
       :save (make-action "Save Session" session/save-session false)
-      :save-as (make-action "Save Session As..." session/save-session-as true)})
+      :save-as (make-action "Save Session As..."
+                            #(wrap-session-action session/save-session-as %1)
+                            true)})
 
 (def label-controller
      (proxy [com.nwalex.sponge.gui.LabelDialogController] []

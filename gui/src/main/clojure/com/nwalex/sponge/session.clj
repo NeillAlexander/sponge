@@ -5,6 +5,11 @@
    [clojure.contrib.logging :as log]
    [clojure.contrib.duck-streams :as io]))
 
+(def #^{:private true} session-file (atom nil))
+
+(defn has-file []
+  (not (nil? @session-file)))
+
 (defn- choose-file [text]
   (let [file-chooser (doto (javax.swing.JFileChooser.)
                        (.setApproveButtonText text))
@@ -18,20 +23,25 @@
       (io/with-in-reader file
         (let [persistence-map (read *in*)]          
           (state/load-from-persistence-map (:gui-state persistence-map))
-          (model/load-from-persistence-map (:table-model persistence-map)))
+          (model/load-from-persistence-map (:table-model persistence-map))
+          (compare-and-set! session-file @session-file file))   
         (log/info "Done"))
       (log/info "No file chosen"))))
 
+(defn- save-session-to-file [file]
+  (if file
+    (let [persistence-map {}]
+      (log/info (format "Ready to save in file %s" file))
+      (io/spit file (assoc persistence-map
+                      :gui-state (state/get-persistence-map)
+                      :table-model (model/get-persistence-map)))
+      (compare-and-set! session-file @session-file file)
+      (log/info "Done"))      
+    (log/info "No file chosen")))
+
 (defn save-session [event]
-  (log/info "Ready to save session"))
+  (save-session-to-file @session-file))
 
 (defn save-session-as [event]
   (let [file (choose-file "Save")]
-    (if file
-      (let [persistence-map {}]
-        (log/info (format "Ready to save in file %s" file))
-        (io/spit file (assoc persistence-map
-                        :gui-state (state/get-persistence-map)
-                        :table-model (model/get-persistence-map)))
-        (log/info "Done"))      
-      (log/info "No file chosen"))))
+    (save-session-to-file file)))
