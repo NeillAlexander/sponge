@@ -15,12 +15,11 @@
 (defn load-session [event]
   (let [file (choose-file "Load")]
     (if file
-      (let [persistence-map {}]
-        (log/info (format "Ready to load from file %s" file))
-        ;(io/spit file (assoc persistence-map
-        ;                :gui-state (state/get-persistence-map)
-        ;                :table-model (model/get-persistence-map)))
-        (log/info "Done"))      
+      (io/with-in-reader file
+        (let [persistence-map (read *in*)]          
+          (state/load-from-persistence-map (:gui-state persistence-map))
+          (model/load-from-persistence-map (:table-model persistence-map)))
+        (log/info "Done"))
       (log/info "No file chosen"))))
 
 (defn save-session [event]
