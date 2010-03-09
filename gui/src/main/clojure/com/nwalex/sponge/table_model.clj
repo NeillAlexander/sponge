@@ -28,8 +28,8 @@
   {:data-id-store @data-id-store :table-data-store @table-data-store
    :id-store-value (.get @id-store)})
 
-(defn load-from-persistence-map [persistence-map]
-  (dosync
+(defn load-from-persistence-map [persistence-map]  
+  (dosync   
    (ref-set data-id-store (:data-id-store persistence-map))
    (ref-set table-data-store (:table-data-store persistence-map))
    (ref-set id-store (java.util.concurrent.atomic.AtomicLong.

@@ -38,7 +38,8 @@
       (with-open [out (io/writer (java.io.BufferedOutputStream.
                                   (java.util.zip.GZIPOutputStream.
                                    (java.io.FileOutputStream. file))))]
-        (.write out (str persistence-map)))      
+        (.write out (str persistence-map))
+        (.write out "\n"))      
       (compare-and-set! session-file @session-file file)
       (log/info "Done"))      
     (log/info "No file chosen")))
