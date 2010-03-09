@@ -11,7 +11,6 @@
 package com.nwalex.sponge.gui;
 
 import java.awt.event.KeyEvent;
-import java.io.StringWriter;
 import javax.swing.InputMap;
 import javax.swing.JFrame;
 import javax.swing.JTable;
@@ -19,9 +18,6 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.dom4j.DocumentHelper;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
@@ -48,21 +44,6 @@ public class SpongeGUI extends javax.swing.JFrame {
     InputMap im = exchangeTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0), "LABEL_EX");
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "DELETE_LABEL");
-  }
-
-  public String prettyPrint(final String xml) {
-    final StringWriter sw;
-
-    try {
-      final OutputFormat format = OutputFormat.createPrettyPrint();
-      final org.dom4j.Document document = DocumentHelper.parseText(xml);
-      sw = new StringWriter();
-      final XMLWriter writer = new XMLWriter(sw, format);
-      writer.write(document);
-    } catch (Exception e) {
-      throw new RuntimeException("Error pretty printing xml:\n" + xml, e);
-    }
-    return sw.toString();
   }
 
   /** This method is called from within the constructor to
@@ -134,10 +115,10 @@ public class SpongeGUI extends javax.swing.JFrame {
 
           if (selectedIndex > -1) {                  
 
-            requestTextArea.setText(prettyPrint(controller.getRequestDataForRow(selectedIndex))); 
+            requestTextArea.setText(controller.getRequestDataForRow(selectedIndex)); 
             requestTextArea.setCaretPosition(0);
 
-            responseArea.setText(prettyPrint(controller.getResponseDataForRow(selectedIndex))); 
+            responseArea.setText(controller.getResponseDataForRow(selectedIndex)); 
             responseArea.setCaretPosition(0);
           }
         }

@@ -3,6 +3,7 @@
    [clojure.contrib.swing-utils :as swing]
    [clojure.contrib.zip-filter :as zipf]
    [clojure.contrib.zip-filter.xml :as zipfx]
+   [clojure.contrib.logging :as log]
    [clojure.zip :as zip]
    [clojure.xml :as xml]))
 
@@ -63,9 +64,37 @@
                  "n/a")
      (= col 7) (if (:label data) (:label data) ""))))
 
-(defn get-data-for-row [row key]
-  (let [data-id (@data-id-store row)]
-    (:body (key (@table-data-store data-id)))))
+(defn- do-pretty-print [body]
+  (let [format (org.dom4j.io.OutputFormat/createPrettyPrint)
+        document (org.dom4j.DocumentHelper/parseText body)
+        sw (java.io.StringWriter.)
+        xml-writer (org.dom4j.io.XMLWriter. sw format)]
+    (try
+     (.write xml-writer document)
+     (.toString sw)
+     (catch Exception ex
+       body))))
+
+(defn- pretty-print [data key]
+  (log/info (format "Pretty printing %s id %d" key (:id data)))
+  (let [pp-body (do-pretty-print (:body (key data)))
+        pp-data-key (assoc (key data)
+                      :body pp-body
+                      :pretty-printed true)
+        pp-data (assoc data key pp-data-key)]    
+    (dosync
+     (commute table-data-store assoc (:id data) pp-data))
+    (@table-data-store (:id data))))
+
+(defn- pretty-printed-body [data key]  
+  (if (:pretty-printed (key data))
+    (:body (key data))
+    (:body (key (pretty-print data key)))))
+
+(defn get-data-for-row
+  "Returns the full xml body for the row"
+  [row key]
+  (pretty-printed-body (get-table-data-for-row row) key))
 
 (defn- assign-id-to [exchange]
   (if (:id exchange)
