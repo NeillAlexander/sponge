@@ -168,3 +168,7 @@
 
 (defn delete-label-on-row [row]
   (set-label-on-row nil row))
+
+(defn use-current-row-response [row]  
+  ;; create a new namespace for this)
+  )

@@ -20,6 +20,7 @@ public interface SpongeGUIController {
   public Action getLoadAction();
   public Action getSaveAction();
   public Action getSaveAsAction();
+  public Action getSetDefaultResponseAction();
 
   public TableModel getExchangeTableModel();
 

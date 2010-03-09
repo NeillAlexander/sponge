@@ -62,11 +62,15 @@
 (defn- update-row [row]
   (state/set-current-row! row)
   (.setEnabled (:label-action action-map) (state/row-selected))
-  (.setEnabled (:delete-label action-map) (state/row-selected)))
+  (.setEnabled (:delete-label action-map) (state/row-selected))
+  (.setEnabled (:use-response action-map) (state/row-selected)))
 
 (defn- wrap-session-action [f event]
   (f event)
   (.setEnabled (:save action-map) (session/has-file)))
+
+(defn- use-response [event]
+  (model/use-current-row-response (state/current-row)))
 
 (def action-map
      {:start-server (make-action "Start Server" start-server true)
@@ -82,7 +86,8 @@
       :save (make-action "Save Session" session/save-session false)
       :save-as (make-action "Save Session As..."
                             #(wrap-session-action session/save-session-as %1)
-                            true)})
+                            true)
+      :use-response (make-action "Use this Response" use-response false)})
 
 (def label-controller
      (proxy [com.nwalex.sponge.gui.LabelDialogController] []
@@ -111,7 +116,8 @@
        (getDeleteLabelAction [] (:delete-label action-map))
        (getLoadAction [] (:load action-map))
        (getSaveAction [] (:save action-map))
-       (getSaveAsAction [] (:save-as action-map))))
+       (getSaveAsAction [] (:save-as action-map))
+       (getSetDefaultResponseAction [] (:use-response action-map))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)

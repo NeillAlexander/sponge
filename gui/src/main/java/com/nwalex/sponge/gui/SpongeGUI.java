@@ -40,10 +40,12 @@ public class SpongeGUI extends javax.swing.JFrame {
     // set up the key handlers
     exchangeTable.getActionMap().put("LABEL_EX", controller.getLabelExchangeAction());
     exchangeTable.getActionMap().put("DELETE_LABEL", controller.getDeleteLabelAction());
+    exchangeTable.getActionMap().put("DEFAULT_RESPONSE", controller.getSetDefaultResponseAction());
 
     InputMap im = exchangeTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0), "LABEL_EX");
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "DELETE_LABEL");
+    im.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "DEFAULT_RESPONSE");
   }
 
   /** This method is called from within the constructor to
@@ -57,6 +59,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     tablePopup = new javax.swing.JPopupMenu();
     attachLabelItem = new javax.swing.JMenuItem();
     deleteLabelItem = new javax.swing.JMenuItem();
+    setDefaultResponseItem = new javax.swing.JMenuItem();
     jScrollPane2 = new javax.swing.JScrollPane();
     exchangeTable = new JXTable(controller.getExchangeTableModel());
     ((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});
@@ -94,6 +97,10 @@ public class SpongeGUI extends javax.swing.JFrame {
     deleteLabelItem.setAction(controller.getDeleteLabelAction());
     deleteLabelItem.setText("Delete Label");
     tablePopup.add(deleteLabelItem);
+
+    setDefaultResponseItem.setAction(controller.getSetDefaultResponseAction());
+    setDefaultResponseItem.setText("Use this Response");
+    tablePopup.add(setDefaultResponseItem);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -247,6 +254,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenuItem saveAsMenuItem;
   private javax.swing.JMenuItem saveMenuItem;
   private javax.swing.JMenu serverMenu;
+  private javax.swing.JMenuItem setDefaultResponseItem;
   private javax.swing.JMenuItem startServerMenuItem;
   private javax.swing.JMenuItem stopServerMenuItem;
   private javax.swing.JPopupMenu tablePopup;
