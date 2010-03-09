@@ -189,3 +189,8 @@
      (commute default-responses assoc
               (make-default-response-key table-data) (:id table-data)))
     (notify-data-changed)))
+
+(defn replay-response [exchange]
+  (let [response-id (@default-responses (make-default-response-key exchange))]
+    (if response-id
+      (:response (@table-data-store response-id)))))

@@ -124,7 +124,7 @@
                 <Property name="selected" type="boolean" value="true"/>
                 <Property name="text" type="java.lang.String" value="Forward All"/>
                 <Property name="actionCommand" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="SpongeGUIController.FORWARD_ALL_COMMAND" type="code"/>
+                  <Connection code="SpongeGUIController.FORWARD_ALL" type="code"/>
                 </Property>
               </Properties>
               <Events>
@@ -138,7 +138,7 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="Replay or Forward"/>
                 <Property name="actionCommand" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="SpongeGUIController.REPLAY_OR_FORWARD_COMMAND" type="code"/>
+                  <Connection code="SpongeGUIController.REPLAY_OR_FORWARD" type="code"/>
                 </Property>
               </Properties>
               <Events>
@@ -152,8 +152,9 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="Replay or Prompt"/>
                 <Property name="actionCommand" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="SpongeGUIController.REPLAY_OR_PROMPT_COMMAND" type="code"/>
+                  <Connection code="SpongeGUIController.REPLAY_OR_PROMPT" type="code"/>
                 </Property>
+                <Property name="enabled" type="boolean" value="false"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="replayOrPromptMenuItemActionPerformed"/>
@@ -166,7 +167,7 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="Replay or Fail"/>
                 <Property name="actionCommand" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="SpongeGUIController.REPLAY_OR_FAIL_COMMAND" type="code"/>
+                  <Connection code="SpongeGUIController.REPLAY_OR_FAIL" type="code"/>
                 </Property>
               </Properties>
               <Events>

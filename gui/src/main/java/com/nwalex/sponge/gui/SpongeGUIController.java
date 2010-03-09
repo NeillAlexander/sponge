@@ -10,10 +10,10 @@ import javax.swing.table.TableModel;
  */
 public interface SpongeGUIController {
 
-  public static final String FORWARD_ALL_COMMAND = "forwardAll";
-  public static final String REPLAY_OR_FORWARD_COMMAND = "replayOrForward";
-  public static final String REPLAY_OR_FAIL_COMMAND = "replayOrFail";
-  public static final String REPLAY_OR_PROMPT_COMMAND = "replayOrPrompt";
+  public static final String FORWARD_ALL = "forwardAll";
+  public static final String REPLAY_OR_FORWARD = "replayOrForward";
+  public static final String REPLAY_OR_FAIL = "replayOrFail";
+  public static final String REPLAY_OR_PROMPT = "replayOrPrompt";
 
   public Action getStartServerAction();
   public Action getStopServerAction();
@@ -27,6 +27,9 @@ public interface SpongeGUIController {
   public Action getSaveAction();
   public Action getSaveAsAction();
   public Action getSetDefaultResponseAction();
+
+  public String getMode();
+  public void setMode(String mode);
 
   public TableModel getExchangeTableModel();
 

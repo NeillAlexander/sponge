@@ -8,17 +8,27 @@
 (def #^{:private true} port-store (ref 8139))
 (def #^{:private true} target-store (ref "http://services.aonaware.com"))
 (def #^{:private true} current-row-store (atom nil))
-
-(defn get-persistence-map []
-  {:port @port-store :target @target-store})
+(def #^{:private true}
+     mode (atom
+           com.nwalex.sponge.gui.SpongeGUIController/FORWARD_ALL))
 
 (defn set-config! [port target]
   (dosync
    (ref-set port-store port)
    (ref-set target-store target)))
 
+(defn set-mode [new-mode]
+  (compare-and-set! mode @mode new-mode))
+
 (defn load-from-persistence-map [persistence-map]
-  (set-config! (:port persistence-map) (:target persistence-map)))
+  (set-config! (:port persistence-map) (:target persistence-map))
+  (set-mode (:mode persistence-map)))
+
+(defn get-persistence-map []
+  {:port @port-store :target @target-store :mode @mode})
+
+(defn get-mode []
+  @mode)
 
 (defn set-gui! [gui]
   (compare-and-set! gui-frame-store @gui-frame-store gui))

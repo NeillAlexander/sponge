@@ -13,6 +13,8 @@ package com.nwalex.sponge.gui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
+import java.util.Enumeration;
+import javax.swing.AbstractButton;
 import javax.swing.InputMap;
 import javax.swing.JFrame;
 import javax.swing.JTable;
@@ -57,6 +59,15 @@ public class SpongeGUI extends javax.swing.JFrame {
     ((JXTable) exchangeTable).addHighlighter(new ColorHighlighter(
             new PatternPredicate("R", 7),
             new Color(213, 234, 212), Color.BLACK));
+
+    // set the mode
+    Enumeration<AbstractButton> en = modeButtonGroup.getElements();
+    while(en.hasMoreElements()) {
+      AbstractButton button = en.nextElement();
+      if (button.getActionCommand().equals(controller.getMode())) {
+        modeButtonGroup.setSelected(button.getModel(), true);
+      }
+    }
   }
 
   /** This method is called from within the constructor to
@@ -202,7 +213,7 @@ public class SpongeGUI extends javax.swing.JFrame {
       modeButtonGroup.add(forwardAllMenuItem);
       forwardAllMenuItem.setSelected(true);
       forwardAllMenuItem.setText("Forward All");
-      forwardAllMenuItem.setActionCommand(SpongeGUIController.FORWARD_ALL_COMMAND);
+      forwardAllMenuItem.setActionCommand(SpongeGUIController.FORWARD_ALL);
       forwardAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent evt) {
           modeSelected(evt);
@@ -212,7 +223,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       modeButtonGroup.add(replayOrForwardMenuItem);
       replayOrForwardMenuItem.setText("Replay or Forward");
-      replayOrForwardMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_FORWARD_COMMAND);
+      replayOrForwardMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_FORWARD);
       replayOrForwardMenuItem.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent evt) {
           replayOrForwardMenuItemActionPerformed(evt);
@@ -222,7 +233,8 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       modeButtonGroup.add(replayOrPromptMenuItem);
       replayOrPromptMenuItem.setText("Replay or Prompt");
-      replayOrPromptMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_PROMPT_COMMAND);
+      replayOrPromptMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_PROMPT);
+      replayOrPromptMenuItem.setEnabled(false);
       replayOrPromptMenuItem.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent evt) {
           replayOrPromptMenuItemActionPerformed(evt);
@@ -232,7 +244,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       modeButtonGroup.add(replayOrFailMenuItem);
       replayOrFailMenuItem.setText("Replay or Fail");
-      replayOrFailMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_FAIL_COMMAND);
+      replayOrFailMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_FAIL);
       replayOrFailMenuItem.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent evt) {
           replayOrFailMenuItemActionPerformed(evt);
@@ -294,7 +306,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_exitMenuItemActionPerformed
 
     private void modeSelected(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modeSelected
-      System.out.println("Mode has been selected: " + modeButtonGroup.getSelection().getActionCommand());
+      controller.setMode(modeButtonGroup.getSelection().getActionCommand());
     }//GEN-LAST:event_modeSelected
 
     private void replayOrForwardMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrForwardMenuItemActionPerformed

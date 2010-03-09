@@ -35,7 +35,8 @@
                                 (server/make-server
                                  (:port config)
                                  (:target config)
-                                 :request-filters [filters/display-exchange-filter]
+                                 :request-filters (filters/get-request-filters-for-mode
+                                                   (state/get-mode))
                                  :response-filters [filters/display-exchange-filter]))))
   (toggle-started))
 
@@ -89,6 +90,13 @@
                             true)
       :use-response (make-action "Use this Response" use-response false)})
 
+(defn- set-mode [mode]  
+  (state/set-mode mode)
+  (if (server/running? (state/current-server))
+    (do
+      (stop-server nil)
+      (start-server nil))))
+
 (def label-controller
      (proxy [com.nwalex.sponge.gui.LabelDialogController] []
        (setLabel [label] (model/set-label-on-row label (state/current-row)))
@@ -117,7 +125,9 @@
        (getLoadAction [] (:load action-map))
        (getSaveAction [] (:save action-map))
        (getSaveAsAction [] (:save-as action-map))
-       (getSetDefaultResponseAction [] (:use-response action-map))))
+       (getSetDefaultResponseAction [] (:use-response action-map))
+       (getMode [] (state/get-mode))
+       (setMode [mode] (set-mode mode))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)
