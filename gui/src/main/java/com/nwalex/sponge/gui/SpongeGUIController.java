@@ -9,6 +9,12 @@ import javax.swing.table.TableModel;
  * @author neill
  */
 public interface SpongeGUIController {
+
+  public static final String FORWARD_ALL_COMMAND = "forwardAll";
+  public static final String REPLAY_OR_FORWARD_COMMAND = "replayOrForward";
+  public static final String REPLAY_OR_FAIL_COMMAND = "replayOrFail";
+  public static final String REPLAY_OR_PROMPT_COMMAND = "replayOrPrompt";
+
   public Action getStartServerAction();
   public Action getStopServerAction();
   public Action getConfigureAction();

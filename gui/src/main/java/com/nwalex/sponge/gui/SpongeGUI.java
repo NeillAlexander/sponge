@@ -71,6 +71,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     attachLabelItem = new javax.swing.JMenuItem();
     deleteLabelItem = new javax.swing.JMenuItem();
     setDefaultResponseItem = new javax.swing.JMenuItem();
+    modeButtonGroup = new javax.swing.ButtonGroup();
     jScrollPane2 = new javax.swing.JScrollPane();
     exchangeTable = new JXTable(controller.getExchangeTableModel());
     ((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});
@@ -93,6 +94,11 @@ public class SpongeGUI extends javax.swing.JFrame {
     configureMenuItem.setAction(controller.getConfigureAction());
     exitMenuItem = new javax.swing.JMenuItem();
     exitMenuItem.setAction(controller.getExitAction());
+    modeMenu = new javax.swing.JMenu();
+    forwardAllMenuItem = new javax.swing.JRadioButtonMenuItem();
+    replayOrForwardMenuItem = new javax.swing.JRadioButtonMenuItem();
+    replayOrPromptMenuItem = new javax.swing.JRadioButtonMenuItem();
+    replayOrFailMenuItem = new javax.swing.JRadioButtonMenuItem();
     deleteLabelMenuItem = new javax.swing.JMenu();
     attachLabelMenuItem = new javax.swing.JMenuItem();
     jMenuItem1 = new javax.swing.JMenuItem();
@@ -191,6 +197,51 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       menuBar.add(serverMenu);
 
+      modeMenu.setText("Mode");
+
+      modeButtonGroup.add(forwardAllMenuItem);
+      forwardAllMenuItem.setSelected(true);
+      forwardAllMenuItem.setText("Forward All");
+      forwardAllMenuItem.setActionCommand(SpongeGUIController.FORWARD_ALL_COMMAND);
+      forwardAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+          modeSelected(evt);
+        }
+      });
+      modeMenu.add(forwardAllMenuItem);
+
+      modeButtonGroup.add(replayOrForwardMenuItem);
+      replayOrForwardMenuItem.setText("Replay or Forward");
+      replayOrForwardMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_FORWARD_COMMAND);
+      replayOrForwardMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+          replayOrForwardMenuItemActionPerformed(evt);
+        }
+      });
+      modeMenu.add(replayOrForwardMenuItem);
+
+      modeButtonGroup.add(replayOrPromptMenuItem);
+      replayOrPromptMenuItem.setText("Replay or Prompt");
+      replayOrPromptMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_PROMPT_COMMAND);
+      replayOrPromptMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+          replayOrPromptMenuItemActionPerformed(evt);
+        }
+      });
+      modeMenu.add(replayOrPromptMenuItem);
+
+      modeButtonGroup.add(replayOrFailMenuItem);
+      replayOrFailMenuItem.setText("Replay or Fail");
+      replayOrFailMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_FAIL_COMMAND);
+      replayOrFailMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+          replayOrFailMenuItemActionPerformed(evt);
+        }
+      });
+      modeMenu.add(replayOrFailMenuItem);
+
+      menuBar.add(modeMenu);
+
       deleteLabelMenuItem.setText("Action");
 
       attachLabelMenuItem.setText("Attach Label...");
@@ -241,6 +292,23 @@ public class SpongeGUI extends javax.swing.JFrame {
     private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
       this.dispose();
     }//GEN-LAST:event_exitMenuItemActionPerformed
+
+    private void modeSelected(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modeSelected
+      System.out.println("Mode has been selected: " + modeButtonGroup.getSelection().getActionCommand());
+    }//GEN-LAST:event_modeSelected
+
+    private void replayOrForwardMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrForwardMenuItemActionPerformed
+      modeSelected(evt);
+    }//GEN-LAST:event_replayOrForwardMenuItemActionPerformed
+
+    private void replayOrPromptMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrPromptMenuItemActionPerformed
+      modeSelected(evt);
+    }//GEN-LAST:event_replayOrPromptMenuItemActionPerformed
+
+    private void replayOrFailMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrFailMenuItemActionPerformed
+      modeSelected(evt);
+    }//GEN-LAST:event_replayOrFailMenuItemActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem attachLabelItem;
   private javax.swing.JMenuItem attachLabelMenuItem;
@@ -250,6 +318,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenu deleteLabelMenuItem;
   private javax.swing.JTable exchangeTable;
   private javax.swing.JMenuItem exitMenuItem;
+  private javax.swing.JRadioButtonMenuItem forwardAllMenuItem;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JScrollPane jScrollPane1;
@@ -257,8 +326,13 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JScrollPane jScrollPane3;
   private javax.swing.JMenuItem loadMenuItem;
   private javax.swing.JMenuBar menuBar;
+  private javax.swing.ButtonGroup modeButtonGroup;
+  private javax.swing.JMenu modeMenu;
   private javax.swing.JMenu replMenu;
   private javax.swing.JMenuItem replMenuItem;
+  private javax.swing.JRadioButtonMenuItem replayOrFailMenuItem;
+  private javax.swing.JRadioButtonMenuItem replayOrForwardMenuItem;
+  private javax.swing.JRadioButtonMenuItem replayOrPromptMenuItem;
   private javax.swing.JTextArea requestTextArea;
   private javax.swing.JTextArea responseArea;
   private javax.swing.JMenuItem saveAsMenuItem;
