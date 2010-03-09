@@ -9,24 +9,27 @@
 (def #^{:private true} target-store (ref "http://services.aonaware.com"))
 (def #^{:private true} current-row-store (atom nil))
 
-(defn- set-new-atom [old new]
-  new)
+(defn get-persistence-map []
+  {:port @port-store :target @target-store})
+
+(defn set-config! [port target]
+  (dosync
+   (ref-set port-store port)
+   (ref-set target-store target)))
+
+(defn load-from-persistence-map [persistence-map]
+  (set-config! (:port persistence-map) (:target persistence-map)))
 
 (defn set-gui! [gui]
-  (swap! gui-frame-store set-new-atom gui))
+  (compare-and-set! gui-frame-store @gui-frame-store gui))
 
 (defn gui [] @gui-frame-store)
 
 (defn set-current-server! [server]
-  (swap! current-server-store set-new-atom server))
+  (compare-and-set! current-server-store @current-server-store server))
 
 (defn current-server []
   @current-server-store)
-
-(defn set-config! [port target]
-  (dosync
-   (commute port-store set-new-atom port)
-   (commute target-store set-new-atom target)))
 
 (defn config []
   {:port @port-store :target @target-store})
@@ -35,7 +38,8 @@
   @current-row-store)
 
 (defn set-current-row! [row]
-  (swap! current-row-store set-new-atom (if (> row -1) row nil))
+  (compare-and-set! current-row-store
+                    @current-row-store (if (> row -1) row nil))
   (log/debug (format "Current selected row = %s" (current-row))))
 
 (defn row-selected []

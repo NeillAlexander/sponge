@@ -21,7 +21,8 @@
 (defn- toggle-started []
   (toggle-action (:stop-server action-map))
   (toggle-action (:start-server action-map))
-  (toggle-action (:configure action-map)))
+  (toggle-action (:configure action-map))
+  (toggle-action (:load action-map)))
 
 (defn- stop-server [event]  
   (server/stop (state/current-server))
@@ -72,7 +73,7 @@
       :clear-all (make-action "Clear All" model/clear true)
       :label-action (make-action "Attach Label..." do-label false)
       :delete-label (make-action "Delete Label" delete-label false)
-      :load (make-action "Load Session..." session/load-session false)
+      :load (make-action "Load Session..." session/load-session true)
       :save (make-action "Save Session" session/save-session false)
       :save-as (make-action "Save Session As..." session/save-session-as true)})
 

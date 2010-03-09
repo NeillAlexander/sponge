@@ -7,12 +7,12 @@
    [clojure.zip :as zip]
    [clojure.xml :as xml]))
 
-(declare get-value-at)
+(declare get-value-at notify-data-changed)
 
 (def #^{:private true} data-id-store (ref []))
 (def #^{:private true} table-data-store (ref {}))
 (def #^{:private true} id-store
-     (atom (java.util.concurrent.atomic.AtomicLong.)))
+     (ref (java.util.concurrent.atomic.AtomicLong.)))
 
 (def #^{:private true} columns ["Status" "Namespace" "URL" "Soap Method"
                                 "Start" "End" "Time (ms)" "Label"])
@@ -23,6 +23,18 @@
        (getColumnName [i] (columns i))
        (getRowCount [] (count @data-id-store))
        (getValueAt [row col] (get-value-at row col))))
+
+(defn get-persistence-map []
+  {:data-id-store @data-id-store :table-data-store @table-data-store
+   :id-store-value (.get @id-store)})
+
+(defn load-from-persistence-map [persistence-map]
+  (dosync
+   (ref-set data-id-store (:data-id-store persistence-map))
+   (ref-set table-data-store (:table-data-store persistence-map))
+   (ref-set id-store (java.util.concurrent.atomic.AtomicLong.
+                      (:id-store-value persistence-map))))
+  (notify-data-changed))
 
 (defn- calc-status-from [data]
   (if (:response data) (:status (:response data)) "Requesting..."))
