@@ -7,15 +7,16 @@
    [clojure.zip :as zip]
    [clojure.xml :as xml]))
 
-(declare get-value-at notify-data-changed)
+(declare get-value-at notify-data-changed make-default-response-key)
 
+(def #^{:private true} default-responses (ref {}))
 (def #^{:private true} data-id-store (ref []))
 (def #^{:private true} table-data-store (ref {}))
 (def #^{:private true} id-store
      (ref (java.util.concurrent.atomic.AtomicLong.)))
 
 (def #^{:private true} columns ["Status" "Namespace" "URL" "Soap Method"
-                                "Start" "End" "Time (ms)" "Label"])
+                                "Start" "End" "Time (ms)" "Info" "Label"])
 
 (def #^{:private true} exchange-table-model
      (proxy [javax.swing.table.AbstractTableModel] []
@@ -26,14 +27,16 @@
 
 (defn get-persistence-map []
   {:data-id-store @data-id-store :table-data-store @table-data-store
-   :id-store-value (.get @id-store)})
+   :id-store-value (.get @id-store)
+   :default-responses @default-responses})
 
 (defn load-from-persistence-map [persistence-map]  
   (dosync   
    (ref-set data-id-store (:data-id-store persistence-map))
    (ref-set table-data-store (:table-data-store persistence-map))
    (ref-set id-store (java.util.concurrent.atomic.AtomicLong.
-                      (:id-store-value persistence-map))))
+                      (:id-store-value persistence-map)))
+   (ref-set default-responses (:default-responses persistence-map)))
   (notify-data-changed))
 
 (defn- calc-status-from [data]
@@ -74,7 +77,11 @@
      (= col 6) (if (:ended data)
                  (- (:ended data) (:started data))
                  "n/a")
-     (= col 7) (if (:label data) (:label data) ""))))
+     (= col 7) (if (= (:id data) (@default-responses
+                                   (make-default-response-key data)))
+                 "R"
+                 "")
+     (= col 8) (if (:label data) (:label data) ""))))
 
 (defn- do-pretty-print [body]
   (let [format (org.dom4j.io.OutputFormat/createPrettyPrint)
@@ -169,6 +176,16 @@
 (defn delete-label-on-row [row]
   (set-label-on-row nil row))
 
+(defn- make-default-response-key [data]
+  (str (:namespace (parse-soap (:request data)))
+       "-"
+       (:uri (:request data))
+       "-"
+       (:soap-method (parse-soap (:request data)))))
+
 (defn use-current-row-response [row]  
-  ;; create a new namespace for this)
-  )
+  (let [table-data (get-table-data-for-row row)]
+    (dosync
+     (commute default-responses assoc
+              (make-default-response-key table-data) (:id table-data)))
+    (notify-data-changed)))
