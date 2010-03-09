@@ -13,7 +13,6 @@
       {:continue exchange})))
 
 (defn fail-filter [server exchange key]
-  (println "In fail-filter")
   {:abort exchange})
 
 (def #^{:private true} request-filter-map
@@ -28,5 +27,4 @@
       })
 
 (defn get-request-filters-for-mode [mode]
-  (println (format "Returning filters for mode %s" mode))
   (request-filter-map mode))
