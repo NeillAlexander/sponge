@@ -150,10 +150,23 @@
   (swing/do-swing
      (.fireTableDataChanged exchange-table-model)))
 
+(defn- notify-row-changed [row]
+  (swing/do-swing
+   (.fireTableRowsUpdated exchange-table-model 0
+                          (dec (count @data-id-store)))))
+
+(defn- notify-row-added [row]
+  (swing/do-swing
+   (.fireTableRowsInserted exchange-table-model row row)))
+
+(defn- notify-row-deleted [row]
+  (swing/do-swing
+   (.fireTableRowsDeleted exchange-table-model row row)))
+
 (defn add-exchange! [server exchange key]
   (let [exchange-with-id (assign-id-to exchange)]
     (add-entry (make-table-data exchange-with-id key))
-    (notify-data-changed)
+    (notify-row-added (dec (count @data-id-store)))
     exchange-with-id))
 
 (defn get-table-model []
@@ -170,7 +183,7 @@
     (dosync
      (commute table-data-store assoc (:id table-data)
               (assoc table-data :label label)))
-    (notify-data-changed)))
+    (notify-row-changed row)))
 
 (defn get-label-for-row [row]
   (let [data (get-table-data-for-row row)]
@@ -191,7 +204,7 @@
     (dosync
      (commute default-responses assoc
               (make-default-response-key table-data) (:id table-data)))
-    (notify-data-changed)))
+    (notify-row-changed row)))
 
 (defn replay-response [exchange]
   (let [response-id (@default-responses (make-default-response-key exchange))]
