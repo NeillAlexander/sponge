@@ -210,10 +210,14 @@
        (:soap-method (parse-soap (:request data)))))
 
 (defn use-current-row-response [row]  
-  (let [table-data (get-table-data-for-row row)]
-    (dosync
-     (commute default-responses assoc
-              (make-default-response-key table-data) (:id table-data)))
+  (let [table-data (get-table-data-for-row row)
+        key (make-default-response-key table-data)]
+    ;; if already set then unset (toggle)
+    (if (= (@default-responses key) (:id table-data))
+      (dosync
+       (commute default-responses dissoc key))
+      (dosync
+       (commute default-responses assoc key (:id table-data))))
     (notify-row-changed row)))
 
 (defn replay-response [exchange]
