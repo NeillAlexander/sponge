@@ -20,11 +20,25 @@
       [display-exchange-filter]
 
       com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FAIL
-      [display-exchange-filter replay-filter fail-filter]
+      [replay-filter fail-filter]
 
       com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD
-      [display-exchange-filter replay-filter]
+      [replay-filter display-exchange-filter]
+      })
+
+(def #^{:private true} response-filter-map
+     {com.nwalex.sponge.gui.SpongeGUIController/FORWARD_ALL
+      [display-exchange-filter]
+
+      com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FAIL
+      []
+
+      com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD
+      []
       })
 
 (defn get-request-filters-for-mode [mode]
   (request-filter-map mode))
+
+(defn get-response-filters-for-mode [mode]
+  (response-filter-map mode))

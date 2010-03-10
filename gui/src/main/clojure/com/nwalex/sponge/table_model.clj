@@ -16,7 +16,8 @@
      (ref (java.util.concurrent.atomic.AtomicLong.)))
 
 (def #^{:private true} columns ["Status" "Namespace" "URL" "Soap Method"
-                                "Start" "End" "Time (ms)" "Info" "Label"])
+                                "Start" "End" "Time (ms)" "Info"
+                                "Replays" "Label"])
 
 (def #^{:private true} exchange-table-model
      (proxy [javax.swing.table.AbstractTableModel] []
@@ -26,7 +27,8 @@
        (getValueAt [row col] (get-value-at row col))))
 
 (defn get-persistence-map []
-  {:data-id-store @data-id-store :table-data-store @table-data-store
+  {:data-id-store @data-id-store
+   :table-data-store @table-data-store
    :id-store-value (.get @id-store)
    :default-responses @default-responses})
 
@@ -81,7 +83,8 @@
                                    (make-default-response-key data)))
                  "R"
                  "")
-     (= col 8) (if (:label data) (:label data) ""))))
+     (= col 8) (:num-replays data)
+     (= col 9) (if (:label data) (:label data) ""))))
 
 (defn- do-pretty-print [body]
   (let [format (org.dom4j.io.OutputFormat/createPrettyPrint)
@@ -125,7 +128,7 @@
   [exchange key]
   (let [data (if (@table-data-store (:id exchange))
                (@table-data-store (:id exchange))               
-               {:id (:id exchange)})
+               {:id (:id exchange) :num-replays 0})
         time-key (if (= :request key) :started :ended)]
     (assoc data
       key (key exchange)
@@ -193,4 +196,10 @@
 (defn replay-response [exchange]
   (let [response-id (@default-responses (make-default-response-key exchange))]
     (if response-id
-      (:response (@table-data-store response-id)))))
+      (let [data (@table-data-store response-id)]
+        (dosync
+         (commute table-data-store assoc (:id data)
+                  (assoc data :num-replays (inc
+                                            (:num-replays data)))))
+        (notify-data-changed)
+        (:response data)))))

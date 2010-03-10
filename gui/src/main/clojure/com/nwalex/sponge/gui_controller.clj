@@ -37,7 +37,8 @@
                                  (:target config)
                                  :request-filters (filters/get-request-filters-for-mode
                                                    (state/get-mode))
-                                 :response-filters [filters/display-exchange-filter]))))
+                                 :response-filters (filters/get-response-filters-for-mode
+                                                    (state/get-mode))))))
   (toggle-started))
 
 (defn- start-repl [event]
