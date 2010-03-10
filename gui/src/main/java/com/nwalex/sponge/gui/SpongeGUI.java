@@ -49,11 +49,13 @@ public class SpongeGUI extends javax.swing.JFrame {
     exchangeTable.getActionMap().put("LABEL_EX", controller.getLabelExchangeAction());
     exchangeTable.getActionMap().put("DELETE_LABEL", controller.getDeleteLabelAction());
     exchangeTable.getActionMap().put("DEFAULT_RESPONSE", controller.getSetDefaultResponseAction());
+    exchangeTable.getActionMap().put("DELETE_ROW", controller.getDeleteRowAction());
 
     InputMap im = exchangeTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0), "LABEL_EX");
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "DELETE_LABEL");
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "DEFAULT_RESPONSE");
+    im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE_ROW");
 
     // add highlighter to table
     ((JXTable) exchangeTable).addHighlighter(new ColorHighlighter(

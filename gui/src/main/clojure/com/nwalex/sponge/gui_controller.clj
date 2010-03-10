@@ -61,11 +61,15 @@
 (defn- delete-label [event]
   (model/delete-label-on-row (state/current-row)))
 
+(defn- delete-row [event]
+  (model/delete-current-row (state/current-row)))
+
 (defn- update-row [row]
   (state/set-current-row! row)
   (.setEnabled (:label-action action-map) (state/row-selected))
   (.setEnabled (:delete-label action-map) (state/row-selected))
-  (.setEnabled (:use-response action-map) (state/row-selected)))
+  (.setEnabled (:use-response action-map) (state/row-selected))
+  (.setEnabled (:delete-row action-map) (state/row-selected)))
 
 (defn- wrap-session-action [f event]
   (f event)
@@ -89,7 +93,8 @@
       :save-as (make-action "Save Session As..."
                             #(wrap-session-action session/save-session-as %1)
                             true)
-      :use-response (make-action "Use this Response" use-response false)})
+      :use-response (make-action "Use this Response" use-response false)
+      :delete-row (make-action "Delete Exchange" delete-row false)})
 
 (defn- set-mode [mode]  
   (state/set-mode mode)
@@ -128,7 +133,8 @@
        (getSaveAsAction [] (:save-as action-map))
        (getSetDefaultResponseAction [] (:use-response action-map))
        (getMode [] (state/get-mode))
-       (setMode [mode] (set-mode mode))))
+       (setMode [mode] (set-mode mode))
+       (getDeleteRowAction [] (:delete-row action-map))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)

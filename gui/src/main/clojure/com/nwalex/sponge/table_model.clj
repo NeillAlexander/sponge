@@ -185,6 +185,16 @@
               (assoc table-data :label label)))
     (notify-row-changed row)))
 
+(defn delete-current-row [row]
+  (let [table-data (get-table-data-for-row row)]
+    (dosync
+     (commute table-data-store dissoc (:id table-data))
+     (ref-set data-id-store
+              (vec (concat (subvec @data-id-store 0 row)
+                           (subvec @data-id-store (inc row)))))
+     )
+    (notify-row-deleted row)))
+
 (defn get-label-for-row [row]
   (let [data (get-table-data-for-row row)]
     (if (:label data) (:label data) "")))
