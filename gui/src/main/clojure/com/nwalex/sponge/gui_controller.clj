@@ -6,9 +6,11 @@
    [com.nwalex.sponge.gui-filters :as filters]
    [com.nwalex.sponge.table-model :as model]
    [com.nwalex.sponge.session :as session]
+   [com.nwalex.sponge.label-controller :as label]
+   [com.nwalex.sponge.config-controller :as config]
    ))
 
-(declare action-map config-controller label-controller)
+(declare action-map)
 
 (defn- make-action [name f enabled]
   (doto (proxy [javax.swing.AbstractAction] [name]
@@ -48,19 +50,6 @@
 (defn- exit [event]
   (System/exit 1))
 
-(defn- configure [event]
-  (doto (com.nwalex.sponge.gui.ConfigurationDialog. (state/gui) true config-controller)
-    (.setLocationRelativeTo (state/gui))
-    (.setVisible true)))
-
-(defn- do-label [event]
-  (doto (com.nwalex.sponge.gui.LabelDialog. (state/gui) true label-controller)
-    (.setLocationRelativeTo (state/gui))
-    (.setVisible true)))
-
-(defn- delete-label [event]
-  (model/delete-label-on-row (state/current-row)))
-
 (defn- delete-row [event]
   (model/delete-current-row (state/current-row)))
 
@@ -81,12 +70,12 @@
 (def action-map
      {:start-server (make-action "Start Server" start-server true)
       :stop-server (make-action "Stop Server" stop-server false)
-      :configure (make-action "Configure" configure true)
+      :configure (make-action "Configure" config/configure true)
       :exit (make-action "Exit" exit true)
       :start-repl (make-action "Start Repl" start-repl true)
       :clear-all (make-action "Clear All" model/clear true)
-      :label-action (make-action "Attach Label..." do-label false)
-      :delete-label (make-action "Delete Label" delete-label false)
+      :label-action (make-action "Attach Label..." label/do-label false)
+      :delete-label (make-action "Delete Label" label/delete-label false)
       :load (make-action "Load Session..."
                          #(wrap-session-action session/load-session %1) true)
       :save (make-action "Save Session" session/save-session false)
@@ -103,16 +92,6 @@
       (stop-server nil)
       (start-server nil))))
 
-(def label-controller
-     (proxy [com.nwalex.sponge.gui.LabelDialogController] []
-       (setLabel [label] (model/set-label-on-row label (state/current-row)))
-       (getCurrentLabel [] (model/get-label-for-row (state/current-row)))))
-
-(def config-controller
-     (proxy [com.nwalex.sponge.gui.ConfigurationDialogController] []
-       (setConfiguration [port target] (state/set-config! port target))
-       (getCurrentPort [] (:port (state/config)))
-       (getCurrentTarget [] (:target (state/config)))))
 
 (def sponge-controller
      (proxy [com.nwalex.sponge.gui.SpongeGUIController] []
