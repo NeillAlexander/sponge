@@ -54,6 +54,8 @@
 ;; always have xmlns in the body and that the soap method is the
 ;; name of the first child of the body. Otherwise will need smarter
 ;; xml parsing here
+;; Basically, I don't understand the zipper functions yet
+;; TODO: tidy this up
 (defn- parse-soap [request]
   (let [zipped (zip/xml-zip (xml/parse (java.io.ByteArrayInputStream.
                                         (.getBytes (:body request)))))]
@@ -71,16 +73,17 @@
   (let [data (get-table-data-for-row row)]    
     (cond
      (= col 0) (calc-status-from data)     
-     (= col 1) (:namespace (parse-soap (:request data)))
+     (= col 1) (:namespace data)
      (= col 2) (:uri (:request data))
-     (= col 3) (:soap-method (parse-soap (:request data)))
+     (= col 3) (:soap-method data)
      (= col 4) (format-date (:started data))
      (= col 5) (format-date (:ended data))
      (= col 6) (if (:ended data)
                  (- (:ended data) (:started data))
                  "n/a")
-     (= col 7) (if (= (:id data) (@default-responses
-                                   (make-default-response-key data)))
+     (= col 7) (if (= (:id data)
+                      (@default-responses
+                        (make-default-response-key data)))
                  "R"
                  "")
      (= col 8) (:num-replays data)
@@ -123,12 +126,20 @@
     exchange
     (assoc exchange :id (.getAndIncrement @id-store))))
 
+(defn- new-data [exchange]
+  "Create the structure for the table data. Only done on request"
+  (println exchange)
+  {:id (:id exchange)
+   :num-replays 0
+   :namespace (:namespace (parse-soap (:request exchange)))
+   :soap-method (:soap-method (parse-soap (:request exchange)))})
+
 (defn- make-table-data
   "Create the map structure for all the data"
   [exchange key]
   (let [data (if (@table-data-store (:id exchange))
                (@table-data-store (:id exchange))               
-               {:id (:id exchange) :num-replays 0})
+               (new-data exchange))
         time-key (if (= :request key) :started :ended)]
     (assoc data
       key (key exchange)
@@ -202,12 +213,18 @@
 (defn delete-label-on-row [row]
   (set-label-on-row nil row))
 
-(defn- make-default-response-key [data]
-  (str (:namespace (parse-soap (:request data)))
-       "-"
-       (:uri (:request data))
-       "-"
-       (:soap-method (parse-soap (:request data)))))
+(defn- make-default-response-key
+  ([data]
+     (if (:namespace data)
+       (make-default-response-key
+                         (:namespace data)
+                         (:uri (:request data))
+                         (:soap-method data))
+       (make-default-response-key (:namespace (parse-soap (:request data)))
+                                  (:uri (:request data))
+                                  (:soap-method (parse-soap (:request data))))))
+  ([namespace uri soap-method]
+     (str namespace "-" uri "-" soap-method)))
 
 (defn use-current-row-response [row]  
   (let [table-data (get-table-data-for-row row)
