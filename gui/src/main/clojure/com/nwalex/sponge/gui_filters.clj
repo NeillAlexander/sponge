@@ -1,26 +1,28 @@
 (ns com.nwalex.sponge.gui-filters
   (:require
    [com.nwalex.sponge.gui-state :as state]
-   [com.nwalex.sponge.table-model :as model]))
+   [com.nwalex.sponge.table-model :as model])
+  (:use
+   [com.nwalex.sponge.filters :only [continue return abort]]))
 
 (defn display-exchange-filter [server exchange key]
-  {:continue (model/add-exchange! server exchange key)})
+  (continue (model/add-exchange! server exchange key)))
 
 (defn display-non-replay-response-filter [server exchange key]
   (if (not (:replayed exchange))
-    {:continue (model/add-exchange! server exchange key)}
-    {:continue exchange}))
+    (continue (model/add-exchange! server exchange key))
+    (continue exchange)))
 
 (defn replay-filter [server exchange key]
   (let [response (model/replay-response exchange)]
     (if response
-      {:return (assoc exchange
-                 :response response
-                 :replayed true)}
-      {:continue exchange})))
+      (return (assoc exchange
+                :response response
+                :replayed true))
+      (continue exchange))))
 
 (defn fail-filter [server exchange key]
-  {:abort exchange})
+  (abort exchange))
 
 (def #^{:private true} request-filter-map
      {com.nwalex.sponge.gui.SpongeGUIController/FORWARD_ALL

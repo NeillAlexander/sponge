@@ -2,11 +2,12 @@
   (:require
    [com.nwalex.sponge.http :as http]
    [com.nwalex.sponge.datastore :as ds]
-   [com.nwalex.sponge.filters :as filters]
    [clojure.contrib.logging :as log]
    [clojure.contrib.duck-streams :as duck]
    [ring.adapter.jetty :as jetty]
-   [ring.middleware.reload :as reload]))
+   [ring.middleware.reload :as reload])
+  (:use
+   [com.nwalex.sponge.filters]))
 
 (defn- process-filters
   "Factors out the functionality common to request / response filters"
@@ -18,17 +19,17 @@
     (let [result (exchange-filter server filter-arg exchange-key)]
       ;; check the responses to determine whether to continue etc
       (cond
-       (:return result) (do
+       (return? result) (do
                           (log/info (format "Returning %s..." exchange-key))
                           (:return result))
-       (:continue result) (do
-                              (log/info "Continuing...")
-                              (recur (first remaining-filters)
-                                     (rest remaining-filters)
-                                     (:continue result)))
-       (:abort result) (do
-                           (log/info "Aborting...")
-                           (throw (RuntimeException. "Request aborted")))
+       (continue? result) (do
+                            (log/info "Continuing...")
+                            (recur (first remaining-filters)
+                                   (rest remaining-filters)
+                                   (:continue result)))
+       (abort? result) (do
+                         (log/info "Aborting...")
+                         (throw (RuntimeException. "Request aborted")))
        :else (throw (IllegalStateException.
                      ":return / :continue / :abort not found"))))))
 
@@ -64,10 +65,10 @@
         server {:port port :target target :jetty nil
      :request-filters (conj
                         (vec (:request-filters opts-map))
-                        filters/forwarding-request-filter)
+                        forwarding-request-filter)
      :response-filters (conj
                         (vec (:response-filters opts-map))    
-                        filters/returning-response-filter)}]
+                        returning-response-filter)}]
     server))
 
 (defn start [server]
