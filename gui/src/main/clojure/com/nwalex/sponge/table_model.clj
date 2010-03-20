@@ -31,16 +31,6 @@
    (ref-set default-responses (:default-responses persistence-map)))
   (notify-data-changed))
 
-(defn- calc-status-from [data]
-  (if (:response data) (:status (:response data)) "Requesting..."))
-
-(defn- format-date [time-ms]
-  (if time-ms
-    (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss.SSS")
-             (java.util.Date. time-ms))
-    "n/a"))
-
-
 (defn- get-exchange-for-row [row]
   (exchange/get-exchange (@data-id-store row)))
 
@@ -48,22 +38,20 @@
   ;; see the columns vector above
   (let [exchange (get-exchange-for-row row)]    
     (cond
-     (= col 0) (calc-status-from exchange)     
-     (= col 1) (:namespace exchange)
-     (= col 2) (:uri (:request exchange))
-     (= col 3) (:soap-method exchange)
-     (= col 4) (format-date (:started exchange))
-     (= col 5) (format-date (:ended exchange))
-     (= col 6) (if (:ended exchange)
-                 (- (:ended exchange) (:started exchange))
-                 "n/a")
-     (= col 7) (if (= (:id exchange)
+     (= col 0) (exchange/get-status exchange)     
+     (= col 1) (exchange/get-namespace exchange)
+     (= col 2) (exchange/get-uri exchange)
+     (= col 3) (exchange/get-soap-method exchange)
+     (= col 4) (exchange/get-start-date exchange)
+     (= col 5) (exchange/get-end-date exchange)
+     (= col 6) (exchange/get-request-time exchange)
+     (= col 7) (if (= (exchange/get-id exchange)
                       (@default-responses
                         (make-default-response-key exchange)))
                  "R"
                  "")
-     (= col 8) (:num-replays exchange)
-     (= col 9) (if (:label exchange) (:label exchange) ""))))
+     (= col 8) (exchange/get-num-replays exchange)
+     (= col 9) (exchange/get-label exchange))))
 
 (defn get-data-for-row
   "Returns the full xml body for the row"
@@ -75,7 +63,7 @@
   ;; only add the id once (on request)
   (dosync 
    (if (not (exchange/known? exchange))
-     (commute data-id-store conj (:id exchange)))
+     (commute data-id-store conj (exchange/get-id exchange)))
    ;; but always update the data store
    (exchange/save exchange)))
 
@@ -137,11 +125,11 @@
 
 (defn- make-default-response-key
   ([exchange]
-     (if (:namespace exchange)
+     (if (exchange/get-namespace exchange)
        (make-default-response-key
-                         (:namespace exchange)
-                         (:uri (:request exchange))
-                         (:soap-method exchange))
+                         (exchange/get-namespace exchange)
+                         (exchange/get-uri exchange)
+                         (exchange/get-soap-method exchange))
        (make-default-response-key (:namespace (soap/parse-soap (:request exchange)))
                                   (:uri (:request exchange))
                                   (:soap-method (soap/parse-soap (:request exchange))))))
@@ -152,11 +140,11 @@
   (let [exchange (get-exchange-for-row row)
         key (make-default-response-key exchange)]
     ;; if already set then unset (toggle)
-    (if (= (@default-responses key) (:id exchange))
+    (if (= (@default-responses key) (exchange/get-id exchange))
       (dosync
        (commute default-responses dissoc key))
       (dosync
-       (commute default-responses assoc key (:id exchange))))
+       (commute default-responses assoc key (exchange/get-id exchange))))
     (notify-row-changed row)))
 
 (defn replay-response [exchange]

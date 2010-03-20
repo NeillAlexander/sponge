@@ -86,6 +86,9 @@ from the server"
    (commute exchange-store assoc (:id exchange)
             (assoc exchange :label label))))
 
+(defn get-label [exchange]
+  (if (:label exchange) (:label exchange) ""))
+
 (defn- do-pretty-print [body]
   (let [format (org.dom4j.io.OutputFormat/createPrettyPrint)
         document (org.dom4j.DocumentHelper/parseText body)
@@ -110,6 +113,46 @@ from the server"
   (if (:pretty-printed (key exchange))
     (:body (key exchange))
     (:body (key (pretty-print exchange key)))))
+
+(defn get-status
+  [exchange]
+  (if (:response exchange) (:status (:response exchange)) "Requesting..."))
+
+(defn get-namespace
+  [exchange]
+  (:namespace exchange))
+
+(defn get-id [exchange] (:id exchange))
+
+(defn get-num-replays [exchange] (:num-replays exchange))
+
+(defn get-uri
+  [exchange]
+  (:uri (:request exchange)))
+
+(defn get-soap-method
+  [exchange]
+  (:soap-method exchange))
+
+(defn- format-date [time-ms]
+  (if time-ms
+    (.format (java.text.SimpleDateFormat. "yyyy-MM-dd HH:mm:ss.SSS")
+             (java.util.Date. time-ms))
+    "n/a"))
+
+(defn get-start-date
+  [exchange]
+  (format-date (:started exchange)))
+
+(defn get-end-date
+  [exchange]
+  (format-date (:ended exchange)))
+
+(defn get-request-time
+  [exchange]
+  (if (:ended exchange)
+    (- (:ended exchange) (:started exchange))
+    "n/a"))
 
 (defn known?
   "Returns true if exchange of this id exists"
