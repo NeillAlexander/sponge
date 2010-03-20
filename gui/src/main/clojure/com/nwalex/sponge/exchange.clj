@@ -48,7 +48,8 @@ from the server"
   [exchange]
   (log/info (format "Saving: %s" exchange))
   (dosync
-   (commute exchange-store assoc (:id exchange) exchange)))
+   (commute exchange-store assoc (:id exchange) exchange))
+  exchange)
 
 (defn delete-all
   "Delete all the stored exchanges"
