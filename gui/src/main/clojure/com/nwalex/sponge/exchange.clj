@@ -89,16 +89,18 @@ from the server"
 (defn get-label [exchange]
   (if (:label exchange) (:label exchange) ""))
 
-(defn- do-pretty-print [body]
-  (let [format (org.dom4j.io.OutputFormat/createPrettyPrint)
-        document (org.dom4j.DocumentHelper/parseText body)
-        sw (java.io.StringWriter.)
-        xml-writer (org.dom4j.io.XMLWriter. sw format)]
-    (try
+(defn do-pretty-print
+  "Expects body to be valid xml"
+  [body]
+  (try
+   (let [format (org.dom4j.io.OutputFormat/createPrettyPrint)
+         document (org.dom4j.DocumentHelper/parseText body)
+         sw (java.io.StringWriter.)
+         xml-writer (org.dom4j.io.XMLWriter. sw format)]
      (.write xml-writer document)
-     (.toString sw)
-     (catch Exception ex
-       body))))
+     (.toString sw))
+   (catch Exception ex
+       body)))
 
 (defn pretty-print [exchange key]
   (log/info (format "Pretty printing %s id %d" key (:id exchange)))
