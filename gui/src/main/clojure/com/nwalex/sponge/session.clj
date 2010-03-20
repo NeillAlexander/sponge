@@ -2,6 +2,7 @@
   (:require
    [com.nwalex.sponge.gui-state :as state]
    [com.nwalex.sponge.table-model :as model]
+   [com.nwalex.sponge.exchange :as exchange]
    [clojure.contrib.logging :as log]
    [clojure.contrib.duck-streams :as io]))
 
@@ -26,6 +27,7 @@
         (let [persistence-map (read in)]          
           (state/load-from-persistence-map (:gui-state persistence-map))
           (model/load-from-persistence-map (:table-model persistence-map))
+          (exchange/load-from-persistence-map (:exchange persistence-map))
           (compare-and-set! session-file @session-file file)))      
       (log/info "No file chosen"))))
 
@@ -33,7 +35,8 @@
   (if file
     (let [persistence-map (assoc {}
                             :gui-state (state/get-persistence-map)
-                            :table-model (model/get-persistence-map))]
+                            :table-model (model/get-persistence-map)
+                            :exchange (exchange/get-persistence-map))]
       (log/info (format "Ready to save in file %s" file))
       (with-open [out (io/writer (java.io.BufferedOutputStream.
                                   (java.util.zip.GZIPOutputStream.
