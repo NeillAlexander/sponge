@@ -98,7 +98,8 @@
 (defn clear [event]
   (dosync
    (ref-set data-id-store [])
-   (exchange/delete-all))
+   (exchange/delete-all)
+   (ref-set default-responses {}))
   (notify-data-changed))
 
 (defn set-label-on-row [label row]
@@ -113,6 +114,7 @@
      (ref-set data-id-store
               (vec (concat (subvec @data-id-store 0 row)
                            (subvec @data-id-store (inc row)))))
+     (commute default-responses dissoc (make-default-response-key exchange))
      )
     (notify-row-deleted row)))
 
