@@ -32,6 +32,8 @@
        {:status (.getStatusCode post)
         :headers {"Content-Type" (convert-content-type-header post)}
         :body (duck/slurp* (.getResponseBodyAsStream post))})
+     (catch Exception ex
+       {:status 500 :body (.toString ex)})
      (finally
       (.releaseConnection post)))))
 
