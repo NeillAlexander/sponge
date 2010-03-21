@@ -20,13 +20,26 @@
      mode (atom
            com.nwalex.sponge.gui.SpongeGUIController/FORWARD_ALL))
 
+(defn gui [] @gui-frame-store)
+
+(defn get-mode []
+  @mode)
+
+(defn- set-title []
+  (.setTitle
+   (gui)
+   (format "Sponge [http://localhost:%s --> %s] [%s]"
+           @port-store @target-store (get-mode))))
+
 (defn set-config! [port target]
   (dosync
    (ref-set port-store port)
-   (ref-set target-store target)))
+   (ref-set target-store target)
+   (set-title)))
 
 (defn set-mode [new-mode]
-  (compare-and-set! mode @mode new-mode))
+  (compare-and-set! mode @mode new-mode)
+  (set-title))
 
 (defn load-from-persistence-map [persistence-map]
   (set-config! (:port persistence-map) (:target persistence-map))
@@ -35,13 +48,10 @@
 (defn get-persistence-map []
   {:port @port-store :target @target-store :mode @mode})
 
-(defn get-mode []
-  @mode)
-
 (defn set-gui! [gui]
-  (compare-and-set! gui-frame-store @gui-frame-store gui))
-
-(defn gui [] @gui-frame-store)
+  (compare-and-set! gui-frame-store @gui-frame-store gui)
+  (set-title)
+  gui)
 
 (defn set-current-server! [server]
   (compare-and-set! current-server-store @current-server-store server))

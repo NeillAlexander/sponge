@@ -110,7 +110,6 @@ public class SpongeGUI extends javax.swing.JFrame {
     modeMenu = new javax.swing.JMenu();
     forwardAllMenuItem = new javax.swing.JRadioButtonMenuItem();
     replayOrForwardMenuItem = new javax.swing.JRadioButtonMenuItem();
-    replayOrPromptMenuItem = new javax.swing.JRadioButtonMenuItem();
     replayOrFailMenuItem = new javax.swing.JRadioButtonMenuItem();
     deleteLabelMenuItem = new javax.swing.JMenu();
     attachLabelMenuItem = new javax.swing.JMenuItem();
@@ -233,17 +232,6 @@ public class SpongeGUI extends javax.swing.JFrame {
       });
       modeMenu.add(replayOrForwardMenuItem);
 
-      modeButtonGroup.add(replayOrPromptMenuItem);
-      replayOrPromptMenuItem.setText("Replay or Prompt");
-      replayOrPromptMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_PROMPT);
-      replayOrPromptMenuItem.setEnabled(false);
-      replayOrPromptMenuItem.addActionListener(new java.awt.event.ActionListener() {
-        public void actionPerformed(java.awt.event.ActionEvent evt) {
-          replayOrPromptMenuItemActionPerformed(evt);
-        }
-      });
-      modeMenu.add(replayOrPromptMenuItem);
-
       modeButtonGroup.add(replayOrFailMenuItem);
       replayOrFailMenuItem.setText("Replay or Fail");
       replayOrFailMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_FAIL);
@@ -315,10 +303,6 @@ public class SpongeGUI extends javax.swing.JFrame {
       modeSelected(evt);
     }//GEN-LAST:event_replayOrForwardMenuItemActionPerformed
 
-    private void replayOrPromptMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrPromptMenuItemActionPerformed
-      modeSelected(evt);
-    }//GEN-LAST:event_replayOrPromptMenuItemActionPerformed
-
     private void replayOrFailMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrFailMenuItemActionPerformed
       modeSelected(evt);
     }//GEN-LAST:event_replayOrFailMenuItemActionPerformed
@@ -346,7 +330,6 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenuItem replMenuItem;
   private javax.swing.JRadioButtonMenuItem replayOrFailMenuItem;
   private javax.swing.JRadioButtonMenuItem replayOrForwardMenuItem;
-  private javax.swing.JRadioButtonMenuItem replayOrPromptMenuItem;
   private javax.swing.JTextArea requestTextArea;
   private javax.swing.JTextArea responseArea;
   private javax.swing.JMenuItem saveAsMenuItem;

@@ -20,10 +20,10 @@ import javax.swing.table.TableModel;
  */
 public interface SpongeGUIController {
 
-  public static final String FORWARD_ALL = "forwardAll";
-  public static final String REPLAY_OR_FORWARD = "replayOrForward";
-  public static final String REPLAY_OR_FAIL = "replayOrFail";
-  public static final String REPLAY_OR_PROMPT = "replayOrPrompt";
+  public static final String FORWARD_ALL = "Forward All";
+  public static final String REPLAY_OR_FORWARD = "Replay or Forward";
+  public static final String REPLAY_OR_FAIL = "Replay or Fail";
+  public static final String REPLAY_OR_PROMPT = "Replay or Prompt";
 
   public Action getStartServerAction();
   public Action getStopServerAction();

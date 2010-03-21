@@ -125,5 +125,4 @@
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)
-           (.setVisible true)
-           (.setTitle "Sponge"))))
+           (.setVisible true))))
