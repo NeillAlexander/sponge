@@ -5,12 +5,12 @@
 
   <groupId>com.nwalex</groupId>
   <artifactId>sponge</artifactId>
-  <version>0.9.0</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Sponge parent</name>
 
   <scm>
-    <connection>scm:svn:https://svn.nwalex.com/repos/main/sponge/tags/sponge-0.9.0</connection>
+    <connection>scm:svn:https://svn.nwalex.com/repos/main/sponge/trunk</connection>
   </scm>
 
   <distributionManagement>
