@@ -6,12 +6,11 @@
 ; the terms of this license.
 ; You must not remove this notice, or any other, from this software
 
-(ns runtests
-  ;; Uncomment for Clojure 1.0 & Contrib snapshot:
-  ;; (:use clojure.contrib.test-is)
+(ns com.nwalex.sponge.test-exchange
+  (:require
+   [com.nwalex.sponge.exchange :as exchange])
+  (:use
+   [clojure.test]))
 
-  ;; Uncomment for Clojure 1.1+
-  ;; (:use clojure.test)
-)
-
-;; (run-all-tests)
+(deftest test-pretty-print-invalid-xml
+  (is (= "test" (exchange/do-pretty-print "test"))))
