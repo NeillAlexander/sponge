@@ -22,6 +22,7 @@ from the server"
 (def #^{:private true} exchange-store (ref {}))
 (def #^{:private true} next-exchange-id
      (ref (java.util.concurrent.atomic.AtomicLong.)))
+(def #^{:private true} replay-count (ref {}))
 
 (defn- assign-id-to [exchange]
   (if (:id exchange)
@@ -63,12 +64,14 @@ from the server"
   "Delete all the stored exchanges"
   []
   (dosync
-   (ref-set exchange-store {})))
+   (ref-set exchange-store {})
+   (ref-set replay-count {})))
 
 (defn delete
   [exchange]
   (dosync
-   (commute exchange-store dissoc (:id exchange))))
+   (commute exchange-store dissoc (:id exchange))
+   (commute replay-count dissoc (:id exchange))))
 
 (defn get-exchange
   "Return the exchange with the specified id"
@@ -80,13 +83,15 @@ from the server"
   [exchange key]
   (:body (key exchange)))
 
+(defn get-num-replays [exchange]
+  (let [count (replay-count (:id exchange))]
+    (if count count 0)))
+
 (defn inc-replays
   "Increment the replay account on the exchange"
   [exchange]
   (dosync
-   (commute exchange-store assoc (:id exchange)
-            (assoc exchange :num-replays (inc
-                                          (:num-replays exchange))))))
+   (commute replay-count assoc (:id exchange) (inc (get-num-replays exchange)))))
 
 (defn set-label
   [exchange label]
@@ -138,8 +143,6 @@ from the server"
   (:namespace exchange))
 
 (defn get-id [exchange] (:id exchange))
-
-(defn get-num-replays [exchange] (:num-replays exchange))
 
 (defn get-uri
   [exchange]
