@@ -111,10 +111,15 @@ from the server"
         pp-data (assoc exchange key pp-data-key)]
     (save pp-data)))
 
+(defn- has-body? [exchange key]
+  (:body (key exchange)))
+
 (defn get-pretty-printed-body [exchange key]  
   (if (:pretty-printed (key exchange))
     (:body (key exchange))
-    (:body (key (pretty-print exchange key)))))
+    (if (has-body? exchange key)
+      (:body (key (pretty-print exchange key)))
+      "")))
 
 (defn get-status
   [exchange]
