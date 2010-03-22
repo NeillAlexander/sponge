@@ -28,7 +28,6 @@ from the server"
   (if (:id exchange)
     exchange
     (do
-      (log/info (format "Assigning id to %s " exchange))
       (assoc exchange :id (.getAndIncrement @next-exchange-id)))))
 
 (defn- new-data [exchange]
@@ -46,8 +45,6 @@ from the server"
                (@exchange-store (:id exchange))               
                (new-data exchange))
         time-key (if (= :request key) :started :ended)]
-    (log/info (format "init ex: %s" exchange))
-    (log/info (format "init data: %s" exchange))
     (assoc data
       key (key exchange)
       time-key (System/currentTimeMillis))))
@@ -55,7 +52,6 @@ from the server"
 (defn save
   "Update the exchange to be this new value"
   [exchange]
-  (log/info (format "Saving: %s" exchange))
   (dosync
    (commute exchange-store assoc (:id exchange) exchange))
   exchange)
