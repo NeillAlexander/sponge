@@ -3,12 +3,14 @@
 function add_to_classpath {
     until [ -z "$1" ]
     do
-        if [ $VERBOSE ]
+        if [ $CYGWIN == "true" ]
         then
-            echo Add to classpath: $ITEM
+            ITEM=`cygpath --windows $1`
+        else
+            ITEM=$1
         fi
 
-        CLASSPATH="$CLASSPATH:$ITEM"
+        CLASSPATH="$CLASSPATH$SEPARATOR$ITEM"
         shift
     done
 }
@@ -20,18 +22,26 @@ function init_classpath {
     done
 }
 
+case "`uname`" in
+    CYGWIN*) CYGWIN=true
+esac
+
+if [ $CYGWIN == "true" ]
+then
+    SEPARATOR=";"
+else
+    SEPARATOR=":"
+fi
+
 if [ "$JAVA_HOME" == "" ]
 then
     echo "Error: JAVA_HOME not set"
     exit 1;
 fi
 
-if [ "$SPONGE_HOME" == "" ]
-then
-    echo "Error: SPONGE_HOME not set"
-    exit 1;
-fi
+export SPONGE_HOME=`dirname $0`
 
 init_classpath
 
+# Start the client
 $JAVA_HOME/bin/java.exe -cp $CLASSPATH -Xms128m -Xmx256m com.nwalex.sponge.Client

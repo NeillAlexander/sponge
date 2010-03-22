@@ -6,13 +6,6 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>${project.build.directory}</directory>
-      <outputDirectory>lib</outputDirectory>
-      <includes>
-        <include>${project.build.finalName}.jar</include>
-      </includes>
-    </fileSet>
-    <fileSet>
       <directory>src/main/bin</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
