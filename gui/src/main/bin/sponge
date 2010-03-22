@@ -1,0 +1,37 @@
+#!/bin/sh
+
+function add_to_classpath {
+    until [ -z "$1" ]
+    do
+        if [ $VERBOSE ]
+        then
+            echo Add to classpath: $ITEM
+        fi
+
+        CLASSPATH="$CLASSPATH:$ITEM"
+        shift
+    done
+}
+
+function init_classpath {
+    # set up the classpath dynamically. Note this includes the jline jar
+    for ITEM in `ls $SPONGE_HOME/lib/*.jar`; do
+        add_to_classpath "$ITEM"
+    done
+}
+
+if [ "$JAVA_HOME" == "" ]
+then
+    echo "Error: JAVA_HOME not set"
+    exit 1;
+fi
+
+if [ "$SPONGE_HOME" == "" ]
+then
+    echo "Error: SPONGE_HOME not set"
+    exit 1;
+fi
+
+init_classpath
+
+$JAVA_HOME/bin/java.exe -cp $CLASSPATH -Xms128m -Xmx256m com.nwalex.sponge.Client
