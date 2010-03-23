@@ -1,20 +1,22 @@
 /**
-* Copyright (c) Neill Alexander. All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software
-*/
-
+ * Copyright (c) Neill Alexander. All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software
+ */
 package com.nwalex.sponge.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Enumeration;
+import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
+import javax.swing.Action;
 import javax.swing.InputMap;
 import javax.swing.JFrame;
 import javax.swing.JTable;
@@ -39,7 +41,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   private final SpongeGUIController controller;
 
   /** Creates new form SpongeGUI */
-  public SpongeGUI(SpongeGUIController controller) {
+  public SpongeGUI(final SpongeGUIController controller) {
     this.controller = controller;
     initComponents();
 
@@ -61,15 +63,29 @@ public class SpongeGUI extends javax.swing.JFrame {
     ((JXTable) exchangeTable).addHighlighter(new ColorHighlighter(
             new PatternPredicate("R", 7),
             new Color(213, 234, 212), Color.BLACK));
+    
+    updateSelectedMode(controller);
+  }
 
+  private void updateSelectedMode(final SpongeGUIController controller) {
     // set the mode
     Enumeration<AbstractButton> en = modeButtonGroup.getElements();
-    while(en.hasMoreElements()) {
+    while (en.hasMoreElements()) {
       AbstractButton button = en.nextElement();
       if (button.getActionCommand().equals(controller.getMode())) {
         modeButtonGroup.setSelected(button.getModel(), true);
       }
     }
+  }
+
+  private Action getLoadSessionAction() {
+    return new AbstractAction() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        controller.getLoadAction().actionPerformed(e);
+        updateSelectedMode(controller);
+      }
+    };
   }
 
   /** This method is called from within the constructor to
@@ -182,7 +198,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       jMenu1.setText("File");
 
-      loadMenuItem.setAction(controller.getLoadAction());
+      loadMenuItem.setAction(getLoadSessionAction());
       loadMenuItem.setText("Load Session...");
       jMenu1.add(loadMenuItem);
 
@@ -318,7 +334,6 @@ public class SpongeGUI extends javax.swing.JFrame {
     private void replayOrFailMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrFailMenuItemActionPerformed
       modeSelected(evt);
     }//GEN-LAST:event_replayOrFailMenuItemActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem attachLabelItem;
   private javax.swing.JMenuItem attachLabelMenuItem;
