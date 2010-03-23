@@ -15,16 +15,25 @@
    [clojure.contrib.duck-streams :as io]))
 
 (def #^{:private true} session-file (atom nil))
+(def #^{:private true} sponge-sessions-dir
+     (atom (System/getProperty "sponge.sessions")))
 
 (defn has-file []
   (not (nil? @session-file)))
 
-(defn- choose-file [text]
+(defn- choose-file
+  "Launches JFileChooser. Remembers directory of chosen file for next time"
+  [text]
   (let [file-chooser (doto (javax.swing.JFileChooser.)
-                       (.setApproveButtonText text))
+                       (.setApproveButtonText text)
+                       (.setCurrentDirectory
+                        (java.io.File. @sponge-sessions-dir)))
         response (.showOpenDialog file-chooser (state/gui))]
     (if (= response javax.swing.JFileChooser/APPROVE_OPTION)
-      (.getSelectedFile file-chooser))))
+      (do
+        (compare-and-set! sponge-sessions-dir @sponge-sessions-dir
+                          (.getParent (.getSelectedFile file-chooser)))
+        (.getSelectedFile file-chooser)))))
 
 (defn load-session! [event]
   (let [file (choose-file "Load")]
