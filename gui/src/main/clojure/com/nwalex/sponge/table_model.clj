@@ -115,15 +115,35 @@
     (exchange/set-label exchange label)    
     (notify-row-changed row)))
 
+(defn- get-default-response
+  "Return the default response for this exchange type (if any)"
+  [exchange]
+  (@default-responses (make-default-response-key exchange)))
+
+(defn- delete-default-response-if-required!
+  "Delete the default response if this is the response exchange"
+  [exchange]
+  (let [response-exchange (get-default-response exchange)]
+    (if (= (exchange/get-id exchange/get-id)
+           (exchange/get-id response-exchange))
+      (log/info (format "Deleting default response id = %s"
+                        (exchange/get-id exchange)))
+      (commute default-responses
+               dissoc (make-default-response-key exchange)))))
+
 (defn delete-current-row [row]
+  (log/info (format "Deleting row %d" row))
+  (log/info (format "Num rows before delete = %d" (count @data-id-store)))
+  (log/info (format "Num exchanges before delete = %d"
+                    (exchange/get-num-exchanges)))
   (let [exchange (get-exchange-for-row row)]
     (dosync
      (exchange/delete exchange)
      (ref-set data-id-store
               (vec (concat (subvec @data-id-store 0 row)
                            (subvec @data-id-store (inc row)))))
-     (commute default-responses dissoc (make-default-response-key exchange))
-     )
+     (delete-default-response-if-required! exchange))
+    (log/info (format "Num rows after delete = %d" (count @data-id-store)))
     (notify-row-deleted row)))
 
 (defn get-label-for-row [row]
@@ -158,7 +178,7 @@
     (notify-row-changed row)))
 
 (defn replay-response [exchange]
-  (let [response-id (@default-responses (make-default-response-key exchange))]
+  (let [response-id (get-default-response exchange)]
     (if response-id
       (let [exchange (exchange/get-exchange response-id)]
         (exchange/inc-replays exchange)

@@ -49,6 +49,8 @@ from the server"
       key (key exchange)
       time-key (System/currentTimeMillis))))
 
+(defn get-id [exchange] (:id exchange))
+
 (defn save
   "Update the exchange to be this new value"
   [exchange]
@@ -65,6 +67,7 @@ from the server"
 
 (defn delete
   [exchange]
+  (log/info (format "Deleting exchange id: %s" (get-id exchange)))
   (dosync
    (commute exchange-store dissoc (:id exchange))
    (commute replay-count dissoc (:id exchange))))
@@ -138,8 +141,6 @@ from the server"
   [exchange]
   (:namespace exchange))
 
-(defn get-id [exchange] (:id exchange))
-
 (defn get-uri
   [exchange]
   (:uri (:request exchange)))
@@ -172,6 +173,9 @@ from the server"
   "Returns true if exchange of this id exists"
   [exchange]
   (@exchange-store (:id exchange)))
+
+(defn get-num-exchanges []
+  (count (keys @exchange-store)))
 
 (defn get-persistence-map []
   {:exchange-store @exchange-store
