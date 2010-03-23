@@ -37,13 +37,13 @@
    (ref-set target-store target)
    (set-title)))
 
-(defn set-mode [new-mode]
+(defn set-mode! [new-mode]
   (compare-and-set! mode @mode new-mode)
   (set-title))
 
-(defn load-from-persistence-map [persistence-map]
+(defn load-from-persistence-map! [persistence-map]
   (set-config! (:port persistence-map) (:target persistence-map))
-  (set-mode (:mode persistence-map)))
+  (set-mode! (:mode persistence-map)))
 
 (defn get-persistence-map []
   {:port @port-store :target @target-store :mode @mode})

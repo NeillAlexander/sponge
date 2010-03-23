@@ -59,7 +59,7 @@
   (System/exit 1))
 
 (defn- delete-row [event]
-  (model/delete-current-row (state/current-row)))
+  (model/delete-current-row! (state/current-row)))
 
 (defn- update-row [row]
   (state/set-current-row! row)
@@ -73,7 +73,7 @@
   (.setEnabled (:save action-map) (session/has-file)))
 
 (defn- use-response [event]
-  (model/use-current-row-response (state/current-row)))
+  (model/use-current-row-response! (state/current-row)))
 
 (def action-map
      {:start-server (make-action "Start Server" start-server true)
@@ -81,11 +81,11 @@
       :configure (make-action "Configure" config/configure true)
       :exit (make-action "Exit" exit true)
       :start-repl (make-action "Start Repl" start-repl true)
-      :clear-all (make-action "Clear All" model/clear true)
+      :clear-all (make-action "Clear All" model/clear! true)
       :label-action (make-action "Attach Label..." label/do-label false)
       :delete-label (make-action "Delete Label" label/delete-label false)
       :load (make-action "Load Session..."
-                         #(wrap-session-action session/load-session %1) true)
+                         #(wrap-session-action session/load-session! %1) true)
       :save (make-action "Save Session" session/save-session false)
       :save-as (make-action "Save Session As..."
                             #(wrap-session-action session/save-session-as %1)
@@ -94,7 +94,7 @@
       :delete-row (make-action "Delete Exchange" delete-row false)})
 
 (defn- set-mode [mode]  
-  (state/set-mode mode)
+  (state/set-mode! mode)
   (if (server/running? (state/current-server))
     (do
       (stop-server nil)

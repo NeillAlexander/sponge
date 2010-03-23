@@ -51,21 +51,21 @@ from the server"
 
 (defn get-id [exchange] (:id exchange))
 
-(defn save
+(defn save!
   "Update the exchange to be this new value"
   [exchange]
   (dosync
    (commute exchange-store assoc (:id exchange) exchange))
   exchange)
 
-(defn delete-all
+(defn delete-all!
   "Delete all the stored exchanges"
   []
   (dosync
    (ref-set exchange-store {})
    (ref-set replay-count {})))
 
-(defn delete
+(defn delete!
   [exchange]
   (log/info (format "Deleting exchange id: %s" (get-id exchange)))
   (dosync
@@ -86,13 +86,13 @@ from the server"
   (let [count (replay-count (:id exchange))]
     (if count count 0)))
 
-(defn inc-replays
+(defn inc-replays!
   "Increment the replay account on the exchange"
   [exchange]
   (dosync
    (commute replay-count assoc (:id exchange) (inc (get-num-replays exchange)))))
 
-(defn set-label
+(defn set-label!
   [exchange label]
   (dosync
    (commute exchange-store assoc (:id exchange)
@@ -121,7 +121,7 @@ from the server"
                       :body pp-body
                       :pretty-printed true)
         pp-data (assoc exchange key pp-data-key)]
-    (save pp-data)))
+    (save! pp-data)))
 
 (defn- has-body? [exchange key]
   (:body (key exchange)))
@@ -181,7 +181,7 @@ from the server"
   {:exchange-store @exchange-store
    :next-exchange-id (.get @next-exchange-id)})
 
-(defn load-from-persistence-map [persistence-map]  
+(defn load-from-persistence-map! [persistence-map]  
   (dosync   
    (ref-set exchange-store (:exchange-store persistence-map))
    (ref-set next-exchange-id (java.util.concurrent.atomic.AtomicLong.

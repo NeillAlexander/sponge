@@ -34,7 +34,7 @@
   {:data-id-store @data-id-store
    :default-responses @default-responses})
 
-(defn load-from-persistence-map [persistence-map]  
+(defn load-from-persistence-map! [persistence-map]  
   (dosync   
    (ref-set data-id-store (:data-id-store persistence-map))
    (ref-set default-responses (:default-responses persistence-map)))
@@ -67,14 +67,14 @@
   [row key]
   (exchange/get-pretty-printed-body (get-exchange-for-row row) key))
 
-(defn- add-entry
+(defn- add-entry!
   [exchange]
   ;; only add the id once (on request)
   (dosync 
    (if (not (exchange/known? exchange))
      (commute data-id-store conj (exchange/get-id exchange)))
    ;; but always update the data store
-   (exchange/save exchange)))
+   (exchange/save! exchange)))
 
 (defn- notify-data-changed []
   (swing/do-swing
@@ -98,26 +98,26 @@
   "Add the exchange represented by map m"
   [server m key]
   (let [exchange (exchange/init m key)]
-    (add-entry exchange)
+    (add-entry! exchange)
     (notify-row-added (dec (count @data-id-store)))
     exchange))
 
 (defn get-table-model []
   exchange-table-model)
 
-(defn clear [event]
+(defn clear! [event]
   (log/info "Clearing all saved exchanges...")
   (dosync
    (state/clear-current-row!)
    (ref-set data-id-store [])
-   (exchange/delete-all)
+   (exchange/delete-all!)
    (ref-set default-responses {}))
   (log/info "Finished clearing all saved exchanges")
   (notify-data-changed))
 
 (defn set-label-on-row [label row]
   (let [exchange (get-exchange-for-row row)]
-    (exchange/set-label exchange label)    
+    (exchange/set-label! exchange label)    
     (notify-row-changed row)))
 
 (defn- get-default-response
@@ -136,14 +136,14 @@
       (commute default-responses
                dissoc (make-default-response-key exchange)))))
 
-(defn delete-current-row [row]
+(defn delete-current-row! [row]
   (log/info (format "Deleting row %d" row))
   (log/info (format "Num rows before delete = %d" (count @data-id-store)))
   (log/info (format "Num exchanges before delete = %d"
                     (exchange/get-num-exchanges)))
   (let [exchange (get-exchange-for-row row)]
     (dosync
-     (exchange/delete exchange)
+     (exchange/delete! exchange)
      (ref-set data-id-store
               (vec (concat (subvec @data-id-store 0 row)
                            (subvec @data-id-store (inc row)))))
@@ -171,7 +171,7 @@
   ([namespace uri soap-method]
      (str namespace "-" uri "-" soap-method)))
 
-(defn use-current-row-response [row]  
+(defn use-current-row-response! [row]  
   (let [exchange (get-exchange-for-row row)
         key (make-default-response-key exchange)]
     ;; if already set then unset (toggle)
@@ -186,6 +186,6 @@
   (let [response-id (get-default-response exchange)]
     (if response-id
       (let [exchange (exchange/get-exchange response-id)]
-        (exchange/inc-replays exchange)
+        (exchange/inc-replays! exchange)
         (notify-data-changed)
         (:response exchange)))))
