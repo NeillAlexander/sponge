@@ -52,8 +52,9 @@
   (toggle-started))
 
 (defn- start-repl [event]
-  (core/start-repl 4006)
-  (toggle-action (:start-repl action-map)))
+  (toggle-action (:start-repl action-map))
+  (future   
+   (core/start-repl 4006)))
 
 (defn- exit [event]
   (System/exit 1))
