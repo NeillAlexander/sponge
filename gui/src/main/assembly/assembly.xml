@@ -17,11 +17,9 @@
       </excludes>
     </fileSet>
   </fileSets>
-  <binaries>
-    <dependencySets>
-      <dependencySet>
-        <outputDirectory>lib</outputDirectory>
-      </dependencySet>
-    </dependencySets>
-  </binaries>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>lib</outputDirectory>
+    </dependencySet>
+  </dependencySets>
 </assembly>
