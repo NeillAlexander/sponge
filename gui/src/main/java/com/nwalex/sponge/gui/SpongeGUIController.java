@@ -38,6 +38,7 @@ public interface SpongeGUIController {
   public Action getSaveAsAction();
   public Action getSetDefaultResponseAction();
   public Action getDeleteRowAction();
+  public Action getResendRequestAction();
 
   public String getMode();
   public void setMode(String mode);

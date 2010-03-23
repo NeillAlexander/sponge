@@ -32,6 +32,14 @@
             <Property name="text" type="java.lang.String" value="Use this Response"/>
           </Properties>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="resendRequestItem">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="controller.getResendRequestAction()" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Resend Request"/>
+          </Properties>
+        </MenuItem>
       </SubComponents>
     </Container>
     <Component class="javax.swing.ButtonGroup" name="modeButtonGroup">
@@ -189,6 +197,14 @@
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="clearAllMenuItem.setAction(controller.getClearAllAction());"/>
               </AuxValues>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="resendRequestMenuItem">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="controller.getResendRequestAction()" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Resend Request"/>
+              </Properties>
             </MenuItem>
           </SubComponents>
         </Menu>

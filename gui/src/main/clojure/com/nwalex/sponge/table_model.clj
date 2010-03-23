@@ -40,7 +40,7 @@
    (ref-set default-responses (:default-responses persistence-map)))
   (notify-data-changed))
 
-(defn- get-exchange-for-row [row]
+(defn get-exchange-for-row [row]
   (exchange/get-exchange (@data-id-store row)))
 
 (defn get-value-at [row col]

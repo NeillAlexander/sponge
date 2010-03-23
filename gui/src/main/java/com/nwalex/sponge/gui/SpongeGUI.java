@@ -84,6 +84,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     attachLabelItem = new javax.swing.JMenuItem();
     deleteLabelItem = new javax.swing.JMenuItem();
     setDefaultResponseItem = new javax.swing.JMenuItem();
+    resendRequestItem = new javax.swing.JMenuItem();
     modeButtonGroup = new javax.swing.ButtonGroup();
     jScrollPane2 = new javax.swing.JScrollPane();
     exchangeTable = new JXTable(controller.getExchangeTableModel());
@@ -115,6 +116,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     attachLabelMenuItem = new javax.swing.JMenuItem();
     jMenuItem1 = new javax.swing.JMenuItem();
     clearAllMenuItem = new javax.swing.JMenuItem();
+    resendRequestMenuItem = new javax.swing.JMenuItem();
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
     replMenuItem.setAction(controller.getStartReplAction());
@@ -130,6 +132,10 @@ public class SpongeGUI extends javax.swing.JFrame {
     setDefaultResponseItem.setAction(controller.getSetDefaultResponseAction());
     setDefaultResponseItem.setText("Use this Response");
     tablePopup.add(setDefaultResponseItem);
+
+    resendRequestItem.setAction(controller.getResendRequestAction());
+    resendRequestItem.setText("Resend Request");
+    tablePopup.add(resendRequestItem);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -260,6 +266,10 @@ public class SpongeGUI extends javax.swing.JFrame {
       clearAllMenuItem.setAction(controller.getClearAllAction());
       deleteLabelMenuItem.add(clearAllMenuItem);
 
+      resendRequestMenuItem.setAction(controller.getResendRequestAction());
+      resendRequestMenuItem.setText("Resend Request");
+      deleteLabelMenuItem.add(resendRequestMenuItem);
+
       menuBar.add(deleteLabelMenuItem);
 
       replMenu.setText("Repl");
@@ -333,6 +343,8 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JRadioButtonMenuItem replayOrFailMenuItem;
   private javax.swing.JRadioButtonMenuItem replayOrForwardMenuItem;
   private javax.swing.JTextArea requestTextArea;
+  private javax.swing.JMenuItem resendRequestItem;
+  private javax.swing.JMenuItem resendRequestMenuItem;
   private javax.swing.JTextArea responseArea;
   private javax.swing.JMenuItem saveAsMenuItem;
   private javax.swing.JMenuItem saveMenuItem;

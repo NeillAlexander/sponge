@@ -16,7 +16,7 @@
    [com.nwalex.sponge.session :as session]
    [com.nwalex.sponge.label-controller :as label]
    [com.nwalex.sponge.config-controller :as config]
-   ))
+   [com.nwalex.sponge.exchange :as exchange]))
 
 (declare action-map)
 
@@ -61,12 +61,18 @@
 (defn- delete-row [event]
   (model/delete-current-row! (state/current-row)))
 
+(defn- resend-request [event]
+  (let [exchange (model/get-exchange-for-row (state/current-row))]
+    (future (server/resend-request exchange (state/current-server)))))
+
 (defn- update-row [row]
   (state/set-current-row! row)
   (.setEnabled (:label-action action-map) (state/row-selected))
   (.setEnabled (:delete-label action-map) (state/row-selected))
   (.setEnabled (:use-response action-map) (state/row-selected))
-  (.setEnabled (:delete-row action-map) (state/row-selected)))
+  (.setEnabled (:delete-row action-map) (state/row-selected))
+  (.setEnabled (:resend-request action-map)
+               (and (state/row-selected) (server/running? (state/current-server)))))
 
 (defn- wrap-session-action [f event]
   (f event)
@@ -91,7 +97,8 @@
                             #(wrap-session-action session/save-session-as %1)
                             true)
       :use-response (make-action "Use this Response" use-response false)
-      :delete-row (make-action "Delete Exchange" delete-row false)})
+      :delete-row (make-action "Delete Exchange" delete-row false)
+      :resend-request (make-action "Resend this Request" resend-request false)})
 
 (defn- set-mode [mode]  
   (state/set-mode! mode)
@@ -121,7 +128,8 @@
        (getSetDefaultResponseAction [] (:use-response action-map))
        (getMode [] (state/get-mode))
        (setMode [mode] (set-mode mode))
-       (getDeleteRowAction [] (:delete-row action-map))))
+       (getDeleteRowAction [] (:delete-row action-map))
+       (getResendRequestAction [] (:resend-request action-map))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)

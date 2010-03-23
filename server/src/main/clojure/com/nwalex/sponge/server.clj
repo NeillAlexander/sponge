@@ -9,7 +9,7 @@
 (ns com.nwalex.sponge.server
   (:require
    [com.nwalex.sponge.http :as http]
-   [com.nwalex.sponge.datastore :as ds]
+   [com.nwalex.sponge.datastore :as ds]   
    [clojure.contrib.logging :as log]
    [clojure.contrib.duck-streams :as duck]
    [ring.adapter.jetty :as jetty]
@@ -63,6 +63,16 @@
 
 (defn- with-reload-app [server]
   (reload/wrap-reload #(app server %1) '(com.nwalex.sponge.core)))
+
+(defn resend-request
+  "Sends the request in the exchange to the current endpoint"
+  [exchange server]
+  (log/info (format "Resending request id %s: %s"
+                    (:id exchange)
+                    (:soap-method exchange)))
+  (let [r-exchange (dissoc exchange :id :response :replayed :num-replays
+                           :namespace :soap-method)]        
+    (process-response server (process-request server r-exchange))))
 
 (defn make-server
   "Create an instance of the Sponge server. Options are as follows:
