@@ -70,5 +70,8 @@
                     @current-row-store (if (> row -1) row nil))
   (log/debug (format "Current selected row = %s" (current-row))))
 
+(defn clear-current-row! []
+  (set-current-row! -1))
+
 (defn row-selected []
   (not (nil? (current-row))))

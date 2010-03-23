@@ -145,17 +145,19 @@ public class SpongeGUI extends javax.swing.JFrame {
           }
 
           ListSelectionModel rowSM = (ListSelectionModel) e.getSource();
-          int selectedIndex = rowSM.getMinSelectionIndex();
+          int rawIndex = rowSM.getMinSelectionIndex();         
 
-          controller.setSelectedRow(selectedIndex);
+          if (rawIndex > -1) {                  
+            int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);
 
-          if (selectedIndex > -1) {                  
-
+            controller.setSelectedRow(selectedIndex);
             requestTextArea.setText(controller.getRequestDataForRow(selectedIndex)); 
             requestTextArea.setCaretPosition(0);
 
             responseArea.setText(controller.getResponseDataForRow(selectedIndex)); 
             responseArea.setCaretPosition(0);
+          } else {
+            controller.setSelectedRow(-1);
           }
         }
       });

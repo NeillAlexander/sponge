@@ -10,6 +10,7 @@
   (:require
    [com.nwalex.sponge.soap :as soap]
    [com.nwalex.sponge.exchange :as exchange]
+   [com.nwalex.sponge.gui-state :as state]
    [clojure.contrib.swing-utils :as swing]
    [clojure.contrib.logging :as log]))
 
@@ -89,6 +90,7 @@
    (.fireTableRowsInserted exchange-table-model row row)))
 
 (defn- notify-row-deleted [row]
+  (log/info (format "Notify row deleted: %d" row))
   (swing/do-swing
    (.fireTableRowsDeleted exchange-table-model row row)))
 
@@ -104,10 +106,13 @@
   exchange-table-model)
 
 (defn clear [event]
+  (log/info "Clearing all saved exchanges...")
   (dosync
+   (state/clear-current-row!)
    (ref-set data-id-store [])
    (exchange/delete-all)
    (ref-set default-responses {}))
+  (log/info "Finished clearing all saved exchanges")
   (notify-data-changed))
 
 (defn set-label-on-row [label row]
