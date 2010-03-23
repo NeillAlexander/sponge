@@ -9,6 +9,13 @@
       <directory>src/main/bin</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>target/</directory>
+      <outputDirectory>sessions</outputDirectory>
+      <excludes>
+        <exclude>**/*</exclude>
+      </excludes>
+    </fileSet>
   </fileSets>
   <binaries>
     <dependencySets>
