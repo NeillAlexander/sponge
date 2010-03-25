@@ -127,10 +127,8 @@ public class SpongeGUI extends javax.swing.JFrame {
     exchangeTable = new JXTable(controller.getExchangeTableModel());
     ((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});
     ((JXTable) exchangeTable).setColumnControlVisible(true);
-    jScrollPane1 = new javax.swing.JScrollPane();
-    requestTextArea = new javax.swing.JTextArea();
-    jScrollPane3 = new javax.swing.JScrollPane();
-    responseArea = new javax.swing.JTextArea();
+    requestPanel = new com.nwalex.sponge.gui.BodyPanel();
+    responsePanel = new com.nwalex.sponge.gui.BodyPanel();
     menuBar = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     loadMenuItem = new javax.swing.JMenuItem();
@@ -194,11 +192,9 @@ public class SpongeGUI extends javax.swing.JFrame {
             int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);
 
             controller.setSelectedRow(selectedIndex);
-            requestTextArea.setText(controller.getRequestDataForRow(selectedIndex)); 
-            requestTextArea.setCaretPosition(0);
+            requestPanel.setText(controller.getRequestDataForRow(selectedIndex)); 
 
-            responseArea.setText(controller.getResponseDataForRow(selectedIndex)); 
-            responseArea.setCaretPosition(0);
+            responsePanel.setText(controller.getResponseDataForRow(selectedIndex)); 
           } else {
             controller.setSelectedRow(-1);
           }
@@ -206,16 +202,6 @@ public class SpongeGUI extends javax.swing.JFrame {
       });
 
       jScrollPane2.setViewportView(exchangeTable);
-
-      requestTextArea.setColumns(20);
-      requestTextArea.setEditable(false);
-      requestTextArea.setRows(5);
-      jScrollPane1.setViewportView(requestTextArea);
-
-      responseArea.setColumns(20);
-      responseArea.setEditable(false);
-      responseArea.setRows(5);
-      jScrollPane3.setViewportView(responseArea);
 
       jMenu1.setText("File");
 
@@ -322,20 +308,21 @@ public class SpongeGUI extends javax.swing.JFrame {
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 520, Short.MAX_VALUE)
         .addGroup(layout.createSequentialGroup()
-          .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+          .addComponent(requestPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-          .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE))
-        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
+          .addComponent(responsePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE))
       );
       layout.setVerticalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
         .addGroup(layout.createSequentialGroup()
-          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 158, Short.MAX_VALUE)
+          .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
           .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)))
+            .addComponent(responsePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+            .addComponent(requestPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE))
+          .addGap(11, 11, 11))
       );
 
       pack();
@@ -367,9 +354,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JRadioButtonMenuItem forwardAllMenuItem;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenuItem jMenuItem1;
-  private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JScrollPane jScrollPane2;
-  private javax.swing.JScrollPane jScrollPane3;
   private javax.swing.JMenuItem loadMenuItem;
   private javax.swing.JMenuBar menuBar;
   private javax.swing.ButtonGroup modeButtonGroup;
@@ -378,10 +363,10 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenuItem replMenuItem;
   private javax.swing.JRadioButtonMenuItem replayOrFailMenuItem;
   private javax.swing.JRadioButtonMenuItem replayOrForwardMenuItem;
-  private javax.swing.JTextArea requestTextArea;
+  private com.nwalex.sponge.gui.BodyPanel requestPanel;
   private javax.swing.JMenuItem resendRequestItem;
   private javax.swing.JMenuItem resendRequestMenuItem;
-  private javax.swing.JTextArea responseArea;
+  private com.nwalex.sponge.gui.BodyPanel responsePanel;
   private javax.swing.JMenuItem saveAsMenuItem;
   private javax.swing.JMenuItem saveMenuItem;
   private javax.swing.JMenu serverMenu;

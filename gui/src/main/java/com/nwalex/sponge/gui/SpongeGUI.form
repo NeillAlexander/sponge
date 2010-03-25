@@ -248,23 +248,24 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
+          <Component id="jScrollPane2" alignment="0" pref="520" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jScrollPane1" pref="243" max="32767" attributes="0"/>
+              <Component id="requestPanel" pref="257" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPane3" pref="243" max="32767" attributes="0"/>
+              <Component id="responsePanel" pref="257" max="32767" attributes="0"/>
           </Group>
-          <Component id="jScrollPane2" alignment="0" pref="492" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jScrollPane2" pref="158" max="32767" attributes="0"/>
+              <Component id="jScrollPane2" pref="176" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane3" pref="157" max="32767" attributes="0"/>
-                  <Component id="jScrollPane1" alignment="0" pref="157" max="32767" attributes="0"/>
+                  <Component id="responsePanel" pref="176" max="32767" attributes="0"/>
+                  <Component id="requestPanel" alignment="0" pref="176" max="32767" attributes="0"/>
               </Group>
+              <EmptySpace min="-2" pref="11" max="-2" attributes="1"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -289,42 +290,14 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JXTable(controller.getExchangeTableModel());"/>
             <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});&#xa;((JXTable) exchangeTable).setColumnControlVisible(true);&#xa;"/>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="exchangeTable.getSelectionModel().addListSelectionListener(&#xd;&#xa;        new ListSelectionListener() {&#xd;&#xa;&#xd;&#xa;          public void valueChanged(ListSelectionEvent e) {&#xd;&#xa;            if (e.getValueIsAdjusting()) {&#xd;&#xa;              return;&#xd;&#xa;            }&#xd;&#xa;&#xd;&#xa;            ListSelectionModel rowSM = (ListSelectionModel) e.getSource();&#xd;&#xa;            int rawIndex = rowSM.getMinSelectionIndex();         &#xd;&#xa;&#xd;&#xa;            if (rawIndex &gt; -1) {                  &#xd;&#xa;              int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);&#xd;&#xa;&#xd;&#xa;              controller.setSelectedRow(selectedIndex);&#xd;&#xa;              requestTextArea.setText(controller.getRequestDataForRow(selectedIndex)); &#xd;&#xa;              requestTextArea.setCaretPosition(0);&#xd;&#xa;&#xd;&#xa;              responseArea.setText(controller.getResponseDataForRow(selectedIndex)); &#xd;&#xa;              responseArea.setCaretPosition(0);&#xd;&#xa;            } else {&#xd;&#xa;              controller.setSelectedRow(-1);&#xd;&#xa;            }&#xd;&#xa;          }&#xd;&#xa;        });&#xd;&#xa;&#xd;&#xa;"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="exchangeTable.getSelectionModel().addListSelectionListener(&#xd;&#xa;        new ListSelectionListener() {&#xd;&#xa;&#xd;&#xa;          public void valueChanged(ListSelectionEvent e) {&#xd;&#xa;            if (e.getValueIsAdjusting()) {&#xd;&#xa;              return;&#xd;&#xa;            }&#xd;&#xa;&#xd;&#xa;            ListSelectionModel rowSM = (ListSelectionModel) e.getSource();&#xd;&#xa;            int rawIndex = rowSM.getMinSelectionIndex();         &#xd;&#xa;&#xd;&#xa;            if (rawIndex &gt; -1) {                  &#xd;&#xa;              int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);&#xd;&#xa;&#xd;&#xa;              controller.setSelectedRow(selectedIndex);&#xd;&#xa;              requestPanel.setText(controller.getRequestDataForRow(selectedIndex)); &#xd;&#xa;&#xd;&#xa;              responsePanel.setText(controller.getResponseDataForRow(selectedIndex)); &#xd;&#xa;            } else {&#xd;&#xa;              controller.setSelectedRow(-1);&#xd;&#xa;            }&#xd;&#xa;          }&#xd;&#xa;        });&#xd;&#xa;&#xd;&#xa;"/>
           </AuxValues>
         </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
-      <AuxValues>
-        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-      </AuxValues>
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-      <SubComponents>
-        <Component class="javax.swing.JTextArea" name="requestTextArea">
-          <Properties>
-            <Property name="columns" type="int" value="20"/>
-            <Property name="editable" type="boolean" value="false"/>
-            <Property name="rows" type="int" value="5"/>
-          </Properties>
-        </Component>
-      </SubComponents>
-    </Container>
-    <Container class="javax.swing.JScrollPane" name="jScrollPane3">
-      <AuxValues>
-        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
-      </AuxValues>
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-      <SubComponents>
-        <Component class="javax.swing.JTextArea" name="responseArea">
-          <Properties>
-            <Property name="columns" type="int" value="20"/>
-            <Property name="editable" type="boolean" value="false"/>
-            <Property name="rows" type="int" value="5"/>
-          </Properties>
-        </Component>
-      </SubComponents>
-    </Container>
+    <Component class="com.nwalex.sponge.gui.BodyPanel" name="requestPanel">
+    </Component>
+    <Component class="com.nwalex.sponge.gui.BodyPanel" name="responsePanel">
+    </Component>
   </SubComponents>
 </Form>
