@@ -43,6 +43,7 @@ public class BodyPanel extends javax.swing.JPanel {
     displayArea = new javax.swing.JTextArea();
 
     displayArea.setColumns(20);
+    displayArea.setEditable(false);
     displayArea.setRows(5);
     jScrollPane1.setViewportView(displayArea);
 
