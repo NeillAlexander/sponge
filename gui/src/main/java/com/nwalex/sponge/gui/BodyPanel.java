@@ -22,6 +22,10 @@ public class BodyPanel extends javax.swing.JPanel {
 
   private final SaveAction saveAction;
 
+  public BodyPanel() {
+    saveAction = null;
+  }
+
   /** Creates new form BodyPanel */
   public BodyPanel(SaveAction saveAction) {
     this.saveAction = saveAction;
