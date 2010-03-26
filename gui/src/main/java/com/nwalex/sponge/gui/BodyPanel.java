@@ -42,6 +42,14 @@ public class BodyPanel extends javax.swing.JPanel {
     ((CardLayout) getLayout()).next(this);
   }
 
+  public void displayReadOnlyView() {
+    ((CardLayout) getLayout()).show(this, "readOnlyCard");
+  }
+
+  public void displayEditView() {
+    ((CardLayout) getLayout()).show(this, "editCard");
+  }
+
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
@@ -90,7 +98,7 @@ public class BodyPanel extends javax.swing.JPanel {
         .addComponent(readOnlyPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE))
     );
 
-    add(readOnlyContainer, "card2");
+    add(readOnlyContainer, "readOnlyCard");
 
     editContainer.setName("write"); // NOI18N
 
@@ -129,7 +137,7 @@ public class BodyPanel extends javax.swing.JPanel {
           .addGap(41, 41, 41)))
     );
 
-    add(editContainer, "card3");
+    add(editContainer, "editCard");
   }// </editor-fold>//GEN-END:initComponents
 
   private void displayAreaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayAreaMouseClicked

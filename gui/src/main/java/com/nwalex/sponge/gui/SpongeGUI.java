@@ -93,19 +93,13 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       @Override
       public void tableChanged(TableModelEvent e) {
-        int firstRow = e.getFirstRow();
-        int lastRow = e.getLastRow();
+        int rawIndex = exchangeTable.getSelectedRow();
 
-        System.out.println("First row " + firstRow + ", last row " + lastRow);
-
-//        if (rawIndex > -1) {
-//          int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);
-//
-//          controller.setSelectedRow(selectedIndex);
-//          requestPanel.setText(controller.getRequestDataForRow(selectedIndex));
-//
-//          responsePanel.setText(controller.getResponseDataForRow(selectedIndex));
-//        }
+        if (rawIndex > -1) {
+          int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);
+          requestPanel.setText(controller.getRequestDataForRow(selectedIndex));
+          responsePanel.setText(controller.getResponseDataForRow(selectedIndex));
+        }
       }
     });
   }
@@ -216,8 +210,10 @@ public class SpongeGUI extends javax.swing.JFrame {
 
             controller.setSelectedRow(selectedIndex);
             requestPanel.setText(controller.getRequestDataForRow(selectedIndex)); 
-
             responsePanel.setText(controller.getResponseDataForRow(selectedIndex)); 
+
+            requestPanel.displayReadOnlyView();
+            responsePanel.displayReadOnlyView();
           } else {
             controller.setSelectedRow(-1);
           }
