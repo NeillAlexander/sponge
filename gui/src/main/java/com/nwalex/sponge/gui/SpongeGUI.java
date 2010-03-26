@@ -120,7 +120,10 @@ public class SpongeGUI extends javax.swing.JFrame {
           controller.getDeleteRowAction().actionPerformed(e);
 
           int numRows = exchangeTable.getRowCount();
-          selectedRow = selectedRow - 1;
+          
+          if (selectedRow > 0) {
+            selectedRow = selectedRow - 1;
+          }
 
           if (numRows > 0) {
             if (selectedRow < numRows) {
