@@ -169,6 +169,9 @@ public class SpongeGUI extends javax.swing.JFrame {
     deleteLabelItem = new javax.swing.JMenuItem();
     setDefaultResponseItem = new javax.swing.JMenuItem();
     resendRequestItem = new javax.swing.JMenuItem();
+    duplicate = new javax.swing.JMenuItem();
+    jSeparator1 = new javax.swing.JPopupMenu.Separator();
+    delete = new javax.swing.JMenuItem();
     modeButtonGroup = new javax.swing.ButtonGroup();
     jScrollPane2 = new javax.swing.JScrollPane();
     exchangeTable = new JXTable(controller.getExchangeTableModel());
@@ -195,29 +198,35 @@ public class SpongeGUI extends javax.swing.JFrame {
     replayOrForwardMenuItem = new javax.swing.JRadioButtonMenuItem();
     replayOrFailMenuItem = new javax.swing.JRadioButtonMenuItem();
     deleteLabelMenuItem = new javax.swing.JMenu();
-    attachLabelMenuItem = new javax.swing.JMenuItem();
-    jMenuItem1 = new javax.swing.JMenuItem();
     clearAllMenuItem = new javax.swing.JMenuItem();
-    resendRequestMenuItem = new javax.swing.JMenuItem();
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
     replMenuItem.setAction(controller.getStartReplAction());
 
     attachLabelItem.setAction(controller.getLabelExchangeAction());
-    attachLabelItem.setText("Attach Label...");
+    attachLabelItem.setText("Label...");
     tablePopup.add(attachLabelItem);
 
     deleteLabelItem.setAction(controller.getDeleteLabelAction());
-    deleteLabelItem.setText("Delete Label");
+    deleteLabelItem.setText("Unlabel");
     tablePopup.add(deleteLabelItem);
 
     setDefaultResponseItem.setAction(controller.getSetDefaultResponseAction());
-    setDefaultResponseItem.setText("Use this Response");
+    setDefaultResponseItem.setText("Replay");
     tablePopup.add(setDefaultResponseItem);
 
     resendRequestItem.setAction(controller.getResendRequestAction());
-    resendRequestItem.setText("Resend Request");
+    resendRequestItem.setText("Resend");
     tablePopup.add(resendRequestItem);
+
+    duplicate.setAction(controller.getDuplicateRowAction());
+    duplicate.setText("Duplicate");
+    tablePopup.add(duplicate);
+    tablePopup.add(jSeparator1);
+
+    delete.setAction(getWrappedDeleteAction());
+    delete.setText("Delete");
+    tablePopup.add(delete);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -255,10 +264,12 @@ public class SpongeGUI extends javax.swing.JFrame {
       jMenu1.setText("File");
 
       loadMenuItem.setAction(getLoadSessionAction());
+      loadMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
       loadMenuItem.setText("Load Session...");
       jMenu1.add(loadMenuItem);
 
       saveMenuItem.setAction(controller.getSaveAction());
+      saveMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
       saveMenuItem.setText("Save Session");
       jMenu1.add(saveMenuItem);
 
@@ -270,12 +281,15 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       serverMenu.setText("Server");
 
+      startServerMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, java.awt.event.InputEvent.CTRL_MASK));
       startServerMenuItem.setText("Start Server");
       serverMenu.add(startServerMenuItem);
 
+      stopServerMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
       stopServerMenuItem.setText("Stop Server");
       serverMenu.add(stopServerMenuItem);
 
+      configureMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_PERIOD, java.awt.event.InputEvent.CTRL_MASK));
       configureMenuItem.setText("Configure...");
       serverMenu.add(configureMenuItem);
 
@@ -291,6 +305,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       modeMenu.setText("Mode");
 
+      forwardAllMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_1, java.awt.event.InputEvent.CTRL_MASK));
       modeButtonGroup.add(forwardAllMenuItem);
       forwardAllMenuItem.setSelected(true);
       forwardAllMenuItem.setText("Forward All");
@@ -302,6 +317,7 @@ public class SpongeGUI extends javax.swing.JFrame {
       });
       modeMenu.add(forwardAllMenuItem);
 
+      replayOrForwardMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_2, java.awt.event.InputEvent.CTRL_MASK));
       modeButtonGroup.add(replayOrForwardMenuItem);
       replayOrForwardMenuItem.setText("Replay or Forward");
       replayOrForwardMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_FORWARD);
@@ -312,6 +328,7 @@ public class SpongeGUI extends javax.swing.JFrame {
       });
       modeMenu.add(replayOrForwardMenuItem);
 
+      replayOrFailMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_3, java.awt.event.InputEvent.CTRL_MASK));
       modeButtonGroup.add(replayOrFailMenuItem);
       replayOrFailMenuItem.setText("Replay or Fail");
       replayOrFailMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_FAIL);
@@ -326,26 +343,15 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       deleteLabelMenuItem.setText("Action");
 
-      attachLabelMenuItem.setText("Attach Label...");
-      attachLabelMenuItem.setAction(controller.getLabelExchangeAction());
-      deleteLabelMenuItem.add(attachLabelMenuItem);
-
-      jMenuItem1.setAction(controller.getDeleteLabelAction());
-      jMenuItem1.setText("Delete Label");
-      deleteLabelMenuItem.add(jMenuItem1);
-
       clearAllMenuItem.setText("Clear All");
       clearAllMenuItem.setAction(controller.getClearAllAction());
       deleteLabelMenuItem.add(clearAllMenuItem);
-
-      resendRequestMenuItem.setAction(controller.getResendRequestAction());
-      resendRequestMenuItem.setText("Resend Request");
-      deleteLabelMenuItem.add(resendRequestMenuItem);
 
       menuBar.add(deleteLabelMenuItem);
 
       replMenu.setText("Repl");
 
+      replMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
       replMenuItem.setText("Start Repl");
       replMenu.add(replMenuItem);
 
@@ -393,17 +399,18 @@ public class SpongeGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_replayOrFailMenuItemActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem attachLabelItem;
-  private javax.swing.JMenuItem attachLabelMenuItem;
   private javax.swing.JMenuItem clearAllMenuItem;
   private javax.swing.JMenuItem configureMenuItem;
+  private javax.swing.JMenuItem delete;
   private javax.swing.JMenuItem deleteLabelItem;
   private javax.swing.JMenu deleteLabelMenuItem;
+  private javax.swing.JMenuItem duplicate;
   private javax.swing.JTable exchangeTable;
   private javax.swing.JMenuItem exitMenuItem;
   private javax.swing.JRadioButtonMenuItem forwardAllMenuItem;
   private javax.swing.JMenu jMenu1;
-  private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JScrollPane jScrollPane2;
+  private javax.swing.JPopupMenu.Separator jSeparator1;
   private javax.swing.JMenuItem loadMenuItem;
   private javax.swing.JMenuBar menuBar;
   private javax.swing.ButtonGroup modeButtonGroup;
@@ -414,7 +421,6 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JRadioButtonMenuItem replayOrForwardMenuItem;
   private com.nwalex.sponge.gui.BodyPanel requestPanel;
   private javax.swing.JMenuItem resendRequestItem;
-  private javax.swing.JMenuItem resendRequestMenuItem;
   private com.nwalex.sponge.gui.BodyPanel responsePanel;
   private javax.swing.JMenuItem saveAsMenuItem;
   private javax.swing.JMenuItem saveMenuItem;

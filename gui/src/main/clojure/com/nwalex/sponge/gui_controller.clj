@@ -59,6 +59,7 @@
 
 (defn- start-repl [event]
   (toggle-action (:start-repl action-map))
+  (state/repl-started!)
   (future   
    (core/start-repl 4006)))
 

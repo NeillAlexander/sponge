@@ -13,7 +13,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="controller.getLabelExchangeAction()" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Attach Label..."/>
+            <Property name="text" type="java.lang.String" value="Label..."/>
           </Properties>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="deleteLabelItem">
@@ -21,7 +21,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="controller.getDeleteLabelAction()" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Delete Label"/>
+            <Property name="text" type="java.lang.String" value="Unlabel"/>
           </Properties>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="setDefaultResponseItem">
@@ -29,7 +29,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="controller.getSetDefaultResponseAction()" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Use this Response"/>
+            <Property name="text" type="java.lang.String" value="Replay"/>
           </Properties>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="resendRequestItem">
@@ -37,7 +37,25 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="controller.getResendRequestAction()" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Resend Request"/>
+            <Property name="text" type="java.lang.String" value="Resend"/>
+          </Properties>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="duplicate">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="controller.getDuplicateRowAction()" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Duplicate"/>
+          </Properties>
+        </MenuItem>
+        <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
+        </Component>
+        <MenuItem class="javax.swing.JMenuItem" name="delete">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="getWrappedDeleteAction()" type="code"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Delete"/>
           </Properties>
         </MenuItem>
       </SubComponents>
@@ -56,6 +74,9 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="getLoadSessionAction()" type="code"/>
                 </Property>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+O"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Load Session..."/>
               </Properties>
             </MenuItem>
@@ -63,6 +84,9 @@
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="controller.getSaveAction()" type="code"/>
+                </Property>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+S"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Save Session"/>
               </Properties>
@@ -84,6 +108,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="startServerMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+ENTER"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Start Server"/>
               </Properties>
               <AuxValues>
@@ -92,6 +119,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="stopServerMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+Z"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Stop Server"/>
               </Properties>
               <AuxValues>
@@ -100,6 +130,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="configureMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+PERIOD"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Configure..."/>
               </Properties>
               <AuxValues>
@@ -126,6 +159,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JRadioButtonMenuItem" name="forwardAllMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+1"/>
+                </Property>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="modeButtonGroup"/>
                 </Property>
@@ -141,6 +177,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JRadioButtonMenuItem" name="replayOrForwardMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+2"/>
+                </Property>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="modeButtonGroup"/>
                 </Property>
@@ -155,6 +194,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JRadioButtonMenuItem" name="replayOrFailMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+3"/>
+                </Property>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="modeButtonGroup"/>
                 </Property>
@@ -174,22 +216,6 @@
             <Property name="text" type="java.lang.String" value="Action"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="attachLabelMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Attach Label..."/>
-              </Properties>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="attachLabelMenuItem.setAction(controller.getLabelExchangeAction());"/>
-              </AuxValues>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
-              <Properties>
-                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="controller.getDeleteLabelAction()" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Delete Label"/>
-              </Properties>
-            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="clearAllMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Clear All"/>
@@ -197,14 +223,6 @@
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="clearAllMenuItem.setAction(controller.getClearAllAction());"/>
               </AuxValues>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="resendRequestMenuItem">
-              <Properties>
-                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="controller.getResendRequestAction()" type="code"/>
-                </Property>
-                <Property name="text" type="java.lang.String" value="Resend Request"/>
-              </Properties>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -215,6 +233,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="replMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+R"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Start Repl"/>
               </Properties>
               <AuxValues>

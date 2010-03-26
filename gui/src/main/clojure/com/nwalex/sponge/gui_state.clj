@@ -8,9 +8,11 @@
 
 (ns com.nwalex.sponge.gui-state
   (:require
+   [com.nwalex.sponge.server :as server]
    [clojure.contrib.logging :as log]))
 
 ;; the currently running server
+(def #^{:private true} repl-running (atom false))
 (def #^{:private true} current-server-store (atom nil))
 (def #^{:private true} gui-frame-store (atom nil))
 (def #^{:private true} port-store (ref 8139))
@@ -28,8 +30,10 @@
 (defn- set-title []
   (.setTitle
    (gui)
-   (format "Sponge [http://localhost:%s --> %s] [%s]"
-           @port-store @target-store (get-mode))))
+   (format "Sponge  [%s]  [http://localhost:%s --> %s]  [%s]  [%s]"
+           (if (server/running? @current-server-store) "Running" "Stopped")
+           @port-store @target-store (get-mode)           
+           (if @repl-running "REPL" ""))))
 
 (defn set-config! [port target]
   (dosync
@@ -54,7 +58,8 @@
   gui)
 
 (defn set-current-server! [server]
-  (compare-and-set! current-server-store @current-server-store server))
+  (compare-and-set! current-server-store @current-server-store server)
+  (set-title))
 
 (defn current-server []
   @current-server-store)
@@ -75,3 +80,7 @@
 
 (defn row-selected []
   (not (nil? (current-row))))
+
+(defn repl-started! []
+  (reset! repl-running true)
+  (set-title))
