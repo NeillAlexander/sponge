@@ -1,0 +1,69 @@
+Sponge uses a number of 3rd party libraries. Listed below are the licenses along
+with the libraries that are covered by each license.
+
+
+Apache License Version 1.1 (apache-license-1.1.txt)
+---------------------------------------------------
+servlet-api-2.5-6.1.14.jar
+xercesImpl-2.6.2.jar
+
+
+Apache License Version 2.0 (apache-license-2.0.txt)
+---------------------------------------------------
+commons-codec-1.4.jar
+commons-fileupload-1.2.1.jar
+commons-httpclient-3.1.jar
+commons-io-1.4.jar
+commons-logging-1.1.1.jar
+filters-2.0.235.jar
+httpcore-4.0.1.jar
+httpcore-nio-4.0.1.jar
+jetty-6.1.14.jar
+jetty-util-6.1.14.jar
+log4j-1.2.15.jar
+xalan-2.6.0.jar
+xml-apis-1.0.b2.jar
+xmlParserAPIs-2.6.2.jar
+
+
+Eclipse Public License (epl-v10.thml)
+----------------------------------------
+clojure-1.1.0.jar
+clojure-contrib-1.1.0.jar
+
+
+GPL 3.0 (gpt-3.0.txt)
+----------------------
+swank-clojure-1.1.0.jar
+
+
+LGPL (lgpl.txt)
+----------------
+swing-worker-1.1.jar
+swingx-1.6.jar
+xom-1.0.jar
+
+
+dom4j-license.txt
+-----------------------------------
+dom4j-1.6.1.jar
+
+
+icu4j-license.txt
+----------------------------------
+icu4j-2.6.1.jar
+
+
+jaxen-license.txt
+------------------
+jaxen-1.1.1.jar
+
+
+jdom-license.txt
+----------------
+jdom-1.0.jar
+
+
+ring-license.txt
+----------------
+ring-0.1.1-NWALEX.jar
