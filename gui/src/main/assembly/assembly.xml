@@ -10,6 +10,10 @@
       <outputDirectory>/</outputDirectory>
     </fileSet>
     <fileSet>
+      <directory>src/main/licenses</directory>
+      <outputDirectory>/third-party-licenses</outputDirectory>
+    </fileSet>
+    <fileSet>
       <directory>target/</directory>
       <outputDirectory>sessions</outputDirectory>
       <excludes>
