@@ -17,6 +17,9 @@
   <Layout class="org.netbeans.modules.form.compat2.layouts.DesignCardLayout"/>
   <SubComponents>
     <Container class="javax.swing.JPanel" name="readOnlyContainer">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="read" noResource="true"/>
+      </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
           <CardConstraints cardName="card2"/>
@@ -55,12 +58,18 @@
                 <Property name="editable" type="boolean" value="false"/>
                 <Property name="rows" type="int" value="5"/>
               </Properties>
+              <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="displayAreaMouseClicked"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="editContainer">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="write" noResource="true"/>
+      </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
           <CardConstraints cardName="card3"/>
@@ -83,9 +92,8 @@
                   <Component id="buttonPanel" min="-2" max="-2" attributes="0"/>
               </Group>
               <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="editPanel" pref="275" max="32767" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="editPanel" pref="286" max="32767" attributes="0"/>
                       <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -103,7 +111,6 @@
             <Component class="javax.swing.JTextArea" name="editingArea">
               <Properties>
                 <Property name="columns" type="int" value="20"/>
-                <Property name="editable" type="boolean" value="false"/>
                 <Property name="rows" type="int" value="5"/>
               </Properties>
             </Component>
@@ -115,13 +122,18 @@
           <SubComponents>
             <Component class="javax.swing.JButton" name="saveButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Save"/>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="this.saveAction" type="code"/>
+                </Property>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="cancelButton">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Cancel"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cancelButtonActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

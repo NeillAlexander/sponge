@@ -25,6 +25,12 @@
           (actionPerformed [event] (f event)))
     (.setEnabled enabled)))
 
+(defn- make-save-action [f]
+  (doto
+      (proxy [com.nwalex.sponge.gui.BodyPanel$SaveAction] []
+        (saveText [text] (f text)))
+    (.setEnabled false)))
+
 (defn- toggle-action [action]
   (.setEnabled action (not (.isEnabled action))))
 
@@ -68,6 +74,8 @@
 
 (defn- update-row [row]
   (state/set-current-row! row)
+  (.setEnabled (:update-request action-map) (state/row-selected))
+  (.setEnabled (:update-response action-map) (state/row-selected))
   (.setEnabled (:label-action action-map) (state/row-selected))
   (.setEnabled (:delete-label action-map) (state/row-selected))
   (.setEnabled (:use-response action-map) (state/row-selected))
@@ -81,6 +89,12 @@
 
 (defn- use-response [event]
   (model/use-current-row-response! (state/current-row)))
+
+(defn- update-response [text]
+  (model/update-selected-exchange-body! text :response))
+
+(defn- update-request [text]
+  (model/update-selected-exchange-body! text :request))
 
 (def action-map
      {:start-server (make-action "Start Server" start-server true)
@@ -99,7 +113,9 @@
                             true)
       :use-response (make-action "Use this Response" use-response false)
       :delete-row (make-action "Delete Exchange" delete-row false)
-      :resend-request (make-action "Resend this Request" resend-request false)})
+      :resend-request (make-action "Resend this Request" resend-request false)
+      :update-request (make-save-action update-request)
+      :update-response (make-save-action update-response)})
 
 (defn- set-mode [mode]  
   (state/set-mode! mode)
@@ -130,7 +146,9 @@
        (getMode [] (state/get-mode))
        (setMode [mode] (set-mode mode))
        (getDeleteRowAction [] (:delete-row action-map))
-       (getResendRequestAction [] (:resend-request action-map))))
+       (getResendRequestAction [] (:resend-request action-map))
+       (getUpdateRequestBodyAction [] (:update-request action-map))
+       (getUpdateResponseBodyAction [] (:update-response action-map))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)

@@ -82,6 +82,13 @@ from the server"
   [exchange key]
   (:body (key exchange)))
 
+(defn update-body!
+  "Update the body of the exchange"
+  [exchange key text]
+  (dosync
+   (commute exchange-store assoc-in [(:id exchange) key :body] text)
+   (commute exchange-store assoc-in [(:id exchange) key :pretty-printed] false)))
+
 (defn get-num-replays [exchange]
   (let [count (replay-count (:id exchange))]
     (if count count 0)))

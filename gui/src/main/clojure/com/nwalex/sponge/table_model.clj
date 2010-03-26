@@ -120,6 +120,13 @@
     (exchange/set-label! exchange label)    
     (notify-row-changed row)))
 
+(defn update-selected-exchange-body!
+  "Updates the body on the currently selected exchange"
+  [text key]
+  (let [exchange (get-exchange-for-row (state/current-row))]
+    (exchange/update-body! exchange key text)
+    (notify-row-changed (state/current-row))))
+
 (defn- get-default-response
   "Return the default response for this exchange type (if any)"
   [exchange]

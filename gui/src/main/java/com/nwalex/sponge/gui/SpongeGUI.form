@@ -296,8 +296,14 @@
       </SubComponents>
     </Container>
     <Component class="com.nwalex.sponge.gui.BodyPanel" name="requestPanel">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new BodyPanel(controller.getUpdateRequestBodyAction())"/>
+      </AuxValues>
     </Component>
     <Component class="com.nwalex.sponge.gui.BodyPanel" name="responsePanel">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new BodyPanel(controller.getUpdateResponseBodyAction())"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

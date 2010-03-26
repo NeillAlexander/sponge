@@ -10,7 +10,6 @@
 package com.nwalex.sponge.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Enumeration;
@@ -24,10 +23,10 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.ComponentAdapter;
-import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.Highlighter;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
@@ -54,6 +53,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     exchangeTable.getActionMap().put("DELETE_ROW", controller.getDeleteRowAction());
 
     exchangeTable.getActionMap().put("PACK", new AbstractAction() {
+
       @Override
       public void actionPerformed(ActionEvent e) {
         ((JXTable) exchangeTable).packAll();
@@ -61,6 +61,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     });
 
     exchangeTable.getActionMap().put("SEND", new AbstractAction() {
+
       @Override
       public void actionPerformed(ActionEvent e) {
         controller.getResendRequestAction().actionPerformed(e);
@@ -84,8 +85,29 @@ public class SpongeGUI extends javax.swing.JFrame {
     ((JXTable) exchangeTable).addHighlighter(new ColorHighlighter(
             new PatternPredicate("R", 7),
             new Color(213, 234, 212), Color.BLACK));
-    
+
     updateSelectedMode(controller);
+
+    // set up listener to update display panels when data changes
+    exchangeTable.getModel().addTableModelListener(new TableModelListener() {
+
+      @Override
+      public void tableChanged(TableModelEvent e) {
+        int firstRow = e.getFirstRow();
+        int lastRow = e.getLastRow();
+
+        System.out.println("First row " + firstRow + ", last row " + lastRow);
+
+//        if (rawIndex > -1) {
+//          int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);
+//
+//          controller.setSelectedRow(selectedIndex);
+//          requestPanel.setText(controller.getRequestDataForRow(selectedIndex));
+//
+//          responsePanel.setText(controller.getResponseDataForRow(selectedIndex));
+//        }
+      }
+    });
   }
 
   private void updateSelectedMode(final SpongeGUIController controller) {
@@ -101,6 +123,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
   private Action getLoadSessionAction() {
     return new AbstractAction() {
+
       @Override
       public void actionPerformed(ActionEvent e) {
         controller.getLoadAction().actionPerformed(e);
@@ -127,8 +150,8 @@ public class SpongeGUI extends javax.swing.JFrame {
     exchangeTable = new JXTable(controller.getExchangeTableModel());
     ((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});
     ((JXTable) exchangeTable).setColumnControlVisible(true);
-    requestPanel = new com.nwalex.sponge.gui.BodyPanel();
-    responsePanel = new com.nwalex.sponge.gui.BodyPanel();
+    requestPanel = new BodyPanel(controller.getUpdateRequestBodyAction());
+    responsePanel = new BodyPanel(controller.getUpdateResponseBodyAction());
     menuBar = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     loadMenuItem = new javax.swing.JMenuItem();

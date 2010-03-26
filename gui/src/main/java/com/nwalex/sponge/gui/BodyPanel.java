@@ -1,14 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * BodyPanel.java
- *
- * Created on 25-Mar-2010, 14:59:34
- */
+/**
+* Copyright (c) Neill Alexander. All rights reserved.
+* The use and distribution terms for this software are covered by the
+* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+* which can be found in the file epl-v10.html at the root of this distribution.
+* By using this software in any fashion, you are agreeing to be bound by
+* the terms of this license.
+* You must not remove this notice, or any other, from this software
+*/
 package com.nwalex.sponge.gui;
+
+import java.awt.CardLayout;
+import java.awt.event.ActionEvent;
+import javax.swing.AbstractAction;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -16,9 +20,13 @@ package com.nwalex.sponge.gui;
  */
 public class BodyPanel extends javax.swing.JPanel {
 
+  private final SaveAction saveAction;
+
   /** Creates new form BodyPanel */
-  public BodyPanel() {
+  public BodyPanel(SaveAction saveAction) {
+    this.saveAction = saveAction;
     initComponents();
+    saveAction.setCallbacks(editingArea, this);
   }
 
   public void setText(String text) {
@@ -28,6 +36,10 @@ public class BodyPanel extends javax.swing.JPanel {
 
   public String getText() {
     return displayArea.getText();
+  }
+
+  public void toggleView() {
+    ((CardLayout) getLayout()).next(this);
   }
 
   /** This method is called from within the constructor to
@@ -51,9 +63,16 @@ public class BodyPanel extends javax.swing.JPanel {
 
     setLayout(new java.awt.CardLayout());
 
+    readOnlyContainer.setName("read"); // NOI18N
+
     displayArea.setColumns(20);
     displayArea.setEditable(false);
     displayArea.setRows(5);
+    displayArea.addMouseListener(new java.awt.event.MouseAdapter() {
+      public void mouseClicked(java.awt.event.MouseEvent evt) {
+        displayAreaMouseClicked(evt);
+      }
+    });
     readOnlyPanel.setViewportView(displayArea);
 
     javax.swing.GroupLayout readOnlyContainerLayout = new javax.swing.GroupLayout(readOnlyContainer);
@@ -73,15 +92,22 @@ public class BodyPanel extends javax.swing.JPanel {
 
     add(readOnlyContainer, "card2");
 
+    editContainer.setName("write"); // NOI18N
+
     editingArea.setColumns(20);
-    editingArea.setEditable(false);
     editingArea.setRows(5);
     editPanel.setViewportView(editingArea);
 
+    saveButton.setAction(this.saveAction);
     saveButton.setText("Save");
     buttonPanel.add(saveButton);
 
     cancelButton.setText("Cancel");
+    cancelButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        cancelButtonActionPerformed(evt);
+      }
+    });
     buttonPanel.add(cancelButton);
 
     javax.swing.GroupLayout editContainerLayout = new javax.swing.GroupLayout(editContainer);
@@ -98,14 +124,26 @@ public class BodyPanel extends javax.swing.JPanel {
         .addContainerGap(294, Short.MAX_VALUE)
         .addComponent(buttonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
       .addGroup(editContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addGroup(editContainerLayout.createSequentialGroup()
-          .addContainerGap()
-          .addComponent(editPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editContainerLayout.createSequentialGroup()
+          .addComponent(editPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
           .addGap(41, 41, 41)))
     );
 
     add(editContainer, "card3");
   }// </editor-fold>//GEN-END:initComponents
+
+  private void displayAreaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayAreaMouseClicked
+    if (evt.getClickCount() > 1) {
+      editingArea.setText(displayArea.getText());
+      editingArea.setCaretPosition(0);
+      toggleView();
+    }
+  }//GEN-LAST:event_displayAreaMouseClicked
+
+  private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+    toggleView();
+  }//GEN-LAST:event_cancelButtonActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel buttonPanel;
   private javax.swing.JButton cancelButton;
@@ -117,4 +155,24 @@ public class BodyPanel extends javax.swing.JPanel {
   private javax.swing.JScrollPane readOnlyPanel;
   private javax.swing.JButton saveButton;
   // End of variables declaration//GEN-END:variables
+
+
+  public static abstract class SaveAction extends AbstractAction {
+
+    private JTextArea textArea;
+    private BodyPanel bodyPanel;
+
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+      saveText(textArea.getText());
+      bodyPanel.toggleView();
+    }
+
+    protected void setCallbacks(JTextArea textArea, BodyPanel bp) {
+      this.bodyPanel = bp;
+      this.textArea = textArea;
+    }
+    
+    public abstract void saveText(String text);
+  }
 }
