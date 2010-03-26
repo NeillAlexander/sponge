@@ -68,6 +68,9 @@
 (defn- delete-row [event]
   (model/delete-current-row! (state/current-row)))
 
+(defn- duplicate-row [event]
+  (model/duplicate-row! (state/current-row)))
+
 (defn- resend-request [event]
   (let [exchange (model/get-exchange-for-row (state/current-row))]
     (future (server/resend-request exchange (state/current-server)))))
@@ -80,6 +83,7 @@
   (.setEnabled (:delete-label action-map) (state/row-selected))
   (.setEnabled (:use-response action-map) (state/row-selected))
   (.setEnabled (:delete-row action-map) (state/row-selected))
+  (.setEnabled (:duplicate-row action-map) (state/row-selected))
   (.setEnabled (:resend-request action-map)
                (and (state/row-selected) (server/running? (state/current-server)))))
 
@@ -96,13 +100,17 @@
 (defn- update-request [text]
   (model/update-selected-exchange-body! text :request))
 
+(defn- clear-all [event]
+  (model/clear!)
+  (toggle-action (:save action-map)))
+
 (def action-map
      {:start-server (make-action "Start Server" start-server true)
       :stop-server (make-action "Stop Server" stop-server false)
       :configure (make-action "Configure" config/configure true)
       :exit (make-action "Exit" exit true)
       :start-repl (make-action "Start Repl" start-repl true)
-      :clear-all (make-action "Clear All" model/clear! true)
+      :clear-all (make-action "Clear All" clear-all true)
       :label-action (make-action "Attach Label..." label/do-label false)
       :delete-label (make-action "Delete Label" label/delete-label false)
       :load (make-action "Load Session..."
@@ -115,7 +123,8 @@
       :delete-row (make-action "Delete Exchange" delete-row false)
       :resend-request (make-action "Resend this Request" resend-request false)
       :update-request (make-save-action update-request)
-      :update-response (make-save-action update-response)})
+      :update-response (make-save-action update-response)
+      :duplicate-row (make-action "Duplicate Row" duplicate-row false)})
 
 (defn- set-mode [mode]  
   (state/set-mode! mode)
@@ -148,7 +157,8 @@
        (getDeleteRowAction [] (:delete-row action-map))
        (getResendRequestAction [] (:resend-request action-map))
        (getUpdateRequestBodyAction [] (:update-request action-map))
-       (getUpdateResponseBodyAction [] (:update-response action-map))))
+       (getUpdateResponseBodyAction [] (:update-response action-map))
+       (getDuplicateRowAction [] (:duplicate-row action-map))))
 
 (defn make-gui [& args]
   (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)

@@ -51,6 +51,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     exchangeTable.getActionMap().put("DELETE_LABEL", controller.getDeleteLabelAction());
     exchangeTable.getActionMap().put("DEFAULT_RESPONSE", controller.getSetDefaultResponseAction());
     exchangeTable.getActionMap().put("DELETE_ROW", controller.getDeleteRowAction());
+    exchangeTable.getActionMap().put("DUPLICATE", controller.getDuplicateRowAction());
 
     exchangeTable.getActionMap().put("PACK", new AbstractAction() {
 
@@ -70,11 +71,12 @@ public class SpongeGUI extends javax.swing.JFrame {
 
     InputMap im = exchangeTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0), "LABEL_EX");
-    im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "DELETE_LABEL");
+    im.put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "DELETE_LABEL");
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "DEFAULT_RESPONSE");
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "DELETE_ROW");
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "PACK");
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "SEND");
+    im.put(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0), "DUPLICATE");
 
     // allow to move up / down with k / j
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_K, 0), im.get(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)));
@@ -93,12 +95,17 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       @Override
       public void tableChanged(TableModelEvent e) {
-        int rawIndex = exchangeTable.getSelectedRow();
+        if (e.getType() == TableModelEvent.DELETE) {
+          requestPanel.setText("");
+          responsePanel.setText("");
+        } else {
+          int rawIndex = exchangeTable.getSelectedRow();
 
-        if (rawIndex > -1) {
-          int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);
-          requestPanel.setText(controller.getRequestDataForRow(selectedIndex));
-          responsePanel.setText(controller.getResponseDataForRow(selectedIndex));
+          if (rawIndex > -1) {
+            int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);
+            requestPanel.setText(controller.getRequestDataForRow(selectedIndex));
+            responsePanel.setText(controller.getResponseDataForRow(selectedIndex));
+          }
         }
       }
     });

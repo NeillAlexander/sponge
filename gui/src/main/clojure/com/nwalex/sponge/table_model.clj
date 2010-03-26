@@ -89,10 +89,13 @@
   (swing/do-swing
    (.fireTableRowsInserted exchange-table-model row row)))
 
-(defn- notify-row-deleted [row]
-  (log/info (format "Notify row deleted: %d" row))
-  (swing/do-swing
-   (.fireTableRowsDeleted exchange-table-model row row)))
+(defn- notify-row-deleted
+  ([row]
+     (log/info (format "Notify row deleted: %d" row))
+     (notify-row-deleted row row))
+  ([start end]
+     (swing/do-swing
+      (.fireTableRowsDeleted exchange-table-model start start))))
 
 (defn add-exchange!
   "Add the exchange represented by map m"
@@ -105,15 +108,16 @@
 (defn get-table-model []
   exchange-table-model)
 
-(defn clear! [event]
+(defn clear! []
   (log/info "Clearing all saved exchanges...")
-  (dosync
-   (state/clear-current-row!)
-   (ref-set data-id-store [])
-   (exchange/delete-all!)
-   (ref-set default-responses {}))
-  (log/info "Finished clearing all saved exchanges")
-  (notify-data-changed))
+  (let [num-rows (count @data-id-store)]
+    (dosync
+     (state/clear-current-row!)
+     (ref-set data-id-store [])
+     (exchange/delete-all!)
+     (ref-set default-responses {}))
+    (log/info "Finished clearing all saved exchanges")
+    (notify-row-deleted 0 (dec num-rows))))
 
 (defn set-label-on-row [label row]
   (let [exchange (get-exchange-for-row row)]
@@ -142,6 +146,17 @@
                         (exchange/get-id exchange)))
       (commute default-responses
                dissoc (make-default-response-key exchange)))))
+
+(defn duplicate-row!
+  [row]
+  (let [exchange (get-exchange-for-row row)
+        duplicate (exchange/duplicate exchange)]
+    (dosync
+     (ref-set data-id-store
+              (vec (concat (subvec @data-id-store 0 row)
+                           [(exchange/get-id duplicate)]
+                           (subvec @data-id-store row)))))
+    (notify-row-added (inc row))))
 
 (defn delete-current-row! [row]
   (log/info (format "Deleting row %d" row))

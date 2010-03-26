@@ -39,6 +39,7 @@ public interface SpongeGUIController {
   public Action getSetDefaultResponseAction();
   public Action getDeleteRowAction();
   public Action getResendRequestAction();
+  public Action getDuplicateRowAction();
   public BodyPanel.SaveAction getUpdateRequestBodyAction();
   public BodyPanel.SaveAction getUpdateResponseBodyAction();
 

@@ -77,6 +77,11 @@ from the server"
   [id]
   (@exchange-store id))
 
+(defn duplicate [exchange]
+  (let [dup (assign-id-to (dissoc exchange :id))]
+    (save! (assoc dup :num-replays 0))
+    (get-exchange (:id dup))))
+
 (defn get-body
   "Key is either :request or :response"
   [exchange key]
