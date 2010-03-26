@@ -191,8 +191,6 @@ public class SpongeGUI extends javax.swing.JFrame {
     stopServerMenuItem.setAction(controller.getStopServerAction());
     configureMenuItem = new javax.swing.JMenuItem();
     configureMenuItem.setAction(controller.getConfigureAction());
-    exitMenuItem = new javax.swing.JMenuItem();
-    exitMenuItem.setAction(controller.getExitAction());
     modeMenu = new javax.swing.JMenu();
     forwardAllMenuItem = new javax.swing.JRadioButtonMenuItem();
     replayOrForwardMenuItem = new javax.swing.JRadioButtonMenuItem();
@@ -293,14 +291,6 @@ public class SpongeGUI extends javax.swing.JFrame {
       configureMenuItem.setText("Configure...");
       serverMenu.add(configureMenuItem);
 
-      exitMenuItem.setText("Exit");
-      exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
-        public void actionPerformed(java.awt.event.ActionEvent evt) {
-          exitMenuItemActionPerformed(evt);
-        }
-      });
-      serverMenu.add(exitMenuItem);
-
       menuBar.add(serverMenu);
 
       modeMenu.setText("Mode");
@@ -349,10 +339,10 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       menuBar.add(deleteLabelMenuItem);
 
-      replMenu.setText("Repl");
+      replMenu.setText("REPL");
 
       replMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
-      replMenuItem.setText("Start Repl");
+      replMenuItem.setText("Start REPL");
       replMenu.add(replMenuItem);
 
       menuBar.add(replMenu);
@@ -382,9 +372,6 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       pack();
     }// </editor-fold>//GEN-END:initComponents
-    private void exitMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMenuItemActionPerformed
-      this.dispose();
-    }//GEN-LAST:event_exitMenuItemActionPerformed
 
     private void modeSelected(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modeSelected
       controller.setMode(modeButtonGroup.getSelection().getActionCommand());
@@ -406,7 +393,6 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenu deleteLabelMenuItem;
   private javax.swing.JMenuItem duplicate;
   private javax.swing.JTable exchangeTable;
-  private javax.swing.JMenuItem exitMenuItem;
   private javax.swing.JRadioButtonMenuItem forwardAllMenuItem;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JScrollPane jScrollPane2;
