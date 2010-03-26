@@ -39,27 +39,82 @@ public class BodyPanel extends javax.swing.JPanel {
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    jScrollPane1 = new javax.swing.JScrollPane();
+    readOnlyContainer = new javax.swing.JPanel();
+    readOnlyPanel = new javax.swing.JScrollPane();
     displayArea = new javax.swing.JTextArea();
+    editContainer = new javax.swing.JPanel();
+    editPanel = new javax.swing.JScrollPane();
+    editingArea = new javax.swing.JTextArea();
+    buttonPanel = new javax.swing.JPanel();
+    saveButton = new javax.swing.JButton();
+    cancelButton = new javax.swing.JButton();
+
+    setLayout(new java.awt.CardLayout());
 
     displayArea.setColumns(20);
     displayArea.setEditable(false);
     displayArea.setRows(5);
-    jScrollPane1.setViewportView(displayArea);
+    readOnlyPanel.setViewportView(displayArea);
 
-    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-    this.setLayout(layout);
-    layout.setHorizontalGroup(
-      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+    javax.swing.GroupLayout readOnlyContainerLayout = new javax.swing.GroupLayout(readOnlyContainer);
+    readOnlyContainer.setLayout(readOnlyContainerLayout);
+    readOnlyContainerLayout.setHorizontalGroup(
+      readOnlyContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGap(0, 400, Short.MAX_VALUE)
+      .addGroup(readOnlyContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addComponent(readOnlyPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE))
     );
-    layout.setVerticalGroup(
-      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+    readOnlyContainerLayout.setVerticalGroup(
+      readOnlyContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGap(0, 327, Short.MAX_VALUE)
+      .addGroup(readOnlyContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addComponent(readOnlyPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE))
     );
+
+    add(readOnlyContainer, "card2");
+
+    editingArea.setColumns(20);
+    editingArea.setEditable(false);
+    editingArea.setRows(5);
+    editPanel.setViewportView(editingArea);
+
+    saveButton.setText("Save");
+    buttonPanel.add(saveButton);
+
+    cancelButton.setText("Cancel");
+    buttonPanel.add(cancelButton);
+
+    javax.swing.GroupLayout editContainerLayout = new javax.swing.GroupLayout(editContainer);
+    editContainer.setLayout(editContainerLayout);
+    editContainerLayout.setHorizontalGroup(
+      editContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addComponent(buttonPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+      .addGroup(editContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addComponent(editPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE))
+    );
+    editContainerLayout.setVerticalGroup(
+      editContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+      .addGroup(editContainerLayout.createSequentialGroup()
+        .addContainerGap(294, Short.MAX_VALUE)
+        .addComponent(buttonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+      .addGroup(editContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        .addGroup(editContainerLayout.createSequentialGroup()
+          .addContainerGap()
+          .addComponent(editPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
+          .addGap(41, 41, 41)))
+    );
+
+    add(editContainer, "card3");
   }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JPanel buttonPanel;
+  private javax.swing.JButton cancelButton;
   private javax.swing.JTextArea displayArea;
-  private javax.swing.JScrollPane jScrollPane1;
+  private javax.swing.JPanel editContainer;
+  private javax.swing.JScrollPane editPanel;
+  private javax.swing.JTextArea editingArea;
+  private javax.swing.JPanel readOnlyContainer;
+  private javax.swing.JScrollPane readOnlyPanel;
+  private javax.swing.JButton saveButton;
   // End of variables declaration//GEN-END:variables
 }
