@@ -50,7 +50,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     exchangeTable.getActionMap().put("LABEL_EX", controller.getLabelExchangeAction());
     exchangeTable.getActionMap().put("DELETE_LABEL", controller.getDeleteLabelAction());
     exchangeTable.getActionMap().put("DEFAULT_RESPONSE", controller.getSetDefaultResponseAction());
-    exchangeTable.getActionMap().put("DELETE_ROW", controller.getDeleteRowAction());
+    exchangeTable.getActionMap().put("DELETE_ROW", getWrappedDeleteAction());
     exchangeTable.getActionMap().put("DUPLICATE", controller.getDuplicateRowAction());
 
     exchangeTable.getActionMap().put("PACK", new AbstractAction() {
@@ -109,6 +109,29 @@ public class SpongeGUI extends javax.swing.JFrame {
         }
       }
     });
+  }
+
+  private Action getWrappedDeleteAction() {
+    return new AbstractAction() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if (controller.getDeleteRowAction().isEnabled()) {
+          int selectedRow = exchangeTable.getSelectedRow();
+          controller.getDeleteRowAction().actionPerformed(e);
+
+          int numRows = exchangeTable.getRowCount();
+          selectedRow = selectedRow - 1;
+
+          if (numRows > 0) {
+            if (selectedRow < numRows) {
+              exchangeTable.setRowSelectionInterval(selectedRow, selectedRow);
+            } else {
+              exchangeTable.setRowSelectionInterval(numRows - 1, numRows - 1);
+            }
+          }
+        }
+      }
+    };
   }
 
   private void updateSelectedMode(final SpongeGUIController controller) {
