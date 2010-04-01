@@ -1,0 +1,15 @@
+On Windows using DOS
+-----------------------
+
+1. Set an environment variable SPONGE_HOME to point to the top level sponge directory.
+2. Run sponge.bat
+
+
+On Windows using Cygwin or on Unix
+------------------------------------
+
+1. cd to the sponge directory
+2. Run: ./sponge
+
+
+Simples.
