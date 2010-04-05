@@ -25,6 +25,11 @@
           (actionPerformed [event] (f event)))
     (.setEnabled enabled)))
 
+(defn- make-safe-action [name f enabled]
+  (com.nwalex.sponge.gui.SafeAction.
+   (make-action name f enabled)
+   (state/gui)))
+
 (defn- make-save-action [f]
   (doto
       (proxy [com.nwalex.sponge.gui.BodyPanel$SaveAction] []
@@ -106,7 +111,7 @@
   (toggle-action (:save action-map)))
 
 (def action-map
-     {:start-server (make-action "Start Server" start-server true)
+     {:start-server (make-safe-action "Start Server" start-server true)
       :stop-server (make-action "Stop Server" stop-server false)
       :configure (make-action "Configure" config/configure true)
       :exit (make-action "Exit" exit true)

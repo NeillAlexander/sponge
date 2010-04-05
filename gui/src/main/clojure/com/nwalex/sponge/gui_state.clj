@@ -36,6 +36,7 @@
            (if @repl-running "REPL" ""))))
 
 (defn set-config! [port target]
+  (java.net.URL. target)
   (dosync
    (ref-set port-store port)
    (ref-set target-store target)

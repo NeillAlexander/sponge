@@ -12,6 +12,7 @@ package com.nwalex.sponge.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
@@ -22,11 +23,14 @@ import javax.swing.KeyStroke;
 public class ConfigurationDialog extends javax.swing.JDialog {
 
   private final ConfigurationDialogController controller;
+  private final Action okAction;
 
   /** Creates new form ConfigurationDialog */
   public ConfigurationDialog(java.awt.Frame parent, boolean modal, ConfigurationDialogController controller) {
     super(parent, modal);
     this.controller = controller;
+    this.okAction = new SafeAction(new OkAction(), parent);
+
     initComponents();
 
     addShortcutsToField(portField);
@@ -35,12 +39,7 @@ public class ConfigurationDialog extends javax.swing.JDialog {
 
   private void addShortcutsToField(JComponent comp) {
     // add some helper keys
-    comp.getActionMap().put("OK_ACTION", new AbstractAction() {
-      public void actionPerformed(ActionEvent e) {
-        okButtonActionPerformed(e);
-      }
-    });
-
+    comp.getActionMap().put("OK_ACTION", okAction);
     comp.getActionMap().put("CANCEL_ACTION", new AbstractAction() {
 
       public void actionPerformed(ActionEvent e) {
@@ -100,12 +99,8 @@ public class ConfigurationDialog extends javax.swing.JDialog {
       }
     });
 
+    okButton.setAction(okAction);
     okButton.setText("Ok");
-    okButton.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        okButtonActionPerformed(evt);
-      }
-    });
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
@@ -160,11 +155,6 @@ public class ConfigurationDialog extends javax.swing.JDialog {
     // TODO add your handling code here:
   }//GEN-LAST:event_targetFieldActionPerformed
 
-  private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-    controller.setConfiguration(Integer.parseInt(portField.getText()), targetField.getText());
-    this.dispose();
-  }//GEN-LAST:event_okButtonActionPerformed
-
   private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
     this.dispose();
   }//GEN-LAST:event_cancelButtonActionPerformed
@@ -176,4 +166,12 @@ public class ConfigurationDialog extends javax.swing.JDialog {
   private javax.swing.JTextField targetField;
   private javax.swing.JLabel targetFieldLabel;
   // End of variables declaration//GEN-END:variables
+
+  private class OkAction extends AbstractAction {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      controller.setConfiguration(Integer.parseInt(portField.getText()), targetField.getText());
+      ConfigurationDialog.this.dispose();
+    }
+  }
 }
