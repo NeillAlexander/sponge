@@ -80,6 +80,7 @@ public class BodyPanel extends javax.swing.JPanel {
 
     displayArea.setColumns(20);
     displayArea.setEditable(false);
+    displayArea.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
     displayArea.setRows(5);
     displayArea.addMouseListener(new java.awt.event.MouseAdapter() {
       public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -108,6 +109,7 @@ public class BodyPanel extends javax.swing.JPanel {
     editContainer.setName("write"); // NOI18N
 
     editingArea.setColumns(20);
+    editingArea.setFont(new java.awt.Font("Monospaced", 0, 12)); // NOI18N
     editingArea.setRows(5);
     editPanel.setViewportView(editingArea);
 
@@ -134,7 +136,7 @@ public class BodyPanel extends javax.swing.JPanel {
     editContainerLayout.setVerticalGroup(
       editContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(editContainerLayout.createSequentialGroup()
-        .addContainerGap(294, Short.MAX_VALUE)
+        .addContainerGap(291, Short.MAX_VALUE)
         .addComponent(buttonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
       .addGroup(editContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, editContainerLayout.createSequentialGroup()
