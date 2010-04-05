@@ -10,6 +10,7 @@
 package com.nwalex.sponge.gui;
 
 import java.awt.CardLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JTextArea;
@@ -146,9 +147,12 @@ public class BodyPanel extends javax.swing.JPanel {
 
   private void displayAreaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayAreaMouseClicked
     if (evt.getClickCount() > 1) {
+      Rectangle visibleArea = displayArea.getVisibleRect();
       editingArea.setText(displayArea.getText());
-      editingArea.setCaretPosition(0);
-      toggleView();
+      editingArea.setCaretPosition(editingArea.viewToModel(evt.getPoint()));      
+      displayEditView();
+      editingArea.scrollRectToVisible(visibleArea);
+      editingArea.requestFocusInWindow();
     }
   }//GEN-LAST:event_displayAreaMouseClicked
 
