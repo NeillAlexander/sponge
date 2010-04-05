@@ -148,7 +148,7 @@ public class BodyPanel extends javax.swing.JPanel {
   }// </editor-fold>//GEN-END:initComponents
 
   private void displayAreaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayAreaMouseClicked
-    if (evt.getClickCount() > 1) {
+    if (evt.getClickCount() > 1 && displayArea.getText().trim().length() > 0) {
       Rectangle visibleArea = displayArea.getVisibleRect();
       editingArea.setText(displayArea.getText());
       editingArea.setCaretPosition(editingArea.viewToModel(evt.getPoint()));      

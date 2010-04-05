@@ -134,6 +134,7 @@ public class SpongeGUI extends javax.swing.JFrame {
           } else {
             requestPanel.setText("");
             responsePanel.setText("");
+            controller.setSelectedRow(-1);
           }
         }
       }
@@ -262,6 +263,8 @@ public class SpongeGUI extends javax.swing.JFrame {
             responsePanel.displayReadOnlyView();
           } else {
             controller.setSelectedRow(-1);
+            requestPanel.setText("");
+            responsePanel.setText("");
           }
         }
       });
