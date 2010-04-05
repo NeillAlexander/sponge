@@ -95,10 +95,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       @Override
       public void tableChanged(TableModelEvent e) {
-        if (e.getType() == TableModelEvent.DELETE) {
-          requestPanel.setText("");
-          responsePanel.setText("");
-        } else {
+        if (!(e.getType() == TableModelEvent.DELETE)) {
           int rawIndex = exchangeTable.getSelectedRow();
 
           if (rawIndex > -1) {
@@ -113,6 +110,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
   private Action getWrappedDeleteAction() {
     return new AbstractAction() {
+
       @Override
       public void actionPerformed(ActionEvent e) {
         if (controller.getDeleteRowAction().isEnabled()) {
@@ -120,7 +118,7 @@ public class SpongeGUI extends javax.swing.JFrame {
           controller.getDeleteRowAction().actionPerformed(e);
 
           int numRows = exchangeTable.getRowCount();
-          
+
           if (selectedRow > 0) {
             selectedRow = selectedRow - 1;
           }
@@ -128,9 +126,14 @@ public class SpongeGUI extends javax.swing.JFrame {
           if (numRows > 0) {
             if (selectedRow < numRows) {
               exchangeTable.setRowSelectionInterval(selectedRow, selectedRow);
+              updateDisplayedData(selectedRow);
             } else {
               exchangeTable.setRowSelectionInterval(numRows - 1, numRows - 1);
+              updateDisplayedData(numRows - 1);
             }
+          } else {
+            requestPanel.setText("");
+            responsePanel.setText("");
           }
         }
       }
@@ -157,6 +160,14 @@ public class SpongeGUI extends javax.swing.JFrame {
         updateSelectedMode(controller);
       }
     };
+  }
+
+  private void updateDisplayedData(int rawIndex) {
+    int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);
+
+    controller.setSelectedRow(selectedIndex);
+    requestPanel.setText(controller.getRequestDataForRow(selectedIndex));
+    responsePanel.setText(controller.getResponseDataForRow(selectedIndex));
   }
 
   /** This method is called from within the constructor to
@@ -246,12 +257,7 @@ public class SpongeGUI extends javax.swing.JFrame {
           int rawIndex = rowSM.getMinSelectionIndex();         
 
           if (rawIndex > -1) {                  
-            int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);
-
-            controller.setSelectedRow(selectedIndex);
-            requestPanel.setText(controller.getRequestDataForRow(selectedIndex)); 
-            responsePanel.setText(controller.getResponseDataForRow(selectedIndex)); 
-
+            updateDisplayedData(rawIndex); 
             requestPanel.displayReadOnlyView();
             responsePanel.displayReadOnlyView();
           } else {
