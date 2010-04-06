@@ -136,9 +136,9 @@
 (defn- set-mode [mode]  
   (state/set-mode! mode)
   (if (server/running? (state/current-server))
-    (do
-      (stop-server nil)
-      (start-server nil))))
+    (server/update-request-filters (state/current-server)
+                                   (filters/get-request-filters-for-mode
+                                    (state/get-mode)))))
 
 
 (def sponge-controller

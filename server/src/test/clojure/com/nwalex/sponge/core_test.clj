@@ -63,8 +63,8 @@
   (let [server (server/make-server 8747 "addr")]
     (is (= 8747 (:port server)))
     (is (= "addr" (:target server)))
-    (is (= 1 (count (:request-filters server))))
-    (is (= 1 (count (:response-filters server))))))
+    (is (= 1 (count (deref (:request-filters server)))))
+    (is (= 1 (count (deref (:response-filters server)))))))
 
 (deftest make-server-test-with-filters
   (let [server (server/make-server 8747 "addr"
@@ -72,8 +72,8 @@
                                    :response-filters '[d e f])]
     (is (= 8747 (:port server)))
     (is (= "addr" (:target server)))
-    (is (= 4 (count (:request-filters server))))
-    (is (= 4 (count (:response-filters server))))))
+    (is (= 4 (count (deref (:request-filters server)))))
+    (is (= 4 (count (deref (:response-filters server)))))))
 
 (defn- cont [flag-atom server exchange key]
   (swap! flag-atom (fn [old] true))

@@ -44,11 +44,11 @@
 (defn- process-request
   "Processes the request passing it through the configured filters"
   [server exchange]
-  (process-filters (:request-filters server) server exchange :request))
+  (process-filters (deref (:request-filters server)) server exchange :request))
 
 (defn- process-response
   [server exchange]
-  (process-filters (:response-filters server) server exchange :response))
+  (process-filters (deref (:response-filters server)) server exchange :response))
 
 (defn- handle-request
   "This is the entry point for the Ring requests"
@@ -74,6 +74,18 @@
                            :namespace :soap-method)]        
     (process-response server (process-request server r-exchange))))
 
+(defn- make-request-filters [filters]
+  (conj filters forwarding-request-filter))
+
+(defn- update-filters [server filters-vec key]
+  (dosync (ref-set (key server) (make-request-filters filters-vec))))
+
+(defn update-request-filters [server new-filters-vec]
+  (update-filters server new-filters-vec :request-filters))
+
+(defn update-response-filters [server new-filters-vec]
+  (update-filters server new-filters-vec :response-filters))
+
 (defn make-server
   "Create an instance of the Sponge server. Options are as follows:
   :request-filters  [f1 f2 ... fx]
@@ -81,12 +93,14 @@
   [port target & opts]
   (let [opts-map (apply array-map opts)
         server {:port port :target target :jetty nil
-     :request-filters (conj
-                        (vec (:request-filters opts-map))
-                        forwarding-request-filter)
-     :response-filters (conj
-                        (vec (:response-filters opts-map))    
-                        returning-response-filter)}]
+                :request-filters (ref (make-request-filters
+                                       (vec (:request-filters opts-map))))
+                :request-filters (ref (conj
+                                       (vec (:request-filters opts-map))
+                                       forwarding-request-filter))
+                :response-filters (ref (conj
+                                        (vec (:response-filters opts-map))    
+                                        returning-response-filter))}]
     server))
 
 (defn start [server]
