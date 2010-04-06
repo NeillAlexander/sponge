@@ -16,7 +16,8 @@
    [com.nwalex.sponge.session :as session]
    [com.nwalex.sponge.label-controller :as label]
    [com.nwalex.sponge.config-controller :as config]
-   [com.nwalex.sponge.exchange :as exchange]))
+   [com.nwalex.sponge.exchange :as exchange]
+   [clojure.contrib.swing-utils :as swing]))
 
 (declare action-map)
 
@@ -167,5 +168,7 @@
        (getDuplicateRowAction [] (:duplicate-row action-map))))
 
 (defn make-gui [& args]
-  (state/set-gui! (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)
-           (.setVisible true))))
+  (swing/do-swing
+   (state/set-gui!
+    (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller)
+                     (.setVisible true)))))
