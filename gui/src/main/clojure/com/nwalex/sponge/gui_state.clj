@@ -20,7 +20,7 @@
 (def #^{:private true} current-row-store (atom nil))
 (def #^{:private true}
      mode (atom
-           com.nwalex.sponge.gui.SpongeGUIController/FORWARD_ALL))
+           com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD))
 
 (defn gui [] @gui-frame-store)
 
