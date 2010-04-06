@@ -193,7 +193,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     exchangeTable = new JXTable(controller.getExchangeTableModel());
     ((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});
     ((JXTable) exchangeTable).setColumnControlVisible(true);
-    jPanel1 = new javax.swing.JPanel();
+    jSplitPane2 = new javax.swing.JSplitPane();
     requestPanel = new BodyPanel(controller.getUpdateRequestBodyAction());
     responsePanel = new BodyPanel(controller.getUpdateResponseBodyAction());
     menuBar = new javax.swing.JMenuBar();
@@ -246,6 +246,11 @@ public class SpongeGUI extends javax.swing.JFrame {
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
     jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+    jSplitPane1.setResizeWeight(0.5);
+    jSplitPane1.setContinuousLayout(true);
+    jSplitPane1.setDoubleBuffered(true);
+
+    jScrollPane2.setPreferredSize(new java.awt.Dimension(800, 280));
 
     exchangeTable.setModel(controller.getExchangeTableModel());
     exchangeTable.setComponentPopupMenu(tablePopup);
@@ -277,22 +282,14 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       jSplitPane1.setLeftComponent(jScrollPane2);
 
-      javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-      jPanel1.setLayout(jPanel1Layout);
-      jPanel1Layout.setHorizontalGroup(
-        jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addGroup(jPanel1Layout.createSequentialGroup()
-          .addComponent(requestPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE)
-          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-          .addComponent(responsePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE))
-      );
-      jPanel1Layout.setVerticalGroup(
-        jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addComponent(requestPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE)
-        .addComponent(responsePanel, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE)
-      );
+      jSplitPane2.setResizeWeight(0.5);
+      jSplitPane2.setContinuousLayout(true);
+      jSplitPane2.setDoubleBuffered(true);
+      jSplitPane2.setPreferredSize(new java.awt.Dimension(800, 280));
+      jSplitPane2.setLeftComponent(requestPanel);
+      jSplitPane2.setRightComponent(responsePanel);
 
-      jSplitPane1.setRightComponent(jPanel1);
+      jSplitPane1.setBottomComponent(jSplitPane2);
 
       jMenu1.setText("File");
 
@@ -388,12 +385,12 @@ public class SpongeGUI extends javax.swing.JFrame {
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+        .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 889, Short.MAX_VALUE)
       );
       layout.setVerticalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
         .addGroup(layout.createSequentialGroup()
-          .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+          .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 957, Short.MAX_VALUE)
           .addContainerGap())
       );
 
@@ -422,10 +419,10 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JTable exchangeTable;
   private javax.swing.JRadioButtonMenuItem forwardAllMenuItem;
   private javax.swing.JMenu jMenu1;
-  private javax.swing.JPanel jPanel1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JPopupMenu.Separator jSeparator1;
   private javax.swing.JSplitPane jSplitPane1;
+  private javax.swing.JSplitPane jSplitPane2;
   private javax.swing.JMenuItem loadMenuItem;
   private javax.swing.JMenuBar menuBar;
   private javax.swing.ButtonGroup modeButtonGroup;
