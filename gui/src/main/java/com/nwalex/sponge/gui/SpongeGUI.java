@@ -38,10 +38,13 @@ import org.jdesktop.swingx.decorator.PatternPredicate;
 public class SpongeGUI extends javax.swing.JFrame {
 
   private final SpongeGUIController controller;
+  private HelpManager helper;
 
   /** Creates new form SpongeGUI */
   public SpongeGUI(final SpongeGUIController controller) {
     this.controller = controller;
+    this.helper = new HelpManager(this);
+    
     initComponents();
 
     setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -217,6 +220,8 @@ public class SpongeGUI extends javax.swing.JFrame {
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
     replMenuItem.setAction(controller.getStartReplAction());
+    jMenu2 = new javax.swing.JMenu();
+    keyboardShortcutsHelp = new javax.swing.JMenuItem();
 
     attachLabelItem.setAction(controller.getLabelExchangeAction());
     attachLabelItem.setText("Label...");
@@ -379,6 +384,14 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       menuBar.add(replMenu);
 
+      jMenu2.setText("Help");
+
+      keyboardShortcutsHelp.setAction(helper.makeMenuAction("manual.html"));
+      keyboardShortcutsHelp.setText("Cheat Sheet");
+      jMenu2.add(keyboardShortcutsHelp);
+
+      menuBar.add(jMenu2);
+
       setJMenuBar(menuBar);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -408,6 +421,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     private void replayOrFailMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrFailMenuItemActionPerformed
       modeSelected(evt);
     }//GEN-LAST:event_replayOrFailMenuItemActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem attachLabelItem;
   private javax.swing.JMenuItem clearAllMenuItem;
@@ -419,10 +433,12 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JTable exchangeTable;
   private javax.swing.JRadioButtonMenuItem forwardAllMenuItem;
   private javax.swing.JMenu jMenu1;
+  private javax.swing.JMenu jMenu2;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JPopupMenu.Separator jSeparator1;
   private javax.swing.JSplitPane jSplitPane1;
   private javax.swing.JSplitPane jSplitPane2;
+  private javax.swing.JMenuItem keyboardShortcutsHelp;
   private javax.swing.JMenuItem loadMenuItem;
   private javax.swing.JMenuBar menuBar;
   private javax.swing.ButtonGroup modeButtonGroup;

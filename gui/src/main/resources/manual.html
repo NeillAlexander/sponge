@@ -1,0 +1,54 @@
+<html>
+  <body>
+    <h1>Sponge</h1>
+    Sponge provides similar functionality to SoapTrace / SoapUI. Configure your application
+    to route all Soap requests to Sponge, and configure Sponge to forward the requests
+    to the server that will respond to them. Sponge will keep a record of all the Soap
+    request / responses (known as 'exchanges') which you can inspect.
+    <p>
+      Once you have recorded some exchanges you can then tell Sponge to replay them i.e.
+      when a this request comes in, replay this exchange. In this way you can specify
+      which response to return for each request type.
+    </p>
+    <p>
+      The intention is to use Sponge during development / debugging so that you can always
+      use the same data, and not be reliant on a back end server.
+    </p>
+    <h2>Configuration</h2>
+    On the configuration screen you can specify the port Sponge listens on for incoming
+    requests, and the url of the server it will redirect to. Note that Sponge will
+    automatically generate the call to the correct Soap method. You should simply
+    supply the server url.
+    <p>
+      i.e. http://someserver:1234 rather than http://someserver:1234/soap-method.asmx
+    </p>
+    <p>
+      Sponge automatically appends the correct soap method.
+    </p>
+    <h2>Modes</h2>
+    <h3>Replay or Forward</h3>
+    In this mode Sponge will first look for an exchange to replay for every request
+    received. If it finds a replay exchange, it returns the response for that exchange.
+    If no replay is found then the request if forwarded to the server.
+    <p>
+      This is the default mode.
+    </p>
+    <h3>Forward All</h3>
+    In this mode Sponge just works as a router, forwarding all requests on to the
+    configured server.
+    <h3>Replay or Fail</h3>
+    If no replay exchange is found, then an exception is thrown.
+    <h2>Keyboard Shortcuts</h2>
+    These shortcuts will work when the exchange table has keyboard focus (i.e. the top panel).
+    <ul>
+      <li>l = label</li>
+      <li>u = unlabel</li>
+      <li>d = duplicate row</li>
+      <li>x = delete row</li>
+      <li>r = replay</li>
+      <li>s = send request again</li>
+      <li>p = pack table (i.e. reformat to fit contents)</li>
+    </ul>
+    There are also shortcuts for the menu items (see the menus for details).
+  </body>
+</html>
