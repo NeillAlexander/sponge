@@ -107,7 +107,7 @@
   (assoc server :jetty (jetty/run-jetty
                         ;;(with-reload-app server)
                         (partial app server)
-                        {:port (:port server) :join false})))
+                        {:port (:port server) :join? false})))
 
 (defn stop [server]
   (if (:jetty server) (.stop (:jetty server))))

@@ -30,7 +30,7 @@
   )
 
 (defn start-app [app-fn port]
-  (jetty/run-jetty app-fn {:port port :join false}))
+  (jetty/run-jetty app-fn {:port port :join? false}))
 
 (defmacro with-responder
   "Starts up a sponge server and responder, executes the body, then stops them again"
