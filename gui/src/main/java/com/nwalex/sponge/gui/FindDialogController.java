@@ -63,7 +63,11 @@ public class FindDialogController {
   public void doFind(String text) {
     for (Searchable searchable : targets) {
       searchable.clearHighlights();
-      searchable.highlightAll(text);
+
+      // only search if we have text
+      if (text.trim().length() > 0) {
+        searchable.highlightAll(text);
+      }
     }
   }
 

@@ -52,8 +52,11 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
 
   @Override
   public void highlightAll(String text) {
-    highlightAll(text, displayArea);
-    highlightAll(text, editingArea);
+    if (editContainer.isVisible()) {
+      highlightAll(text, editingArea);
+    } else {
+      highlightAll(text, displayArea);
+    }    
   }
 
   private void highlightAll(String pattern, JTextComponent textComp) {
@@ -81,17 +84,12 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
   }
 
   @Override
-  public void findNext(String text) {
-  }
-
-  @Override
-  public void findPrevious(String text) {
-  }
-
-  @Override
   public void clearHighlights() {
-    clearHighlights(editingArea);
-    clearHighlights(displayArea);
+    if (editContainer.isVisible()) {
+      clearHighlights(editingArea);
+    } else {
+      clearHighlights(displayArea);
+    }
   }
 
   private void clearHighlights(JTextComponent textComp) {

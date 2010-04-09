@@ -15,8 +15,6 @@ package com.nwalex.sponge.gui;
  */
 public interface Searchable {
   public void highlightAll(String text);
-  public void findNext(String text);
-  public void findPrevious(String text);
   public void clearHighlights();
   public void registeredBy(FindDialogController controller);
 }
