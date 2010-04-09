@@ -17,6 +17,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.Highlight;
 import javax.swing.text.JTextComponent;
 import org.jdesktop.swingx.JXTable;
 
@@ -28,6 +29,8 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
 
   private final SaveAction saveAction;
   private int displayedRow = -1;
+  private int lastHighlight = -1;
+  private Highlight[] currentHighlights;
 
   public BodyPanel() {
     saveAction = null;
@@ -52,16 +55,12 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
 
   @Override
   public void highlightAll(String text) {
-    if (editContainer.isVisible()) {
-      highlightAll(text, editingArea);
-    } else {
-      highlightAll(text, displayArea);
-    }    
+    highlightAll(text, getVisibleTextArea());
   }
 
   private void highlightAll(String pattern, JTextComponent textComp) {
-    try {
-      Highlighter hilite = textComp.getHighlighter();
+    Highlighter hilite = textComp.getHighlighter();
+    try {      
       Document doc = textComp.getDocument();
       String text = doc.getText(0, doc.getLength());
       int pos = 0;
@@ -74,6 +73,10 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
         pos += pattern.length();
       }
     } catch (BadLocationException e) {
+      e.printStackTrace();
+    } finally {
+      this.currentHighlights = hilite.getHighlights();
+      this.lastHighlight = -1;
     }
   }
 
@@ -85,11 +88,11 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
 
   @Override
   public void clearHighlights() {
-    if (editContainer.isVisible()) {
-      clearHighlights(editingArea);
-    } else {
-      clearHighlights(displayArea);
-    }
+    clearHighlights(getVisibleTextArea());
+  }
+
+  private JTextArea getVisibleTextArea() {
+    return editContainer.isVisible() ? editingArea : displayArea;
   }
 
   private void clearHighlights(JTextComponent textComp) {
@@ -97,6 +100,21 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
     Highlighter.Highlight[] hilites = hilite.getHighlights();
     for (int i = 0; i < hilites.length; i++) {
       hilite.removeHighlight(hilites[i]);
+    }
+  }
+
+  @Override
+  public boolean findNext() {
+    int nextHighlight = lastHighlight + 1;
+
+    if (nextHighlight < currentHighlights.length) {
+      getVisibleTextArea().setCaretPosition(currentHighlights[nextHighlight].getStartOffset());
+      lastHighlight = nextHighlight;
+      return true;
+    } else {
+      // wrap around
+      lastHighlight = -1;
+      return false;
     }
   }
 

@@ -27,6 +27,8 @@ public class FindDialogController {
   private final JFrame parent;
   private final List<Searchable> targets = new ArrayList<Searchable>();
   private FindDialog dialog;
+  private int hasFindNextFocusIndex = 0;
+  private String lastSearchText = null;
 
   public FindDialogController(JFrame parent) {
     this.parent = parent;
@@ -43,8 +45,9 @@ public class FindDialogController {
     }
   }
 
-  public void initFindActionOn(JComponent component) {
+  public void initFindActionOn(final JComponent component) {
     component.getActionMap().put("FIND", new AbstractAction() {
+
       @Override
       public void actionPerformed(ActionEvent e) {
         displayDialog();
@@ -55,18 +58,55 @@ public class FindDialogController {
             "FIND");
 
     if (component instanceof Searchable) {
+//      component.getActionMap().put("FINDNEXT", new AbstractAction() {
+//
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//          ((Searchable) component).findNext();
+//        }
+//      });
+//
+//      component.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0),
+//              "FINDNEXT");
+
       ((Searchable) component).registeredBy(this);
       addTarget((Searchable) component);
     }
   }
 
   public void doFind(String text) {
-    for (Searchable searchable : targets) {
-      searchable.clearHighlights();
+    if (!text.equals(lastSearchText)) {
+      for (Searchable searchable : targets) {
+        searchable.clearHighlights();
 
-      // only search if we have text
-      if (text.trim().length() > 0) {
-        searchable.highlightAll(text);
+        // only search if we have text
+        if (text.trim().length() > 0) {
+          lastSearchText = text;
+          searchable.highlightAll(text);
+        }
+      }
+    }
+
+    if (text.trim().length() > 0) {
+      findNext();
+    }
+  }
+
+  public void findNext() {
+    for (int i = hasFindNextFocusIndex; i < targets.size(); i++) {
+      Searchable searchable = targets.get(i);
+      if (searchable.findNext()) {
+        hasFindNextFocusIndex = i;
+        return;
+      }
+    }
+
+    // nothing found so search from the start
+    for (int i = 0; i < hasFindNextFocusIndex; i++) {
+      Searchable searchable = targets.get(i);
+      if (searchable.findNext()) {
+        hasFindNextFocusIndex = i;
+        return;
       }
     }
   }
