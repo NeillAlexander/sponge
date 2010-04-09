@@ -400,7 +400,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       keyboardShortcutsHelp.setAction(helper.makeMenuAction("manual.html"));
       keyboardShortcutsHelp.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, 0));
-      keyboardShortcutsHelp.setText("Cheat Sheet");
+      keyboardShortcutsHelp.setText("Manual");
       jMenu2.add(keyboardShortcutsHelp);
 
       menuBar.add(jMenu2);
