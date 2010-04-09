@@ -50,6 +50,17 @@ public class FindDialog extends javax.swing.JDialog {
             "CANCEL_ACTION");
   }
 
+  @Override
+  public void setVisible(boolean visible) {
+    if (visible) {
+      findTextField.requestFocusInWindow();
+    } else {
+      findTextField.setText("");
+    }
+
+    super.setVisible(visible);
+  }
+
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is

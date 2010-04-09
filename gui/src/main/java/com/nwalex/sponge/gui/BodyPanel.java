@@ -1,26 +1,30 @@
 /**
-* Copyright (c) Neill Alexander. All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software
-*/
+ * Copyright (c) Neill Alexander. All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software
+ */
 package com.nwalex.sponge.gui;
 
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import javax.swing.AbstractAction;
 import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 import org.jdesktop.swingx.JXTable;
 
 /**
  *
  * @author alexanc
  */
-public class BodyPanel extends javax.swing.JPanel {
+public class BodyPanel extends javax.swing.JPanel implements Searchable {
 
   private final SaveAction saveAction;
   private int displayedRow = -1;
@@ -44,6 +48,58 @@ public class BodyPanel extends javax.swing.JPanel {
 
   public String getText() {
     return displayArea.getText();
+  }
+
+  @Override
+  public void highlightAll(String text) {
+    highlightAll(text, displayArea);
+    highlightAll(text, editingArea);
+  }
+
+  private void highlightAll(String pattern, JTextComponent textComp) {
+    try {
+      Highlighter hilite = textComp.getHighlighter();
+      Document doc = textComp.getDocument();
+      String text = doc.getText(0, doc.getLength());
+      int pos = 0;
+
+      // Search for pattern
+      while ((pos = text.indexOf(pattern, pos)) >= 0) {
+        // Create highlighter using private painter and apply around pattern
+        hilite.addHighlight(pos, pos + pattern.length(),
+                new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
+        pos += pattern.length();
+      }
+    } catch (BadLocationException e) {
+    }
+  }
+
+  @Override
+  public void registeredBy(FindDialogController controller) {
+    controller.initFindActionOn(displayArea);
+    controller.initFindActionOn(editingArea);
+  }
+
+  @Override
+  public void findNext(String text) {
+  }
+
+  @Override
+  public void findPrevious(String text) {
+  }
+
+  @Override
+  public void clearHighlights() {
+    clearHighlights(editingArea);
+    clearHighlights(displayArea);
+  }
+
+  private void clearHighlights(JTextComponent textComp) {
+    Highlighter hilite = textComp.getHighlighter();
+    Highlighter.Highlight[] hilites = hilite.getHighlights();
+    for (int i = 0; i < hilites.length; i++) {
+      hilite.removeHighlight(hilites[i]);
+    }
   }
 
   public void toggleView() {
@@ -159,7 +215,7 @@ public class BodyPanel extends javax.swing.JPanel {
     if (evt.getClickCount() > 1 && displayArea.getText().trim().length() > 0) {
       Rectangle visibleArea = displayArea.getVisibleRect();
       editingArea.setText(displayArea.getText());
-      editingArea.setCaretPosition(editingArea.viewToModel(evt.getPoint()));      
+      editingArea.setCaretPosition(editingArea.viewToModel(evt.getPoint()));
       displayEditView();
       editingArea.scrollRectToVisible(visibleArea);
       editingArea.requestFocusInWindow();
@@ -169,7 +225,6 @@ public class BodyPanel extends javax.swing.JPanel {
   private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
     toggleView();
   }//GEN-LAST:event_cancelButtonActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JPanel buttonPanel;
   private javax.swing.JButton cancelButton;
@@ -181,7 +236,6 @@ public class BodyPanel extends javax.swing.JPanel {
   private javax.swing.JScrollPane readOnlyPanel;
   private javax.swing.JButton saveButton;
   // End of variables declaration//GEN-END:variables
-
 
   public static abstract class SaveAction extends JXTableSingleRowAction {
 
@@ -202,7 +256,7 @@ public class BodyPanel extends javax.swing.JPanel {
       this.bodyPanel = bp;
       this.textArea = textArea;
     }
-    
+
     public abstract void saveText(String text, int row);
   }
 }

@@ -9,9 +9,14 @@
  */
 package com.nwalex.sponge.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 
 /**
  * Simple way to search for text
@@ -38,8 +43,28 @@ public class FindDialogController {
     }
   }
 
+  public void initFindActionOn(JComponent component) {
+    component.getActionMap().put("FIND", new AbstractAction() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        displayDialog();
+      }
+    });
+
+    component.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK),
+            "FIND");
+
+    if (component instanceof Searchable) {
+      ((Searchable) component).registeredBy(this);
+      addTarget((Searchable) component);
+    }
+  }
+
   public void doFind(String text) {
-    System.out.println("Ready to find: " + text);
+    for (Searchable searchable : targets) {
+      searchable.clearHighlights();
+      searchable.highlightAll(text);
+    }
   }
 
   public void addTarget(Searchable target) {

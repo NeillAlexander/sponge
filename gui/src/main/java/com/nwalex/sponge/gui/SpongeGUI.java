@@ -117,25 +117,9 @@ public class SpongeGUI extends javax.swing.JFrame {
   }
 
   private void initFindAction() {
-    initFindActionOn(exchangeTable);
-    initFindActionOn(requestPanel);
-    initFindActionOn(responsePanel);
-  }
-
-  private void initFindActionOn(JComponent component) {
-    component.getActionMap().put("FIND", new AbstractAction() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        findController.displayDialog();
-      }
-    });
-    
-    component.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK),
-            "FIND");
-
-    if (component instanceof Searchable) {
-      findController.addTarget((Searchable) component);
-    }
+    findController.initFindActionOn(exchangeTable);
+    findController.initFindActionOn(requestPanel);
+    findController.initFindActionOn(responsePanel);
   }
 
   private Action getWrappedDeleteAction() {
