@@ -79,7 +79,12 @@
 
 (defn- resend-request [row]
   (let [exchange (model/get-exchange-for-row row)]
-    (future (server/resend-request exchange (state/current-server)))))
+    (future (server/resend-request exchange (state/current-server))))
+  0)
+
+(defn- resend-all-requests [rows]
+  (println (format "resend all requests %s" rows))
+  (amap rows idx ret (resend-request (aget rows idx))))
 
 (defn- wrap-session-action [f event]
   (f event)
@@ -116,8 +121,8 @@
   @(key action-map))
 
 (defn- resend-request-proxy [table]
-  (proxy [com.nwalex.sponge.gui.JXTableSingleRowAction] [table]
-    (singleRowActionPerformed [row] (resend-request row))
+  (proxy [com.nwalex.sponge.gui.JXTableMultiRowAction] [table]
+    (multiRowActionPerformed [rows] (resend-all-requests rows))
     (setEnabled [enabled] (proxy-super setEnabled
                                        (and enabled
                                             (server/running?

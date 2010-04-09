@@ -34,8 +34,6 @@ public interface SpongeGUIController {
   public Action getDuplicateRowAction(JXTable table);
   public BodyPanel.SaveAction getUpdateRequestBodyAction(JXTable table);
   public BodyPanel.SaveAction getUpdateResponseBodyAction(JXTable table);
-
-  // single row actions
   public Action getResendRequestAction(JXTable table);
 
   // non row specific actions
