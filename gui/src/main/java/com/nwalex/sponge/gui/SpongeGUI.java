@@ -19,6 +19,7 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -40,11 +41,13 @@ import org.jdesktop.swingx.decorator.PatternPredicate;
 public class SpongeGUI extends javax.swing.JFrame {
 
   private final SpongeGUIController controller;
+  private final FindDialogController findController;
   private HelpManager helper;
 
   /** Creates new form SpongeGUI */
   public SpongeGUI(final SpongeGUIController controller) {
     this.controller = controller;
+    this.findController = new FindDialogController(this);
     this.helper = new HelpManager(this);
 
     initComponents();
@@ -82,6 +85,12 @@ public class SpongeGUI extends javax.swing.JFrame {
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_J, 0), im.get(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)));
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, 0), im.get(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)));
 
+    // remove the key stroke for ctrl f from the table
+    im.remove(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK));
+
+    // now add a global find action to the table and the 2 display panels
+    initFindAction();
+
     // add highlighter to table
     ((JXTable) exchangeTable).addHighlighter(new ColorHighlighter(
             new PatternPredicate("R", 7),
@@ -105,6 +114,28 @@ public class SpongeGUI extends javax.swing.JFrame {
         }
       }
     });
+  }
+
+  private void initFindAction() {
+    initFindActionOn(exchangeTable);
+    initFindActionOn(requestPanel);
+    initFindActionOn(responsePanel);
+  }
+
+  private void initFindActionOn(JComponent component) {
+    component.getActionMap().put("FIND", new AbstractAction() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        findController.displayDialog();
+      }
+    });
+    
+    component.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_DOWN_MASK),
+            "FIND");
+
+    if (component instanceof Searchable) {
+      findController.addTarget((Searchable) component);
+    }
   }
 
   private Action getWrappedDeleteAction() {
