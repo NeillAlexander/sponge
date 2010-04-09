@@ -22,14 +22,24 @@ import javax.swing.KeyStroke;
 public class LabelDialog extends javax.swing.JDialog {
 
   private final LabelDialogController controller;
+  private final int[] indices;
 
   /** Creates new form LabelDialog */
-  public LabelDialog(java.awt.Frame parent, boolean modal, final LabelDialogController controller) {
+  public LabelDialog(java.awt.Frame parent, boolean modal, final LabelDialogController controller, int[] indices) {
     super(parent, modal);
     this.controller = controller;
+    this.indices = indices;
+    
     initComponents();
 
-    labelField.setText(controller.getCurrentLabel());
+    String currentLabel = controller.getLabel(indices[0]);
+    for (int i = 0; i < indices.length; i++) {
+      if (!currentLabel.equals(controller.getLabel(indices[i]))) {
+        currentLabel = "";
+        break;
+      }
+    }
+    labelField.setText(currentLabel);
 
     // add some helper keys
     labelField.getActionMap().put("OK_ACTION", new AbstractAction() {
@@ -124,7 +134,7 @@ public class LabelDialog extends javax.swing.JDialog {
   }//GEN-LAST:event_jButton1ActionPerformed
 
   private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-    controller.setLabel(labelField.getText());
+    controller.setLabel(labelField.getText(), indices);
     this.dispose();
   }//GEN-LAST:event_jButton2ActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables

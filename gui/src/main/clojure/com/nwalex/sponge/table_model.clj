@@ -78,16 +78,21 @@
 
 (defn- notify-data-changed []
   (swing/do-swing
-     (.fireTableDataChanged exchange-table-model)))
+   (.fireTableDataChanged exchange-table-model)))
 
-(defn- notify-row-changed [row]
-  (swing/do-swing
-   (.fireTableRowsUpdated exchange-table-model 0
-                          (dec (count @data-id-store)))))
+(defn- notify-row-changed
+  ([row]
+     (notify-row-changed row row))
+  ([start end]
+     (swing/do-swing
+      (.fireTableRowsUpdated exchange-table-model start end))))
 
-(defn- notify-row-added [row]
-  (swing/do-swing
-   (.fireTableRowsInserted exchange-table-model row row)))
+(defn- notify-row-added
+  ([row]
+     (notify-row-added row row))
+  ([start end]
+     (swing/do-swing
+      (.fireTableRowsInserted exchange-table-model start end))))
 
 (defn- notify-row-deleted
   ([row]
@@ -108,28 +113,22 @@
 (defn get-table-model []
   exchange-table-model)
 
-(defn clear! []
-  (log/info "Clearing all saved exchanges...")
-  (let [num-rows (count @data-id-store)]
-    (dosync
-     (state/clear-current-row!)
-     (ref-set data-id-store [])
-     (exchange/delete-all!)
-     (ref-set default-responses {}))
-    (log/info "Finished clearing all saved exchanges")
-    (notify-row-deleted 0 (dec num-rows))))
-
-(defn set-label-on-row [label row]
+(defn- set-label-on-row [label row]
+  (log/info (format "Setting label on row %d to %s" row label))
   (let [exchange (get-exchange-for-row row)]
-    (exchange/set-label! exchange label)    
-    (notify-row-changed row)))
+    (exchange/set-label! exchange label)
+    0))
 
-(defn update-selected-exchange-body!
+(defn set-label-on-rows! [label rows]
+  (amap rows idx ret (set-label-on-row label (aget rows idx)))
+  (notify-row-changed (aget rows 0) (aget rows (dec (alength rows)))))
+
+(defn update-exchange-body!
   "Updates the body on the currently selected exchange"
-  [text key]
-  (let [exchange (get-exchange-for-row (state/current-row))]
+  [text key row]
+  (let [exchange (get-exchange-for-row row)]
     (exchange/update-body! exchange key text)
-    (notify-row-changed (state/current-row))))
+    (notify-row-changed row)))
 
 (defn- get-default-response
   "Return the default response for this exchange type (if any)"
@@ -147,7 +146,17 @@
       (commute default-responses
                dissoc (make-default-response-key exchange)))))
 
-(defn duplicate-row!
+(defn- row-loop [rows row-fn notify-fn]
+  (loop [idx (first rows)
+         rem (rest rows)]
+    (if idx
+      (do
+        (row-fn idx)
+        (recur (first rem) (rest rem)))))
+  (if notify-fn
+    (notify-fn (first rows) (last rows))))
+
+(defn- duplicate-row!
   [row]
   (let [exchange (get-exchange-for-row row)
         duplicate (exchange/duplicate exchange)]
@@ -155,10 +164,14 @@
      (ref-set data-id-store
               (vec (concat (subvec @data-id-store 0 row)
                            [(exchange/get-id duplicate)]
-                           (subvec @data-id-store row)))))
-    (notify-row-added (inc row))))
+                           (subvec @data-id-store row))))
+     (notify-row-added (inc row))))
+  0)
 
-(defn delete-current-row! [row]
+(defn duplicate-rows! [rows]
+  (row-loop (reverse rows) duplicate-row! nil))
+
+(defn- delete-row! [row]
   (log/info (format "Deleting row %d" row))
   (log/info (format "Num rows before delete = %d" (count @data-id-store)))
   (log/info (format "Num exchanges before delete = %d"
@@ -170,15 +183,17 @@
               (vec (concat (subvec @data-id-store 0 row)
                            (subvec @data-id-store (inc row)))))
      (delete-default-response-if-required! exchange))
-    (log/info (format "Num rows after delete = %d" (count @data-id-store)))
-    (notify-row-deleted row)))
+    (log/info (format "Num rows after delete = %d" (count @data-id-store)))))
+
+(defn delete-rows! [rows]
+  (row-loop (reverse rows) delete-row! notify-row-deleted))
 
 (defn get-label-for-row [row]
   (let [exchange (get-exchange-for-row row)]
     (if (:label exchange) (:label exchange) "")))
 
-(defn delete-label-on-row [row]
-  (set-label-on-row nil row))
+(defn delete-label-on-rows! [rows]  
+  (set-label-on-rows! nil rows))
 
 (defn- make-default-response-key
   ([exchange]
@@ -193,7 +208,7 @@
   ([namespace uri soap-method]
      (str namespace "-" uri "-" soap-method)))
 
-(defn use-current-row-response! [row]  
+(defn- set-default-response! [row]  
   (let [exchange (get-exchange-for-row row)
         key (make-default-response-key exchange)]
     ;; if already set then unset (toggle)
@@ -202,7 +217,11 @@
        (commute default-responses dissoc key))
       (dosync
        (commute default-responses assoc key (exchange/get-id exchange))))
-    (notify-row-changed row)))
+    0))
+
+(defn set-as-default-response! [rows]
+  (amap rows idx ret (set-default-response! (aget rows idx)))
+  (notify-row-changed 0 (dec (count @data-id-store))))
 
 (defn replay-response [exchange]
   (let [response-id (get-default-response exchange)]

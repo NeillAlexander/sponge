@@ -12,6 +12,7 @@ package com.nwalex.sponge.gui;
 
 import javax.swing.Action;
 import javax.swing.table.TableModel;
+import org.jdesktop.swingx.JXTable;
 
 /**
  * This is the thin layer that the GUI will call. Can implement this from
@@ -25,23 +26,27 @@ public interface SpongeGUIController {
   public static final String REPLAY_OR_FAIL = "Replay or Fail";
   public static final String REPLAY_OR_PROMPT = "Replay or Prompt";
 
+  // multi-row actions
+  public Action getLabelExchangeAction(JXTable table);
+  public Action getDeleteLabelAction(JXTable table);
+  public Action getSetDefaultResponseAction(JXTable table);
+  public Action getDeleteRowAction(JXTable table);
+  public Action getDuplicateRowAction(JXTable table);
+  public BodyPanel.SaveAction getUpdateRequestBodyAction(JXTable table);
+  public BodyPanel.SaveAction getUpdateResponseBodyAction(JXTable table);
+
+  // single row actions
+  public Action getResendRequestAction(JXTable table);
+
+  // non row specific actions
   public Action getStartServerAction();
   public Action getStopServerAction();
   public Action getConfigureAction();
   public Action getExitAction();
   public Action getStartReplAction();
-  public Action getClearAllAction();
-  public Action getLabelExchangeAction();
-  public Action getDeleteLabelAction();
   public Action getLoadAction();
   public Action getSaveAction();
-  public Action getSaveAsAction();
-  public Action getSetDefaultResponseAction();
-  public Action getDeleteRowAction();
-  public Action getResendRequestAction();
-  public Action getDuplicateRowAction();
-  public BodyPanel.SaveAction getUpdateRequestBodyAction();
-  public BodyPanel.SaveAction getUpdateResponseBodyAction();
+  public Action getSaveAsAction();       
 
   public String getMode();
   public void setMode(String mode);
@@ -50,6 +55,4 @@ public interface SpongeGUIController {
 
   public String getRequestDataForRow(int row);
   public String getResponseDataForRow(int row);
-
-  public void setSelectedRow(int row);
 }

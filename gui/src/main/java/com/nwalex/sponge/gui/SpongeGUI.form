@@ -11,7 +11,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="attachLabelItem">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="controller.getLabelExchangeAction()" type="code"/>
+              <Connection code="controller.getLabelExchangeAction((JXTable) exchangeTable)" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Label..."/>
           </Properties>
@@ -19,7 +19,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="deleteLabelItem">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="controller.getDeleteLabelAction()" type="code"/>
+              <Connection code="controller.getDeleteLabelAction((JXTable) exchangeTable)" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Unlabel"/>
           </Properties>
@@ -27,7 +27,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="setDefaultResponseItem">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="controller.getSetDefaultResponseAction()" type="code"/>
+              <Connection code="controller.getSetDefaultResponseAction((JXTable) exchangeTable)" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Replay"/>
           </Properties>
@@ -35,7 +35,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="resendRequestItem">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="controller.getResendRequestAction()" type="code"/>
+              <Connection code="controller.getResendRequestAction((JXTable ) exchangeTable)" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Resend"/>
           </Properties>
@@ -43,7 +43,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="duplicate">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="controller.getDuplicateRowAction()" type="code"/>
+              <Connection code="controller.getDuplicateRowAction((JXTable) exchangeTable)" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Duplicate"/>
           </Properties>
@@ -200,21 +200,6 @@
             </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="deleteLabelMenuItem">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Action"/>
-          </Properties>
-          <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="clearAllMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Clear All"/>
-              </Properties>
-              <AuxValues>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="clearAllMenuItem.setAction(controller.getClearAllAction());"/>
-              </AuxValues>
-            </MenuItem>
-          </SubComponents>
-        </Menu>
         <Menu class="javax.swing.JMenu" name="replMenu">
           <Properties>
             <Property name="text" type="java.lang.String" value="REPL"/>
@@ -322,13 +307,13 @@
                   <ComponentRef name="tablePopup"/>
                 </Property>
                 <Property name="selectionModel" type="javax.swing.ListSelectionModel" editor="org.netbeans.modules.form.editors2.JTableSelectionModelEditor">
-                  <JTableSelectionModel selectionMode="0"/>
+                  <JTableSelectionModel selectionMode="2"/>
                 </Property>
               </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JXTable(controller.getExchangeTableModel());"/>
                 <AuxValue name="JavaCodeGenerator_CreateCodePost" type="java.lang.String" value="((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});&#xa;((JXTable) exchangeTable).setColumnControlVisible(true);&#xa;"/>
-                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="exchangeTable.getSelectionModel().addListSelectionListener(&#xd;&#xa;        new ListSelectionListener() {&#xd;&#xa;&#xd;&#xa;          public void valueChanged(ListSelectionEvent e) {&#xd;&#xa;            if (e.getValueIsAdjusting()) {&#xd;&#xa;              return;&#xd;&#xa;            }&#xd;&#xa;&#xd;&#xa;            ListSelectionModel rowSM = (ListSelectionModel) e.getSource();&#xd;&#xa;            int rawIndex = rowSM.getMinSelectionIndex();         &#xd;&#xa;&#xd;&#xa;            if (rawIndex &gt; -1) {                  &#xd;&#xa;              updateDisplayedData(rawIndex); &#xd;&#xa;              requestPanel.displayReadOnlyView();&#xd;&#xa;              responsePanel.displayReadOnlyView();&#xd;&#xa;            } else {&#xd;&#xa;              controller.setSelectedRow(-1);&#xd;&#xa;              requestPanel.setText(&quot;&quot;);&#xd;&#xa;              responsePanel.setText(&quot;&quot;);&#xd;&#xa;            }&#xd;&#xa;          }&#xd;&#xa;        });&#xd;&#xa;&#xd;&#xa;"/>
+                <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="exchangeTable.getSelectionModel().addListSelectionListener(&#xd;&#xa;        new ListSelectionListener() {&#xd;&#xa;&#xd;&#xa;          public void valueChanged(ListSelectionEvent e) {&#xd;&#xa;            if (e.getValueIsAdjusting()) {&#xd;&#xa;              return;&#xd;&#xa;            }&#xd;&#xa;&#xd;&#xa;            ListSelectionModel rowSM = (ListSelectionModel) e.getSource();&#xd;&#xa;&#xd;&#xa;            // check for more than one row selected&#xd;&#xa;            if (!(rowSM.getMinSelectionIndex() == rowSM.getMaxSelectionIndex()) || rowSM.isSelectionEmpty()) {&#xd;&#xa;              requestPanel.setText(&quot;&quot;, -1);&#xd;&#xa;              responsePanel.setText(&quot;&quot;, -1);            &#xd;&#xa;            } else {&#xd;&#xa;              int rawIndex = rowSM.getMinSelectionIndex();         &#xd;&#xa;&#xd;&#xa;              if (rawIndex &gt; -1) {                  &#xd;&#xa;                updateDisplayedData(rawIndex); &#xd;&#xa;                requestPanel.displayReadOnlyView();&#xd;&#xa;                responsePanel.displayReadOnlyView();&#xd;&#xa;              }&#xd;&#xa;            }&#xd;&#xa;          }&#xd;&#xa;        });&#xd;&#xa;&#xd;&#xa;"/>
               </AuxValues>
             </Component>
           </SubComponents>
@@ -352,7 +337,7 @@
           <SubComponents>
             <Component class="com.nwalex.sponge.gui.BodyPanel" name="requestPanel">
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new BodyPanel(controller.getUpdateRequestBodyAction())"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new BodyPanel(controller.getUpdateRequestBodyAction((JXTable) exchangeTable))"/>
               </AuxValues>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">
@@ -362,7 +347,7 @@
             </Component>
             <Component class="com.nwalex.sponge.gui.BodyPanel" name="responsePanel">
               <AuxValues>
-                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new BodyPanel(controller.getUpdateResponseBodyAction())"/>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new BodyPanel(controller.getUpdateResponseBodyAction((JXTable) exchangeTable))"/>
               </AuxValues>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout$JSplitPaneConstraintsDescription">

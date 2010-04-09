@@ -26,6 +26,7 @@ public abstract class JXTableAction extends AbstractAction {
 
   public JXTableAction(JXTable table, final boolean multipleSelectionAllowed) {
     this.table = table;
+    
     table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
       @Override
       public void valueChanged(ListSelectionEvent e) {
@@ -55,14 +56,7 @@ public abstract class JXTableAction extends AbstractAction {
       multiRowActionPerformed(modelIndices);
 
     } else if (table.getSelectedRowCount() == 1) {
-      rowActionPerformed(table.convertRowIndexToModel(table.getSelectedRow()));
-    }
-  }
-
-  // for simplicity we will just call single row action performed multiple times
-  private void multiRowActionPerformed(int[] rowIndices) {
-    for (int i = 0; i < rowIndices.length; i++) {
-      rowActionPerformed(rowIndices[i]);
+      singleRowActionPerformed(table.convertRowIndexToModel(table.getSelectedRow()));
     }
   }
 
@@ -70,5 +64,11 @@ public abstract class JXTableAction extends AbstractAction {
    * Designed to be overridden by child class
    * @param row
    */
-  protected abstract void rowActionPerformed(int index);
+  protected abstract void multiRowActionPerformed(int[] rowIndices);
+
+  /**
+   * Designed to be overridden by child class
+   * @param row
+   */
+  protected abstract void singleRowActionPerformed(int index);
 }

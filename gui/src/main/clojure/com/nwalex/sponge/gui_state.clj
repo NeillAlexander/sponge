@@ -17,7 +17,6 @@
 (def #^{:private true} gui-frame-store (atom nil))
 (def #^{:private true} port-store (ref 8139))
 (def #^{:private true} target-store (ref "http://services.aonaware.com"))
-(def #^{:private true} current-row-store (atom nil))
 (def #^{:private true}
      mode (atom
            com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD))
@@ -67,20 +66,6 @@
 
 (defn config []
   {:port @port-store :target @target-store})
-
-(defn current-row []
-  @current-row-store)
-
-(defn set-current-row! [row]
-  (compare-and-set! current-row-store
-                    @current-row-store (if (> row -1) row nil))
-  (log/debug (format "Current selected row = %s" (current-row))))
-
-(defn clear-current-row! []
-  (set-current-row! -1))
-
-(defn row-selected []
-  (not (nil? (current-row))))
 
 (defn repl-started! []
   (reset! repl-running true)

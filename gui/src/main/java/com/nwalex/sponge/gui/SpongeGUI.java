@@ -12,6 +12,8 @@ package com.nwalex.sponge.gui;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Enumeration;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -44,33 +46,27 @@ public class SpongeGUI extends javax.swing.JFrame {
   public SpongeGUI(final SpongeGUIController controller) {
     this.controller = controller;
     this.helper = new HelpManager(this);
-    
+
     initComponents();
 
     setExtendedState(JFrame.MAXIMIZED_BOTH);
 
     // set up the key handlers
-    exchangeTable.getActionMap().put("LABEL_EX", controller.getLabelExchangeAction());
-    exchangeTable.getActionMap().put("DELETE_LABEL", controller.getDeleteLabelAction());
-    exchangeTable.getActionMap().put("DEFAULT_RESPONSE", controller.getSetDefaultResponseAction());
+    exchangeTable.getActionMap().put("LABEL_EX", controller.getLabelExchangeAction((JXTable) exchangeTable));
+    exchangeTable.getActionMap().put("DELETE_LABEL", controller.getDeleteLabelAction((JXTable) exchangeTable));
+    exchangeTable.getActionMap().put("DEFAULT_RESPONSE", controller.getSetDefaultResponseAction((JXTable) exchangeTable));
     exchangeTable.getActionMap().put("DELETE_ROW", getWrappedDeleteAction());
-    exchangeTable.getActionMap().put("DUPLICATE", controller.getDuplicateRowAction());
+    exchangeTable.getActionMap().put("DUPLICATE", controller.getDuplicateRowAction((JXTable) exchangeTable));
 
     exchangeTable.getActionMap().put("PACK", new AbstractAction() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         ((JXTable) exchangeTable).packAll();
       }
     });
 
-    exchangeTable.getActionMap().put("SEND", new AbstractAction() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        controller.getResendRequestAction().actionPerformed(e);
-      }
-    });
+    final Action resendRequestAction = controller.getResendRequestAction((JXTable) exchangeTable);
+    exchangeTable.getActionMap().put("SEND", resendRequestAction);
 
     InputMap im = exchangeTable.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     im.put(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0), "LABEL_EX");
@@ -103,8 +99,8 @@ public class SpongeGUI extends javax.swing.JFrame {
 
           if (rawIndex > -1) {
             int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);
-            requestPanel.setText(controller.getRequestDataForRow(selectedIndex));
-            responsePanel.setText(controller.getResponseDataForRow(selectedIndex));
+            requestPanel.setText(controller.getRequestDataForRow(selectedIndex), selectedIndex);
+            responsePanel.setText(controller.getResponseDataForRow(selectedIndex), selectedIndex);
           }
         }
       }
@@ -112,36 +108,46 @@ public class SpongeGUI extends javax.swing.JFrame {
   }
 
   private Action getWrappedDeleteAction() {
-    return new AbstractAction() {
+    final Action deleteRowAction = controller.getDeleteRowAction((JXTable) exchangeTable);
 
+    final Action wrappedDeleteAction = new AbstractAction() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (controller.getDeleteRowAction().isEnabled()) {
-          int selectedRow = exchangeTable.getSelectedRow();
-          controller.getDeleteRowAction().actionPerformed(e);
+        int selectedRow = exchangeTable.getSelectedRow();
+        deleteRowAction.actionPerformed(e);
 
-          int numRows = exchangeTable.getRowCount();
+        int numRows = exchangeTable.getRowCount();
 
-          if (selectedRow > 0) {
-            selectedRow = selectedRow - 1;
-          }
+        if (selectedRow > 0) {
+          selectedRow = selectedRow - 1;
+        }
 
-          if (numRows > 0) {
-            if (selectedRow < numRows) {
-              exchangeTable.setRowSelectionInterval(selectedRow, selectedRow);
-              updateDisplayedData(selectedRow);
-            } else {
-              exchangeTable.setRowSelectionInterval(numRows - 1, numRows - 1);
-              updateDisplayedData(numRows - 1);
-            }
+        if (numRows > 0) {
+          if (selectedRow < numRows) {
+            exchangeTable.setRowSelectionInterval(selectedRow, selectedRow);
+            updateDisplayedData(selectedRow);
           } else {
-            requestPanel.setText("");
-            responsePanel.setText("");
-            controller.setSelectedRow(-1);
+            exchangeTable.setRowSelectionInterval(numRows - 1, numRows - 1);
+            updateDisplayedData(numRows - 1);
           }
+        } else {
+          requestPanel.setText("", -1);
+          responsePanel.setText("", -1);
         }
       }
     };
+
+
+    deleteRowAction.addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("enabled")) {
+          wrappedDeleteAction.setEnabled((Boolean) evt.getNewValue());
+        }
+      }
+    });
+
+    return wrappedDeleteAction;
   }
 
   private void updateSelectedMode(final SpongeGUIController controller) {
@@ -168,10 +174,8 @@ public class SpongeGUI extends javax.swing.JFrame {
 
   private void updateDisplayedData(int rawIndex) {
     int selectedIndex = ((JXTable) exchangeTable).convertRowIndexToModel(rawIndex);
-
-    controller.setSelectedRow(selectedIndex);
-    requestPanel.setText(controller.getRequestDataForRow(selectedIndex));
-    responsePanel.setText(controller.getResponseDataForRow(selectedIndex));
+    requestPanel.setText(controller.getRequestDataForRow(selectedIndex), selectedIndex);
+    responsePanel.setText(controller.getResponseDataForRow(selectedIndex), selectedIndex);
   }
 
   /** This method is called from within the constructor to
@@ -197,8 +201,8 @@ public class SpongeGUI extends javax.swing.JFrame {
     ((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});
     ((JXTable) exchangeTable).setColumnControlVisible(true);
     jSplitPane2 = new javax.swing.JSplitPane();
-    requestPanel = new BodyPanel(controller.getUpdateRequestBodyAction());
-    responsePanel = new BodyPanel(controller.getUpdateResponseBodyAction());
+    requestPanel = new BodyPanel(controller.getUpdateRequestBodyAction((JXTable) exchangeTable));
+    responsePanel = new BodyPanel(controller.getUpdateResponseBodyAction((JXTable) exchangeTable));
     menuBar = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     loadMenuItem = new javax.swing.JMenuItem();
@@ -215,31 +219,29 @@ public class SpongeGUI extends javax.swing.JFrame {
     forwardAllMenuItem = new javax.swing.JRadioButtonMenuItem();
     replayOrForwardMenuItem = new javax.swing.JRadioButtonMenuItem();
     replayOrFailMenuItem = new javax.swing.JRadioButtonMenuItem();
-    deleteLabelMenuItem = new javax.swing.JMenu();
-    clearAllMenuItem = new javax.swing.JMenuItem();
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
     replMenuItem.setAction(controller.getStartReplAction());
     jMenu2 = new javax.swing.JMenu();
     keyboardShortcutsHelp = new javax.swing.JMenuItem();
 
-    attachLabelItem.setAction(controller.getLabelExchangeAction());
+    attachLabelItem.setAction(controller.getLabelExchangeAction((JXTable) exchangeTable));
     attachLabelItem.setText("Label...");
     tablePopup.add(attachLabelItem);
 
-    deleteLabelItem.setAction(controller.getDeleteLabelAction());
+    deleteLabelItem.setAction(controller.getDeleteLabelAction((JXTable) exchangeTable));
     deleteLabelItem.setText("Unlabel");
     tablePopup.add(deleteLabelItem);
 
-    setDefaultResponseItem.setAction(controller.getSetDefaultResponseAction());
+    setDefaultResponseItem.setAction(controller.getSetDefaultResponseAction((JXTable) exchangeTable));
     setDefaultResponseItem.setText("Replay");
     tablePopup.add(setDefaultResponseItem);
 
-    resendRequestItem.setAction(controller.getResendRequestAction());
+    resendRequestItem.setAction(controller.getResendRequestAction((JXTable ) exchangeTable));
     resendRequestItem.setText("Resend");
     tablePopup.add(resendRequestItem);
 
-    duplicate.setAction(controller.getDuplicateRowAction());
+    duplicate.setAction(controller.getDuplicateRowAction((JXTable) exchangeTable));
     duplicate.setText("Duplicate");
     tablePopup.add(duplicate);
     tablePopup.add(jSeparator1);
@@ -259,7 +261,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
     exchangeTable.setModel(controller.getExchangeTableModel());
     exchangeTable.setComponentPopupMenu(tablePopup);
-    exchangeTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+    exchangeTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     exchangeTable.getSelectionModel().addListSelectionListener(
       new ListSelectionListener() {
 
@@ -269,16 +271,19 @@ public class SpongeGUI extends javax.swing.JFrame {
           }
 
           ListSelectionModel rowSM = (ListSelectionModel) e.getSource();
-          int rawIndex = rowSM.getMinSelectionIndex();         
 
-          if (rawIndex > -1) {                  
-            updateDisplayedData(rawIndex); 
-            requestPanel.displayReadOnlyView();
-            responsePanel.displayReadOnlyView();
+          // check for more than one row selected
+          if (!(rowSM.getMinSelectionIndex() == rowSM.getMaxSelectionIndex()) || rowSM.isSelectionEmpty()) {
+            requestPanel.setText("", -1);
+            responsePanel.setText("", -1);            
           } else {
-            controller.setSelectedRow(-1);
-            requestPanel.setText("");
-            responsePanel.setText("");
+            int rawIndex = rowSM.getMinSelectionIndex();         
+
+            if (rawIndex > -1) {                  
+              updateDisplayedData(rawIndex); 
+              requestPanel.displayReadOnlyView();
+              responsePanel.displayReadOnlyView();
+            }
           }
         }
       });
@@ -368,14 +373,6 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       menuBar.add(modeMenu);
 
-      deleteLabelMenuItem.setText("Action");
-
-      clearAllMenuItem.setText("Clear All");
-      clearAllMenuItem.setAction(controller.getClearAllAction());
-      deleteLabelMenuItem.add(clearAllMenuItem);
-
-      menuBar.add(deleteLabelMenuItem);
-
       replMenu.setText("REPL");
 
       replMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
@@ -422,14 +419,11 @@ public class SpongeGUI extends javax.swing.JFrame {
     private void replayOrFailMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrFailMenuItemActionPerformed
       modeSelected(evt);
     }//GEN-LAST:event_replayOrFailMenuItemActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem attachLabelItem;
-  private javax.swing.JMenuItem clearAllMenuItem;
   private javax.swing.JMenuItem configureMenuItem;
   private javax.swing.JMenuItem delete;
   private javax.swing.JMenuItem deleteLabelItem;
-  private javax.swing.JMenu deleteLabelMenuItem;
   private javax.swing.JMenuItem duplicate;
   private javax.swing.JTable exchangeTable;
   private javax.swing.JRadioButtonMenuItem forwardAllMenuItem;

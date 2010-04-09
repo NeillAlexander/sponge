@@ -14,6 +14,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JTextArea;
+import org.jdesktop.swingx.JXTable;
 
 /**
  *
@@ -22,6 +23,7 @@ import javax.swing.JTextArea;
 public class BodyPanel extends javax.swing.JPanel {
 
   private final SaveAction saveAction;
+  private int displayedRow = -1;
 
   public BodyPanel() {
     saveAction = null;
@@ -34,9 +36,10 @@ public class BodyPanel extends javax.swing.JPanel {
     saveAction.setCallbacks(editingArea, this);
   }
 
-  public void setText(String text) {
+  public void setText(String text, int row) {
     displayArea.setText(text);
     displayArea.setCaretPosition(0);
+    displayedRow = row;
   }
 
   public String getText() {
@@ -53,6 +56,10 @@ public class BodyPanel extends javax.swing.JPanel {
 
   public void displayEditView() {
     ((CardLayout) getLayout()).show(this, "editCard");
+  }
+
+  public int getDisplayedRow() {
+    return displayedRow;
   }
 
   /** This method is called from within the constructor to
@@ -176,14 +183,18 @@ public class BodyPanel extends javax.swing.JPanel {
   // End of variables declaration//GEN-END:variables
 
 
-  public static abstract class SaveAction extends AbstractAction {
+  public static abstract class SaveAction extends JXTableSingleRowAction {
 
     private JTextArea textArea;
     private BodyPanel bodyPanel;
 
+    public SaveAction(JXTable table) {
+      super(table);
+    }
+
     @Override
-    public void actionPerformed(ActionEvent ae) {
-      saveText(textArea.getText());
+    protected void singleRowActionPerformed(int index) {
+      saveText(textArea.getText(), bodyPanel.getDisplayedRow());
       bodyPanel.toggleView();
     }
 
@@ -192,6 +203,6 @@ public class BodyPanel extends javax.swing.JPanel {
       this.textArea = textArea;
     }
     
-    public abstract void saveText(String text);
+    public abstract void saveText(String text, int row);
   }
 }

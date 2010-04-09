@@ -15,6 +15,6 @@ package com.nwalex.sponge.gui;
  * @author neill
  */
 public interface LabelDialogController {
-  public void setLabel(String label);
-  public String getCurrentLabel();
+  public void setLabel(String label, int[] indices);
+  public String getLabel(int row);
 }

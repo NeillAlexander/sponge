@@ -31,11 +31,16 @@
    (make-action name f enabled)
    (state/gui)))
 
-(defn- make-save-action [f]
-  (doto
-      (proxy [com.nwalex.sponge.gui.BodyPanel$SaveAction] []
-        (saveText [text] (f text)))
-    (.setEnabled false)))
+(defn- make-multi-row-action [f table]
+  (proxy [com.nwalex.sponge.gui.JXTableMultiRowAction] [table]
+    (multiRowActionPerformed [indices] (f indices))))
+
+(defn- make-single-row-action [f table]
+  (proxy [com.nwalex.sponge.gui.JXTableSingleRowAction] [table]
+    (singleRowActionPerformed [row] (f row))))
+
+(defn- make-save-action [f table]
+  )
 
 (defn- toggle-action [action]
   (.setEnabled action (not (.isEnabled action))))
@@ -72,44 +77,13 @@
 (defn- exit [event]
   (System/exit 1))
 
-(defn- delete-row [event]
-  (model/delete-current-row! (state/current-row)))
-
-(defn- duplicate-row [event]
-  (model/duplicate-row! (state/current-row)))
-
-(defn- resend-request [event]
-  (let [exchange (model/get-exchange-for-row (state/current-row))]
+(defn- resend-request [row]
+  (let [exchange (model/get-exchange-for-row row)]
     (future (server/resend-request exchange (state/current-server)))))
-
-(defn- update-row [row]
-  (state/set-current-row! row)
-  (.setEnabled (:update-request action-map) (state/row-selected))
-  (.setEnabled (:update-response action-map) (state/row-selected))
-  (.setEnabled (:label-action action-map) (state/row-selected))
-  (.setEnabled (:delete-label action-map) (state/row-selected))
-  (.setEnabled (:use-response action-map) (state/row-selected))
-  (.setEnabled (:delete-row action-map) (state/row-selected))
-  (.setEnabled (:duplicate-row action-map) (state/row-selected))
-  (.setEnabled (:resend-request action-map)
-               (and (state/row-selected) (server/running? (state/current-server)))))
 
 (defn- wrap-session-action [f event]
   (f event)
   (.setEnabled (:save action-map) (session/has-file)))
-
-(defn- use-response [event]
-  (model/use-current-row-response! (state/current-row)))
-
-(defn- update-response [text]
-  (model/update-selected-exchange-body! text :response))
-
-(defn- update-request [text]
-  (model/update-selected-exchange-body! text :request))
-
-(defn- clear-all [event]
-  (model/clear!)
-  (toggle-action (:save action-map)))
 
 (def action-map
      {:start-server (make-safe-action "Start Server" start-server true)
@@ -117,21 +91,15 @@
       :configure (make-action "Configure" config/configure true)
       :exit (make-action "Exit" exit true)
       :start-repl (make-action "Start Repl" start-repl true)
-      :clear-all (make-action "Clear All" clear-all true)
-      :label-action (make-action "Attach Label..." label/do-label false)
-      :delete-label (make-action "Delete Label" label/delete-label false)
       :load (make-action "Load Session..."
                          #(wrap-session-action session/load-session! %1) true)
       :save (make-action "Save Session" session/save-session false)
       :save-as (make-action "Save Session As..."
                             #(wrap-session-action session/save-session-as %1)
                             true)
-      :use-response (make-action "Use this Response" use-response false)
-      :delete-row (make-action "Delete Exchange" delete-row false)
-      :resend-request (make-action "Resend this Request" resend-request false)
-      :update-request (make-save-action update-request)
-      :update-response (make-save-action update-response)
-      :duplicate-row (make-action "Duplicate Row" duplicate-row false)})
+      :resend-request (ref nil)
+      :update-request (ref nil)
+      :update-response (ref nil)})
 
 (defn- set-mode [mode]  
   (state/set-mode! mode)
@@ -140,6 +108,30 @@
                                    (filters/get-request-filters-for-mode
                                     (state/get-mode)))))
 
+(defn- make-table-action [table key proxy-maker]
+  (if-not @(key action-map)    
+    (dosync
+     (ref-set (key action-map)
+              (proxy-maker table))))
+  @(key action-map))
+
+(defn- resend-request-proxy [table]
+  (proxy [com.nwalex.sponge.gui.JXTableSingleRowAction] [table]
+    (singleRowActionPerformed [row] (resend-request row))
+    (setEnabled [enabled] (proxy-super setEnabled
+                                       (and enabled
+                                            (server/running?
+                                             (state/current-server)))))))
+
+(defn- save-body-action [key table]
+  (proxy [com.nwalex.sponge.gui.BodyPanel$SaveAction] [table]
+    (saveText [text row] (model/update-exchange-body! text key row))))
+
+(defn- resend-request-action [table]
+  (make-table-action table :resend-request resend-request-proxy))
+
+(defn- update-body-action [table key action-key]
+  (make-table-action table action-key (partial save-body-action key)))
 
 (def sponge-controller
      (proxy [com.nwalex.sponge.gui.SpongeGUIController] []
@@ -150,22 +142,28 @@
        (getExchangeTableModel [] (model/get-table-model))
        (getStartReplAction [] (:start-repl action-map))
        (getRequestDataForRow [row] (model/get-data-for-row row :request))
-       (getResponseDataForRow [row] (model/get-data-for-row row :response))
-       (getClearAllAction [] (:clear-all action-map))
-       (getLabelExchangeAction [] (:label-action action-map))
-       (setSelectedRow [row] (update-row row))
-       (getDeleteLabelAction [] (:delete-label action-map))
+       (getResponseDataForRow [row] (model/get-data-for-row row :response))       
+       (getLabelExchangeAction [table] (make-multi-row-action label/do-label table))
+       (getDeleteLabelAction [table] (make-multi-row-action label/delete-label table))
        (getLoadAction [] (:load action-map))
        (getSaveAction [] (:save action-map))
        (getSaveAsAction [] (:save-as action-map))
-       (getSetDefaultResponseAction [] (:use-response action-map))
+       (getSetDefaultResponseAction [table]
+                                    (make-multi-row-action
+                                     model/set-as-default-response! table))
        (getMode [] (state/get-mode))
        (setMode [mode] (set-mode mode))
-       (getDeleteRowAction [] (:delete-row action-map))
-       (getResendRequestAction [] (:resend-request action-map))
-       (getUpdateRequestBodyAction [] (:update-request action-map))
-       (getUpdateResponseBodyAction [] (:update-response action-map))
-       (getDuplicateRowAction [] (:duplicate-row action-map))))
+       (getDeleteRowAction [table] (make-multi-row-action
+                                    model/delete-rows! table))
+       (getResendRequestAction [table] (resend-request-action table))
+       (getUpdateRequestBodyAction [table] (update-body-action table
+                                                               :request
+                                                               :update-request))
+       (getUpdateResponseBodyAction [table] (update-body-action table
+                                                                :response
+                                                                :update-response))
+       (getDuplicateRowAction [table] (make-multi-row-action
+                                       model/duplicate-rows! table))))
 
 (defn make-gui [& args]
   (swing/do-swing

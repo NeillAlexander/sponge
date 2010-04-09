@@ -13,13 +13,13 @@
 
 (def controller
      (proxy [com.nwalex.sponge.gui.LabelDialogController] []
-       (setLabel [label] (model/set-label-on-row label (state/current-row)))
-       (getCurrentLabel [] (model/get-label-for-row (state/current-row)))))
+       (setLabel [label row-indices] (model/set-label-on-rows! label row-indices))
+       (getLabel [row] (model/get-label-for-row row))))
 
-(defn do-label [event]
-  (doto (com.nwalex.sponge.gui.LabelDialog. (state/gui) true controller)
+(defn do-label [rows]
+  (doto (com.nwalex.sponge.gui.LabelDialog. (state/gui) true controller rows)
     (.setLocationRelativeTo (state/gui))
     (.setVisible true)))
 
-(defn delete-label [event]
-  (model/delete-label-on-row (state/current-row)))
+(defn delete-label [rows]
+  (model/delete-label-on-rows! rows))
