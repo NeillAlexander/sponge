@@ -11,6 +11,7 @@ package com.nwalex.sponge.gui;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -26,8 +27,9 @@ public abstract class JXTableAction extends AbstractAction {
 
   public JXTableAction(JXTable table, final boolean multipleSelectionAllowed) {
     this.table = table;
-    
+
     table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
       @Override
       public void valueChanged(ListSelectionEvent e) {
         if (e.getValueIsAdjusting()) {
@@ -36,8 +38,8 @@ public abstract class JXTableAction extends AbstractAction {
 
         ListSelectionModel rowSM = (ListSelectionModel) e.getSource();
         int numRows = rowSM.getMaxSelectionIndex() - rowSM.getMinSelectionIndex() + 1;
-        setEnabled(!rowSM.isSelectionEmpty() &&
-                (multipleSelectionAllowed || (!multipleSelectionAllowed && numRows == 1)));
+        setEnabled(!rowSM.isSelectionEmpty()
+                && (multipleSelectionAllowed || (!multipleSelectionAllowed && numRows == 1)));
       }
     });
   }
@@ -45,18 +47,23 @@ public abstract class JXTableAction extends AbstractAction {
   @Override
   // TODO: change this - need to have separate method for multi-row (see ticket)
   public final void actionPerformed(ActionEvent e) {
-    if (table.getSelectedRowCount() > 1) {
-      int[] indices = table.getSelectedRows();
-      int[] modelIndices = new int[indices.length];
+    try {
+      if (table.getSelectedRowCount() > 1) {
+        int[] indices = table.getSelectedRows();
+        int[] modelIndices = new int[indices.length];
 
-      for (int i = 0; i < indices.length; i++) {
-        modelIndices[i] = table.convertRowIndexToModel(indices[i]);
+        for (int i = 0; i < indices.length; i++) {
+          modelIndices[i] = table.convertRowIndexToModel(indices[i]);
+        }
+
+        multiRowActionPerformed(modelIndices);
+
+      } else if (table.getSelectedRowCount() == 1) {
+        singleRowActionPerformed(table.convertRowIndexToModel(table.getSelectedRow()));
       }
-
-      multiRowActionPerformed(modelIndices);
-
-    } else if (table.getSelectedRowCount() == 1) {
-      singleRowActionPerformed(table.convertRowIndexToModel(table.getSelectedRow()));
+    } catch (Exception ex) {
+      JOptionPane.showMessageDialog(table, ex.getClass().getName() + ": " + ex.getMessage(),
+              "Exception", JOptionPane.ERROR_MESSAGE);
     }
   }
 

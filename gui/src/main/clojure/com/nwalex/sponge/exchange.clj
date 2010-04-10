@@ -54,6 +54,14 @@ from the server"
 (defn save!
   "Update the exchange to be this new value"
   [exchange]
+  ;; there is a bug that led to corrupt data
+  ;; in order to track this down ensure there
+  ;; is a request for the exchange and throw
+  ;; an exception if there isn't
+  (if-not (:request exchange)
+    (do
+      (log/error (format "Corrupt exchange data:\n%s" exchange))
+      (throw (RuntimeException. "Uh oh. Corrupt data detected. Abort, abort!"))))
   (dosync
    (commute exchange-store assoc (:id exchange) exchange))
   exchange)

@@ -39,9 +39,6 @@
   (proxy [com.nwalex.sponge.gui.JXTableSingleRowAction] [table]
     (singleRowActionPerformed [row] (f row))))
 
-(defn- make-save-action [f table]
-  )
-
 (defn- toggle-action [action]
   (.setEnabled action (not (.isEnabled action))))
 
@@ -83,7 +80,6 @@
   0)
 
 (defn- resend-all-requests [rows]
-  (println (format "resend all requests %s" rows))
   (amap rows idx ret (resend-request (aget rows idx))))
 
 (defn- wrap-session-action [f event]
