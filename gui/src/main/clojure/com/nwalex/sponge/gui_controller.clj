@@ -88,14 +88,14 @@
 
 (def action-map
      {:start-server (make-safe-action "Start Server" start-server true)
-      :stop-server (make-action "Stop Server" stop-server false)
-      :configure (make-action "Configure" config/configure true)
-      :exit (make-action "Exit" exit true)
-      :start-repl (make-action "Start Repl" start-repl true)
-      :load (make-action "Load Session..."
+      :stop-server (make-safe-action "Stop Server" stop-server false)
+      :configure (make-safe-action "Configure" config/configure true)
+      :exit (make-safe-action "Exit" exit true)
+      :start-repl (make-safe-action "Start Repl" start-repl true)
+      :load (make-safe-action "Load Session..."
                          #(wrap-session-action session/load-session! %1) true)
-      :save (make-action "Save Session" session/save-session false)
-      :save-as (make-action "Save Session As..."
+      :save (make-safe-action "Save Session" session/save-session false)
+      :save-as (make-safe-action "Save Session As..."
                             #(wrap-session-action session/save-session-as %1)
                             true)
       :resend-request (ref nil)
