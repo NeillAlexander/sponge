@@ -3,7 +3,7 @@
 REM Build the classpath using SPONGE_HOME as the reference point
 if "%SPONGE_HOME%" == "" goto error
 
-set CLASSPATH=%SPONGE_HOME%\lib\*
+set CLASSPATH=%SPONGE_HOME%\lib\*;%SPONGE_HOME%\config
 
 set SPONGE_SESSIONS="%SPONGE_HOME%\sessions"
 

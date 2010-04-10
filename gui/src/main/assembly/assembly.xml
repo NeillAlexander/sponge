@@ -14,6 +14,10 @@
       <outputDirectory>/third-party-licenses</outputDirectory>
     </fileSet>
     <fileSet>
+      <directory>src/main/config</directory>
+      <outputDirectory>/config</outputDirectory>
+    </fileSet>
+    <fileSet>
       <directory>target/</directory>
       <outputDirectory>sessions</outputDirectory>
       <excludes>

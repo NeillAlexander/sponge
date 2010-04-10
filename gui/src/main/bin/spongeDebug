@@ -20,6 +20,9 @@ function init_classpath {
     for ITEM in `ls $SPONGE_HOME/lib/*.jar`; do
         add_to_classpath "$ITEM"
     done
+
+    # Also add the lib directory (for the log4j properties etc)
+    add_to_classpath "$SPONGE_HOME/config"
 }
 
 case "`uname`" in
