@@ -17,13 +17,19 @@
    [com.nwalex.sponge.label-controller :as label]
    [com.nwalex.sponge.config-controller :as config]
    [com.nwalex.sponge.exchange :as exchange]
-   [clojure.contrib.swing-utils :as swing]))
+   [clojure.contrib.swing-utils :as swing]
+   [clojure.contrib.logging :as log]))
 
 (declare action-map)
 
+(defn- log-action [f]
+  (log/info (format "ACTION PERFORMED: %s" f)))
+
 (defn- make-action [name f enabled]
-  (doto (proxy [javax.swing.AbstractAction] [name]
-          (actionPerformed [event] (f event)))
+  (doto (proxy [javax.swing.AbstractAction] [name]          
+          (actionPerformed [event]
+                           (log-action f)
+                           (f event)))
     (.setEnabled enabled)))
 
 (defn- make-safe-action [name f enabled]
@@ -33,11 +39,15 @@
 
 (defn- make-multi-row-action [f table]
   (proxy [com.nwalex.sponge.gui.JXTableMultiRowAction] [table]
-    (multiRowActionPerformed [indices] (f indices))))
+    (multiRowActionPerformed [indices]
+                             (log-action f)
+                             (f indices))))
 
 (defn- make-single-row-action [f table]
   (proxy [com.nwalex.sponge.gui.JXTableSingleRowAction] [table]
-    (singleRowActionPerformed [row] (f row))))
+    (singleRowActionPerformed [row]
+                              (log-action f)
+                              (f row))))
 
 (defn- toggle-action [action]
   (.setEnabled action (not (.isEnabled action))))
@@ -118,7 +128,9 @@
 
 (defn- resend-request-proxy [table]
   (proxy [com.nwalex.sponge.gui.JXTableMultiRowAction] [table]
-    (multiRowActionPerformed [rows] (resend-all-requests rows))
+    (multiRowActionPerformed [rows]
+                             (log-action "resend-request")
+                             (resend-all-requests rows))
     (setEnabled [enabled] (proxy-super setEnabled
                                        (and enabled
                                             (server/running?
@@ -126,7 +138,9 @@
 
 (defn- save-body-action [key table]
   (proxy [com.nwalex.sponge.gui.BodyPanel$SaveAction] [table]
-    (saveText [text row] (model/update-exchange-body! text key row))))
+    (saveText [text row]
+              (log-action (format "save-body %s" key))
+              (model/update-exchange-body! text key row))))
 
 (defn- resend-request-action [table]
   (make-table-action table :resend-request resend-request-proxy))

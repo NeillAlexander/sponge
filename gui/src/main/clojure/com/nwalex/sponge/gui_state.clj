@@ -35,6 +35,7 @@
            (if @repl-running "REPL" ""))))
 
 (defn set-config! [port target]
+  (log/info (format "Setting server config to: port = %s, target = %s" port target))
   (java.net.URL. target)
   (dosync
    (ref-set port-store port)
@@ -42,6 +43,7 @@
    (set-title)))
 
 (defn set-mode! [new-mode]
+  (log/info (format "Setting mode to \"%s\"" new-mode))
   (compare-and-set! mode @mode new-mode)
   (set-title))
 

@@ -126,6 +126,7 @@
 (defn update-exchange-body!
   "Updates the body on the currently selected exchange"
   [text key row]
+  (log/info (format "Updating %s body for row %d" key row))
   (let [exchange (get-exchange-for-row row)]
     (exchange/update-body! exchange key text)
     (notify-row-changed row)))
@@ -160,6 +161,7 @@
   [row]
   (let [exchange (get-exchange-for-row row)
         duplicate (exchange/duplicate exchange)]
+    (log/info (format "Duplicating row: %d" row))
     (dosync
      (ref-set data-id-store
               (vec (concat (subvec @data-id-store 0 row)
@@ -214,9 +216,11 @@
     ;; if already set then unset (toggle)
     (if (= (@default-responses key) (exchange/get-id exchange))
       (dosync
-       (commute default-responses dissoc key))
+       (commute default-responses dissoc key)
+       (log/info (format "Unset default response for row %d" row)))
       (dosync
-       (commute default-responses assoc key (exchange/get-id exchange))))
+       (commute default-responses assoc key (exchange/get-id exchange))
+       (log/info (format "Set row %d as default response" row))))
     0))
 
 (defn set-as-default-response! [rows]
