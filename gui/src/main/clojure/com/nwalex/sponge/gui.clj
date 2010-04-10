@@ -12,4 +12,5 @@
   (:gen-class :main true :name com.nwalex.sponge.Client))
 
 (defn -main [& args]
+  (com.nwalex.sponge.gui.StdOutErrLog/tieSystemOutAndErrToLog)
   (apply controller/make-gui args))

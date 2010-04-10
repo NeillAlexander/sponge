@@ -46,4 +46,4 @@ fi
 init_classpath
 
 # Start the client
-java -cp $CLASSPATH -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=4145 -Xms128m -Xmx256m -Dsponge.sessions="$SPONGE_SESSIONS" com.nwalex.sponge.Client
+java -cp $CLASSPATH -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=4145 -Xms128m -Xmx256m -Dsponge.sessions="$SPONGE_SESSIONS" -Dsponge.home="$SPONGE_HOME" com.nwalex.sponge.Client

@@ -127,7 +127,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
     final Action wrappedDeleteAction = new AbstractAction() {
       @Override
-      public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent e) {        
         int selectedRow = exchangeTable.getSelectedRow();
         deleteRowAction.actionPerformed(e);
 

@@ -7,7 +7,7 @@ set CLASSPATH=%SPONGE_HOME%\lib\*
 
 set SPONGE_SESSIONS="%SPONGE_HOME%\sessions"
 
-java -Xms128m -Xmx256m -Dsponge.sessions="%SPONGE_SESSIONS%"  com.nwalex.sponge.Client
+java -Xms128m -Xmx256m -Dsponge.sessions="%SPONGE_SESSIONS%" -Dsponge.home="%SPONGE_HOME%" com.nwalex.sponge.Client
 
 goto :end
 

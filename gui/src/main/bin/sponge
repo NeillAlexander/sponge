@@ -39,11 +39,11 @@ export SPONGE_HOME=`dirname $0`
 # Where we look for stored sessions
 if [ ! $SPONGE_SESSIONS ]
 then
-    export SPONGE_SESSIONS=$SPONGE_HOME
+    export SPONGE_SESSIONS=$SPONGE_HOME/sessions
 fi
 
 # Add all jar files from lib directory
 init_classpath
 
 # Start the client 
-java -cp $CLASSPATH -Xms128m -Xmx256m -Dsponge.sessions="$SPONGE_SESSIONS" com.nwalex.sponge.Client
+java -cp $CLASSPATH -Xms128m -Xmx256m -Dsponge.sessions="$SPONGE_SESSIONS" -Dsponge.home="$SPONGE_HOME" com.nwalex.sponge.Client

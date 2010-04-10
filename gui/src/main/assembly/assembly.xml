@@ -20,6 +20,13 @@
         <exclude>**/*</exclude>
       </excludes>
     </fileSet>
+    <fileSet>
+      <directory>target/</directory>
+      <outputDirectory>logs</outputDirectory>
+      <excludes>
+        <exclude>**/*</exclude>
+      </excludes>
+    </fileSet>
   </fileSets>
   <dependencySets>
     <dependencySet>
