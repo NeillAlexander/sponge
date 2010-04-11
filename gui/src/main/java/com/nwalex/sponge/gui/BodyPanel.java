@@ -12,6 +12,8 @@ package com.nwalex.sponge.gui;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JTextArea;
@@ -32,7 +34,7 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
   private final SaveAction saveAction;
   private int displayedRow = -1;
   private int lastHighlight = -1;
-  private Highlight[] currentHighlights;
+  private Highlight[] highlights;
 
   public BodyPanel() {
     saveAction = null;
@@ -62,7 +64,7 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
 
   private void highlightAll(String pattern, JTextComponent textComp, boolean caseSensitive) {
     Highlighter hilite = textComp.getHighlighter();
-    try {      
+    try {
       Document doc = textComp.getDocument();
       String text = doc.getText(0, doc.getLength());
       int pos = 0;
@@ -74,15 +76,40 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
 
       // Search for pattern
       while (searchMatcher.find()) {
-        hilite.addHighlight(searchMatcher.start(), searchMatcher.end(),
-                new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
+        doHighlight(hilite, searchMatcher.start(), searchMatcher.end(), Color.YELLOW);
       }
 
     } catch (BadLocationException e) {
       e.printStackTrace();
     } finally {
-      this.currentHighlights = hilite.getHighlights();
+      updateHighlights(hilite);
       this.lastHighlight = -1;
+    }
+  }
+
+  private void resetPreviousHighlight(Highlighter hilite) {
+    // reset the previous hilite
+    if (lastHighlight > -1) {
+      hilite.removeHighlight(highlights[lastHighlight]);
+      doHighlight(hilite, highlights[lastHighlight].getStartOffset(), highlights[lastHighlight].getEndOffset(), Color.YELLOW);
+    }
+  }
+
+  private void updateHighlights(Highlighter hilite) {
+    this.highlights = hilite.getHighlights();
+    Arrays.sort(this.highlights, new Comparator<Highlight>() {
+      @Override
+      public int compare(Highlight o1, Highlight o2) {
+        return o1.getStartOffset() - o2.getStartOffset();
+      }
+    });
+  }
+
+  private void doHighlight(Highlighter hilite, int start, int end, Color color) {
+    try {
+      hilite.addHighlight(start, end, new DefaultHighlighter.DefaultHighlightPainter(color));
+    } catch (BadLocationException ex) {
+      ex.printStackTrace();
     }
   }
 
@@ -113,15 +140,28 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
   public boolean findNext() {
     int nextHighlight = lastHighlight + 1;
 
-    if (nextHighlight < currentHighlights.length) {
-      getVisibleTextArea().setCaretPosition(currentHighlights[nextHighlight].getStartOffset());
+    Highlighter hilite = getVisibleTextArea().getHighlighter();
+    boolean found = false;
+    
+    if (nextHighlight < highlights.length) {
+      getVisibleTextArea().setCaretPosition(highlights[nextHighlight].getStartOffset());
+
+      // change the highlight colour      
+      hilite.removeHighlight(highlights[nextHighlight]);
+      doHighlight(hilite, highlights[nextHighlight].getStartOffset(),
+              highlights[nextHighlight].getEndOffset(), Color.PINK);
+      resetPreviousHighlight(hilite);
+
       lastHighlight = nextHighlight;
-      return true;
+      found = true;
     } else {
       // wrap around
+      resetPreviousHighlight(hilite);
       lastHighlight = -1;
-      return false;
     }
+
+    updateHighlights(hilite);
+    return found;
   }
 
   public void toggleView() {
