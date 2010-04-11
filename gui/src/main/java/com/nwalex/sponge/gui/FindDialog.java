@@ -74,6 +74,7 @@ public class FindDialog extends javax.swing.JDialog {
     findTextField = new javax.swing.JTextField();
     closeButton = new javax.swing.JButton();
     findButton = new javax.swing.JButton();
+    caseSensitiveBox = new javax.swing.JCheckBox();
 
     setTitle("Find");
     setResizable(false);
@@ -94,21 +95,24 @@ public class FindDialog extends javax.swing.JDialog {
       }
     });
 
+    caseSensitiveBox.setText("Case Sensitive");
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
       layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
       .addGroup(layout.createSequentialGroup()
         .addContainerGap()
+        .addComponent(jLabel1)
+        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-          .addGroup(layout.createSequentialGroup()
-            .addComponent(jLabel1)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(findTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE))
           .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addComponent(caseSensitiveBox)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 149, Short.MAX_VALUE)
             .addComponent(findButton)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(closeButton)))
+            .addComponent(closeButton))
+          .addComponent(findTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE))
         .addContainerGap())
     );
 
@@ -124,7 +128,8 @@ public class FindDialog extends javax.swing.JDialog {
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
           .addComponent(closeButton)
-          .addComponent(findButton))
+          .addComponent(findButton)
+          .addComponent(caseSensitiveBox))
         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
     );
 
@@ -132,7 +137,7 @@ public class FindDialog extends javax.swing.JDialog {
   }// </editor-fold>//GEN-END:initComponents
 
   private void findButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findButtonActionPerformed
-    controller.doFind(findTextField.getText());
+    controller.doFind(findTextField.getText(), caseSensitiveBox.isSelected());
   }//GEN-LAST:event_findButtonActionPerformed
 
   private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
@@ -140,6 +145,7 @@ public class FindDialog extends javax.swing.JDialog {
   }//GEN-LAST:event_closeButtonActionPerformed
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JCheckBox caseSensitiveBox;
   private javax.swing.JButton closeButton;
   private javax.swing.JButton findButton;
   private javax.swing.JTextField findTextField;

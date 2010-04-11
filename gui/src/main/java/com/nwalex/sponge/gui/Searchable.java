@@ -14,7 +14,7 @@ package com.nwalex.sponge.gui;
  * @author alexanc
  */
 public interface Searchable {
-  public void highlightAll(String text);
+  public void highlightAll(String text, boolean caseSensitive);
   public boolean findNext();
   public void clearHighlights();
   public void registeredBy(FindDialogController controller);

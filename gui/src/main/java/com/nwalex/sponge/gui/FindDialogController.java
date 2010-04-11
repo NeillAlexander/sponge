@@ -29,6 +29,7 @@ public class FindDialogController {
   private FindDialog dialog;
   private int hasFindNextFocusIndex = 0;
   private String lastSearchText = null;
+  private boolean lastSearchCaseSensitity = false;
 
   public FindDialogController(JFrame parent) {
     this.parent = parent;
@@ -58,31 +59,23 @@ public class FindDialogController {
             "FIND");
 
     if (component instanceof Searchable) {
-//      component.getActionMap().put("FINDNEXT", new AbstractAction() {
-//
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//          ((Searchable) component).findNext();
-//        }
-//      });
-//
-//      component.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0),
-//              "FINDNEXT");
-
       ((Searchable) component).registeredBy(this);
       addTarget((Searchable) component);
     }
   }
 
-  public void doFind(String text) {
-    if (!text.equals(lastSearchText)) {
+  public void doFind(String text, boolean caseSensitive) {
+    if (!text.equals(lastSearchText) || caseSensitive != lastSearchCaseSensitity) {
+      hasFindNextFocusIndex = 0;
+
       for (Searchable searchable : targets) {
         searchable.clearHighlights();
 
         // only search if we have text
         if (text.trim().length() > 0) {
           lastSearchText = text;
-          searchable.highlightAll(text);
+          lastSearchCaseSensitity = caseSensitive;
+          searchable.highlightAll(text, caseSensitive);
         }
       }
     }

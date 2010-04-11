@@ -12,6 +12,8 @@ package com.nwalex.sponge.gui;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -54,24 +56,28 @@ public class BodyPanel extends javax.swing.JPanel implements Searchable {
   }
 
   @Override
-  public void highlightAll(String text) {
-    highlightAll(text, getVisibleTextArea());
+  public void highlightAll(String text, boolean caseSensitive) {
+    highlightAll(text, getVisibleTextArea(), caseSensitive);
   }
 
-  private void highlightAll(String pattern, JTextComponent textComp) {
+  private void highlightAll(String pattern, JTextComponent textComp, boolean caseSensitive) {
     Highlighter hilite = textComp.getHighlighter();
     try {      
       Document doc = textComp.getDocument();
       String text = doc.getText(0, doc.getLength());
       int pos = 0;
 
+      // Create the regexp for doing the matching
+      Pattern searchPattern = Pattern.compile(Pattern.quote(pattern),
+              caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
+      Matcher searchMatcher = searchPattern.matcher(text);
+
       // Search for pattern
-      while ((pos = text.indexOf(pattern, pos)) >= 0) {
-        // Create highlighter using private painter and apply around pattern
-        hilite.addHighlight(pos, pos + pattern.length(),
+      while (searchMatcher.find()) {
+        hilite.addHighlight(searchMatcher.start(), searchMatcher.end(),
                 new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
-        pos += pattern.length();
       }
+
     } catch (BadLocationException e) {
       e.printStackTrace();
     } finally {
