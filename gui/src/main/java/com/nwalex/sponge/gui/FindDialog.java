@@ -96,6 +96,11 @@ public class FindDialog extends javax.swing.JDialog {
     });
 
     caseSensitiveBox.setText("Case Sensitive");
+    caseSensitiveBox.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        caseSensitiveBoxActionPerformed(evt);
+      }
+    });
 
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
@@ -112,7 +117,7 @@ public class FindDialog extends javax.swing.JDialog {
             .addComponent(findButton)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(closeButton))
-          .addComponent(findTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE))
+          .addComponent(findTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
         .addContainerGap())
     );
 
@@ -143,6 +148,10 @@ public class FindDialog extends javax.swing.JDialog {
   private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
     setVisible(false);
   }//GEN-LAST:event_closeButtonActionPerformed
+
+  private void caseSensitiveBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_caseSensitiveBoxActionPerformed
+    findButtonActionPerformed(evt);
+  }//GEN-LAST:event_caseSensitiveBoxActionPerformed
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JCheckBox caseSensitiveBox;

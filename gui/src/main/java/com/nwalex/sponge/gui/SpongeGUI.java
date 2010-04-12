@@ -303,7 +303,8 @@ public class SpongeGUI extends javax.swing.JFrame {
           } else {
             int rawIndex = rowSM.getMinSelectionIndex();         
 
-            if (rawIndex > -1) {                  
+            if (rawIndex > -1) {  
+              findController.resetFindNext();
               updateDisplayedData(rawIndex); 
               requestPanel.displayReadOnlyView();
               responsePanel.displayReadOnlyView();

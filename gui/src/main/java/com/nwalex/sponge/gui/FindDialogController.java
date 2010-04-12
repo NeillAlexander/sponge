@@ -66,7 +66,7 @@ public class FindDialogController {
 
   public void doFind(String text, boolean caseSensitive) {
     if (!text.equals(lastSearchText) || caseSensitive != lastSearchCaseSensitity) {
-      hasFindNextFocusIndex = 0;
+      resetFindNext();
 
       for (Searchable searchable : targets) {
         searchable.clearHighlights();
@@ -83,6 +83,11 @@ public class FindDialogController {
     if (text.trim().length() > 0) {
       findNext();
     }
+  }
+
+  public void resetFindNext() {
+    hasFindNextFocusIndex = 0;
+    lastSearchText = null;
   }
 
   public void findNext() {

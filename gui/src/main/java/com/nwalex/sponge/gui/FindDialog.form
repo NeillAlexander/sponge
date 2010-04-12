@@ -35,7 +35,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="closeButton" linkSize="1" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="findTextField" alignment="0" pref="352" max="32767" attributes="0"/>
+                  <Component id="findTextField" alignment="0" pref="368" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -88,6 +88,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Case Sensitive"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="caseSensitiveBoxActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
