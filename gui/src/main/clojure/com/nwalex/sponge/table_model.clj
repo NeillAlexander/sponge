@@ -105,9 +105,12 @@
 (defn add-exchange!
   "Add the exchange represented by map m"
   [server m key]
-  (let [exchange (exchange/init m key)]
+  (let [exchange (exchange/init m key)
+        known? (exchange/known? exchange)]    
     (add-entry! exchange)
-    (notify-row-added (dec (count @data-id-store)))
+    (if known?
+      (notify-row-changed 0 (dec (count @data-id-store)))
+      (notify-row-added (dec (count @data-id-store))))
     exchange))
 
 (defn get-table-model []
