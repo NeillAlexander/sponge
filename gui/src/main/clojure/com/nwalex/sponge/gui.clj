@@ -8,9 +8,13 @@
 
 (ns com.nwalex.sponge.gui
   (:require
-   [com.nwalex.sponge.gui-controller :as controller])
+   [com.nwalex.sponge.gui-controller :as controller]
+   [clojure.contrib.logging :as log])
   (:gen-class :main true :name com.nwalex.sponge.Client))
 
 (defn -main [& args]
   (com.nwalex.sponge.gui.StdOutErrLog/tieSystemOutAndErrToLog)
+  (log/info "*******************************************************************")
+  (log/info "************************** Starting Sponge ************************")
+  (log/info "*******************************************************************")  
   (apply controller/make-gui args))

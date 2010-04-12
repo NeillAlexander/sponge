@@ -7,7 +7,7 @@ set CLASSPATH=%SPONGE_HOME%\lib\*;%SPONGE_HOME%\config
 
 set SPONGE_SESSIONS="%SPONGE_HOME%\sessions"
 
-java -Xms128m -Xmx256m -Dsponge.sessions="%SPONGE_SESSIONS%" -Dsponge.home="%SPONGE_HOME%" com.nwalex.sponge.Client
+start javaw -Xms128m -Xmx256m -Dsponge.sessions="%SPONGE_SESSIONS%" -Dsponge.home="%SPONGE_HOME%" com.nwalex.sponge.Client
 
 goto :end
 
@@ -15,3 +15,4 @@ goto :end
 echo Set SPONGE_HOME to point to the sponge installation directory
 
 :end
+exit

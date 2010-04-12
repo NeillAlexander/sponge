@@ -30,7 +30,7 @@ public class StdOutErrLog {
     return new PrintStream(realPrintStream) {
       @Override
       public void print(final String string) {
-        realPrintStream.print(string);
+        realPrintStream.println(string);
         if (error) {
           logger.error(string);
         } else {
