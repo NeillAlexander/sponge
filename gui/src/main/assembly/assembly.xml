@@ -35,6 +35,15 @@
   <dependencySets>
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
+      <excludes>
+        <exclude>sponge-demo-plugin*.war</exclude>
+      </excludes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>plugins</outputDirectory>
+      <includes>
+        <include>sponge-demo-plugin*.war</include>
+      </includes>
     </dependencySet>
   </dependencySets>
 </assembly>
