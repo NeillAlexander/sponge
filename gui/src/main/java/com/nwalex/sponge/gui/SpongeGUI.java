@@ -9,6 +9,7 @@
  */
 package com.nwalex.sponge.gui;
 
+import com.nwalex.sponge.gui.plugins.PluginManager;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -45,6 +46,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   private final FindDialogController findController;
   private HelpManager helper;
   private static final Logger log = Logger.getLogger(SpongeGUI.class);
+  private PluginManager pluginManager;
 
   /** Creates new form SpongeGUI */
   public SpongeGUI(final SpongeGUIController controller) {
@@ -52,6 +54,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     this.findController = new FindDialogController(this);
     this.helper = new HelpManager(this);
 
+    initPlugins();
     initComponents();
 
     setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -121,6 +124,10 @@ public class SpongeGUI extends javax.swing.JFrame {
         }
       }
     });
+  }
+
+  private void initPlugins() {
+    this.pluginManager = new PluginManager().init();
   }
 
   private void initFindAction() {
@@ -243,6 +250,8 @@ public class SpongeGUI extends javax.swing.JFrame {
     forwardAllMenuItem = new javax.swing.JRadioButtonMenuItem();
     replayOrForwardMenuItem = new javax.swing.JRadioButtonMenuItem();
     replayOrFailMenuItem = new javax.swing.JRadioButtonMenuItem();
+    pluginMenu = new javax.swing.JMenu();
+    jMenuItem1 = new javax.swing.JMenuItem();
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
     replMenuItem.setAction(controller.getStartReplAction());
@@ -398,6 +407,14 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       menuBar.add(modeMenu);
 
+      pluginMenu.setText("Plugins");
+
+      jMenuItem1.setAction(pluginManager.getFindPluginsAction());
+      jMenuItem1.setText("Find Plugins");
+      pluginMenu.add(jMenuItem1);
+
+      menuBar.add(pluginMenu);
+
       replMenu.setText("REPL");
 
       replMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
@@ -454,6 +471,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JRadioButtonMenuItem forwardAllMenuItem;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenu jMenu2;
+  private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JPopupMenu.Separator jSeparator1;
   private javax.swing.JSplitPane jSplitPane1;
@@ -463,6 +481,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenuBar menuBar;
   private javax.swing.ButtonGroup modeButtonGroup;
   private javax.swing.JMenu modeMenu;
+  private javax.swing.JMenu pluginMenu;
   private javax.swing.JMenu replMenu;
   private javax.swing.JMenuItem replMenuItem;
   private javax.swing.JRadioButtonMenuItem replayOrFailMenuItem;
