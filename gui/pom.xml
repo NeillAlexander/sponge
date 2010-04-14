@@ -94,6 +94,16 @@
       <artifactId>jaxen</artifactId>
       <version>1.1.1</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>sponge-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>sponge-demo-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -128,6 +138,8 @@
     </plugins>
   </build>
 </project>
+
+
 
 
 

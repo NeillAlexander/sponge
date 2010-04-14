@@ -44,6 +44,7 @@
     <module>server</module>
     <module>plugin</module>
     <module>gui</module>
+    <module>demo-plugin</module>
   </modules>
 
   <dependencies>
