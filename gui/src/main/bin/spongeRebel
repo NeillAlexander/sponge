@@ -1,0 +1,52 @@
+#!/bin/bash
+
+function add_to_classpath {
+    until [ -z "$1" ]
+    do
+        if [ $CYGWIN ]
+        then
+            ITEM=`cygpath --windows $1`
+        else
+            ITEM=$1
+        fi
+
+        CLASSPATH="$CLASSPATH$SEPARATOR$ITEM"
+        shift
+    done
+}
+
+function init_classpath {
+    # set up the classpath dynamically. Note this includes the jline jar
+    for ITEM in `ls $SPONGE_HOME/lib/*.jar`; do
+        add_to_classpath "$ITEM"
+    done
+
+    # Also add the lib directory (for the log4j properties etc)
+    add_to_classpath "$SPONGE_HOME/config"
+}
+
+case "`uname`" in
+    CYGWIN*) CYGWIN=true
+esac
+
+if [ $CYGWIN ]
+then
+    SEPARATOR=";"
+else
+    SEPARATOR=":"
+fi
+
+# set up paths for sponge to use
+export SPONGE_HOME=`dirname $0`
+
+# Where we look for stored sessions
+if [ ! $SPONGE_SESSIONS ]
+then
+    export SPONGE_SESSIONS=$SPONGE_HOME
+fi
+
+# Add all jar files from lib directory
+init_classpath
+
+# Start the client
+java -cp $CLASSPATH -noverify -javaagent:C:/jrebel/jrebel-3.0-RC2/jrebel.jar -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=4145 -Xms128m -Xmx256m -Dsponge.sessions="$SPONGE_SESSIONS" -Dsponge.home="$SPONGE_HOME" com.nwalex.sponge.Client
