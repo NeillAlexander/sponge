@@ -43,6 +43,7 @@
   <modules>
     <module>server</module>
     <module>gui</module>
+    <module>sponge-plugin</module>
   </modules>
 
   <dependencies>
