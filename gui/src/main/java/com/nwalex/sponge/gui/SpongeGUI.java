@@ -26,6 +26,7 @@ import javax.swing.Action;
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
@@ -56,7 +57,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     this.controller = controller;
     this.findController = new FindDialogController(this);
     this.helper = new HelpManager(this);
-    
+
     initComponents();
     initPlugins(pluginController);
 
@@ -136,13 +137,20 @@ public class SpongeGUI extends javax.swing.JFrame {
       final Plugin plugin = loadedPlugin.getPlugin();
       JCheckBoxMenuItem pluginMenuItem = new JCheckBoxMenuItem(loadedPlugin.getName(), loadedPlugin.isEnabled());
       pluginMenuItem.addActionListener(new ActionListener() {
+
         @Override
         public void actionPerformed(ActionEvent e) {
           JCheckBoxMenuItem mi = (JCheckBoxMenuItem) e.getSource();
-          if (mi.isSelected()) {
-            pluginController.pluginEnabled(plugin);
-          } else {
-            pluginController.pluginDisabled(plugin);
+          try {
+            if (mi.isSelected()) {
+              pluginController.pluginEnabled(plugin);
+            } else {
+              pluginController.pluginDisabled(plugin);
+            }
+          } catch (Exception ex) {
+            JOptionPane.showMessageDialog(SpongeGUI.this, ex.getClass().getName() + ": " + ex.getMessage(),
+                    "Exception", JOptionPane.ERROR_MESSAGE);
+            mi.setEnabled(false);
           }
         }
       });

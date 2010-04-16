@@ -81,15 +81,14 @@ public class PluginManager {
 
       loadedPlugin = new LoadedPlugin(plugin, name, enabled);
 
-    } catch (Exception ex) {
-      log.error("Failed to load plugin class: " + pluginClassName, ex);
-    }
-
-    if (loadedPlugin != null) {
       log.info("New plugin [" + pluginId + "]: " + loadedPlugin);
       if (loadedPlugin.isEnabled()) {
         controller.pluginEnabled(loadedPlugin.getPlugin());
       }
+
+    } catch (Exception ex) {
+      log.error("Failed to load plugin class: " + pluginClassName, ex);
+      loadedPlugin = null;
     }
     
     return loadedPlugin;

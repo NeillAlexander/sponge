@@ -150,7 +150,10 @@
 
 (defn enable-plugin [plugin]
   (let [lifecycle-point (lifecycle-mapping (.getLifecyclePoint plugin))]
-    (register-plugin lifecycle-point plugin)))
+    (try
+     (register-plugin lifecycle-point plugin)
+     (catch Exception ex
+       (deregister-plugin lifecycle-point plugin)))))
 
 (defn disable-plugin [plugin]
   (let [lifecycle-point (lifecycle-mapping (.getLifecyclePoint plugin))]
