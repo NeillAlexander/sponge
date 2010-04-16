@@ -17,6 +17,7 @@
    [com.nwalex.sponge.label-controller :as label]
    [com.nwalex.sponge.config-controller :as config]
    [com.nwalex.sponge.exchange :as exchange]
+   [com.nwalex.sponge.plugins :as plugins]
    [clojure.contrib.swing-utils :as swing]
    [clojure.contrib.logging :as log]))
 
@@ -180,20 +181,9 @@
        (getDuplicateRowAction [table] (make-multi-row-action
                                        model/duplicate-rows! table))))
 
-(def plugin-manager (ref nil))
-
-(def plugin-controller
-     (proxy [com.nwalex.sponge.gui.plugins.PluginController] []
-       (pluginEnabled [plugin] (println (format "plugin enabled: %s" plugin)))
-       (pluginDisabled [plugin] (println (format "plugin disabled: %s" plugin)))
-       (getPluginManager []
-                         (if-not @plugin-manager
-                           (dosync
-                            (ref-set plugin-manager (com.nwalex.sponge.gui.plugins.PluginManager. plugin-controller))))
-                         @plugin-manager)))
 
 (defn make-gui [& args]
   (swing/do-swing
    (state/set-gui!
-    (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller plugin-controller)
+    (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller plugins/plugin-controller)
                      (.setVisible true)))))

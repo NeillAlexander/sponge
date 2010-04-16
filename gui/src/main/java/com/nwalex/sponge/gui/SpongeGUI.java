@@ -139,7 +139,6 @@ public class SpongeGUI extends javax.swing.JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
           JCheckBoxMenuItem mi = (JCheckBoxMenuItem) e.getSource();
-          System.out.println("Selected = " + mi.isSelected());
           if (mi.isSelected()) {
             pluginController.pluginEnabled(plugin);
           } else {

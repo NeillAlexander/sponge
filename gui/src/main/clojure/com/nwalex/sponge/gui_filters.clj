@@ -9,7 +9,8 @@
 (ns com.nwalex.sponge.gui-filters
   (:require
    [com.nwalex.sponge.gui-state :as state]
-   [com.nwalex.sponge.table-model :as model])
+   [com.nwalex.sponge.table-model :as model]
+   [com.nwalex.sponge.plugins :as plugins])
   (:use
    [com.nwalex.sponge.filters :only [continue return abort]]))
 
@@ -54,8 +55,10 @@
       [display-non-replay-response-filter]
       })
 
+;; note plugin filters happen before others on request
 (defn get-request-filters-for-mode [mode]
-  (request-filter-map mode))
+  (vec (concat (plugins/get-plugin-filters :request) (request-filter-map mode))))
 
+;; note plugin fitlers happen after others on response
 (defn get-response-filters-for-mode [mode]
-  (response-filter-map mode))
+  (vec (concat (response-filter-map mode) (plugins/get-plugin-filters :response))))
