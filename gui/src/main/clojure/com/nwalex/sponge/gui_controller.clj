@@ -180,13 +180,17 @@
        (getDuplicateRowAction [table] (make-multi-row-action
                                        model/duplicate-rows! table))))
 
-(def plugin-manager (com.nwalex.sponge.gui.plugins.PluginManager.))
+(def plugin-manager (ref nil))
 
 (def plugin-controller
      (proxy [com.nwalex.sponge.gui.plugins.PluginController] []
        (pluginEnabled [plugin] (println (format "plugin enabled: %s" plugin)))
        (pluginDisabled [plugin] (println (format "plugin disabled: %s" plugin)))
-       (getPluginManager [] plugin-manager)))
+       (getPluginManager []
+                         (if-not @plugin-manager
+                           (dosync
+                            (ref-set plugin-manager (com.nwalex.sponge.gui.plugins.PluginManager. plugin-controller))))
+                         @plugin-manager)))
 
 (defn make-gui [& args]
   (swing/do-swing

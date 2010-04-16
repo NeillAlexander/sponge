@@ -31,6 +31,11 @@ public class PluginManager {
   private static final Logger log = Logger.getLogger(PluginManager.class);
 
   private List<LoadedPlugin> allPlugins = new ArrayList<LoadedPlugin>();
+  private final PluginController controller;
+
+  public PluginManager(PluginController controller) {
+    this.controller = controller;
+  }
 
   public PluginManager init() {
     findAllPlugins();
@@ -80,7 +85,13 @@ public class PluginManager {
       log.error("Failed to load plugin class: " + pluginClassName, ex);
     }
 
-    log.info("New plugin [" + pluginId + "]: " + loadedPlugin);
+    if (loadedPlugin != null) {
+      log.info("New plugin [" + pluginId + "]: " + loadedPlugin);
+      if (loadedPlugin.isEnabled()) {
+        controller.pluginEnabled(loadedPlugin.getPlugin());
+      }
+    }
+    
     return loadedPlugin;
   }
 
