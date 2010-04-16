@@ -10,26 +10,20 @@
 package com.nwalex.sponge.plugin;
 
 /**
- * Called before the request is sent
+ *
  * @author alexanc
  */
-public abstract class RequestPlugin extends Plugin {
+public abstract class ResponsePlugin extends Plugin {
 
   @Override
   public final LifecyclePoint getLifecyclePoint() {
-    return LifecyclePoint.BEFORE_REQUEST;
+    return LifecyclePoint.AFTER_RESPONSE;
   }
 
   @Override
   public Object doPluginTask(String data, PluginContext context) {
-    return processRequest(data, context);
+    return processResponse(data, context);
   }
 
-  /**
-   * This will be called just before the soap request is sent
-   * @param soapRequest
-   * @param context
-   * @return
-   */
-  public abstract Object processRequest(String soapRequest, PluginContext context);
+  protected abstract Object processResponse(String response, PluginContext context);
 }

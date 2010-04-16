@@ -20,10 +20,9 @@ public abstract class Plugin {
   private static final Logger log = Logger.getLogger(Plugin.class);
 
   // lifecycle methods
-  public abstract String getName();
   public abstract LifecyclePoint getLifecyclePoint();
-  public abstract void enabled(PluginContext context);
-  public abstract void disabled(PluginContext context);
+  public abstract void onEnabled(PluginContext context);
+  public abstract void onDisabled(PluginContext context);
 
   /**
    * this is called by the application

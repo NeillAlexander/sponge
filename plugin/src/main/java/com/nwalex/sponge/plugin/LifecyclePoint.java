@@ -14,5 +14,6 @@ package com.nwalex.sponge.plugin;
  * This determines at what point the plugin is called
  */
 public enum LifecyclePoint {
-  BEFORE_SEND_REQUEST;
+  BEFORE_REQUEST,
+  AFTER_RESPONSE;
 }

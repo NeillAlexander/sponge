@@ -10,27 +10,28 @@
 package com.nwalex.sponge.demo;
 
 import com.nwalex.sponge.plugin.PluginContext;
-import com.nwalex.sponge.plugin.RequestPlugin;
+import com.nwalex.sponge.plugin.ResponsePlugin;
 import org.apache.log4j.Logger;
 
 /**
  *
  * @author alexanc
  */
-public class DemoRequestPlugin extends RequestPlugin {
+public class DemoResponsePlugin extends ResponsePlugin {
 
-  private static final Logger log = Logger.getLogger(DemoRequestPlugin.class);
+  private static final Logger log = Logger.getLogger(DemoResponsePlugin.class);
 
-  public Object processRequest(String soapRequest, PluginContext context) {
-    log.info("preProcessRequest() called for request: \n" + soapRequest);
-    return context.getResponseBuilder().buildContinueResponse(soapRequest);
+  protected Object processResponse(String response, PluginContext context) {
+    log.info("processResponse() called");
+    return context.getResponseBuilder().buildContinueResponse(response);
   }
 
   public void onEnabled(PluginContext context) {
-    log.info("enabled() called");
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   public void onDisabled(PluginContext context) {
-    log.info("disabled() called");
+    throw new UnsupportedOperationException("Not supported yet.");
   }
+
 }
