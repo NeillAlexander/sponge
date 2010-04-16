@@ -22,7 +22,7 @@ public class DemoRequestPlugin extends RequestPlugin {
   private static final Logger log = Logger.getLogger(DemoRequestPlugin.class);
 
   public Object processRequest(String soapRequest, PluginContext context) {
-    log.info("preProcessRequest() called for request: \n" + soapRequest);
+    log.info("processRequest() called");
     return context.getResponseBuilder().buildContinueResponse(soapRequest);
   }
 
