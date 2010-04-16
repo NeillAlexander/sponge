@@ -285,6 +285,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     replMenuItem.setAction(controller.getStartReplAction());
     jMenu2 = new javax.swing.JMenu();
     keyboardShortcutsHelp = new javax.swing.JMenuItem();
+    jMenuItem1 = new javax.swing.JMenuItem();
 
     attachLabelItem.setAction(controller.getLabelExchangeAction((JXTable) exchangeTable));
     attachLabelItem.setText("Label...");
@@ -453,6 +454,10 @@ public class SpongeGUI extends javax.swing.JFrame {
       keyboardShortcutsHelp.setText("Manual");
       jMenu2.add(keyboardShortcutsHelp);
 
+      jMenuItem1.setAction(helper.makeMenuAction("plugins.html"));
+      jMenuItem1.setText("Writing Plugins");
+      jMenu2.add(jMenuItem1);
+
       menuBar.add(jMenu2);
 
       setJMenuBar(menuBar);
@@ -494,6 +499,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JRadioButtonMenuItem forwardAllMenuItem;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenu jMenu2;
+  private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JPopupMenu.Separator jSeparator1;
   private javax.swing.JSplitPane jSplitPane1;

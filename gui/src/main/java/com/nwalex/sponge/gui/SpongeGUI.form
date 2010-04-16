@@ -239,6 +239,14 @@
                 <Property name="text" type="java.lang.String" value="Manual"/>
               </Properties>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="helper.makeMenuAction(&quot;plugins.html&quot;)" type="code"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Writing Plugins"/>
+              </Properties>
+            </MenuItem>
           </SubComponents>
         </Menu>
       </SubComponents>

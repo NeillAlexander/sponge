@@ -1,0 +1,112 @@
+<html>
+  <head/>
+  <body>
+    <h1>Plugins</h1>
+    <h2>Overview</h2>
+    Sponge supports simple plugins that allow you to manipulate the soap request
+    or response xml. To create a new plugin you need to do the following:
+    <ol>
+      <li>Start a new project and add a reference to the plugin module</li>
+      <li>Create a class that extends either com.nwalex.sponge.plugin.RequestPlugin or
+      com.nwalex.sponge.plugin.ResponsePlugin</li>
+      <li>Add a resource called plugin.properties to define the plugin classes</li>
+      <li>Build the jar and place in the plugins directory</li>
+      <li>Restart Sponge</li>
+    </ol>
+    You should then see your plugin in the Plugins menu. Select it to enable it.
+    <p/>
+    Both request and response plugins get the soap xml. You can use whatever you want
+    to transform this, then return the xml that you want to send. If you don't want to
+    transform the xml, simply return the text that was passed into the method (see
+    sample code below).
+    <h2>Sample Code</h2>
+    The following examples are part of the demo plugin that is installed with Sponge.
+    <h3>Example Request Plugin</h3>
+    <pre>
+package com.nwalex.sponge.demo;<br/>
+<br/>
+import com.nwalex.sponge.plugin.PluginContext;<br/>
+import com.nwalex.sponge.plugin.RequestPlugin;<br/>
+import org.apache.log4j.Logger;<br/>
+<br/>
+/**<br/>
+ *<br/>
+ * @author alexanc<br/>
+ */<br/>
+public class DemoRequestPlugin extends RequestPlugin {<br/>
+<br/>
+  private static final Logger log = Logger.getLogger(DemoRequestPlugin.class);<br/>
+<br/>
+  private int counter = 0;<br/>
+<br/>
+  @Override<br/>
+  public String processRequest(String soapRequest, PluginContext context) {<br/>
+    log.info("processRequest() called");<br/>
+    counter++;<br/>
+    log.info("There have been " + counter + " requests");<br/>
+    return soapRequest;<br/>
+  }<br/>
+<br/>
+  @Override<br/>
+  public void onEnabled() {<br/>
+    log.info("resetting counter");<br/>
+    counter = 0;<br/>
+  }<br/>
+<br/>
+  @Override<br/>
+  public void onDisabled() {<br/>
+    log.info("onDisabled() called");<br/>
+  }<br/>
+}<br/>
+    </pre>
+    <h3>Example Response Plugin</h3>
+    <pre>
+package com.nwalex.sponge.demo;<br/>
+<br/>
+import com.nwalex.sponge.plugin.PluginContext;<br/>
+import com.nwalex.sponge.plugin.ResponsePlugin;<br/>
+import org.apache.log4j.Logger;<br/>
+<br/>
+/**<br/>
+ *<br/>
+ * @author alexanc<br/>
+ */<br/>
+public class DemoResponsePlugin extends ResponsePlugin {<br/>
+<br/>
+  private static final Logger log = Logger.getLogger(DemoResponsePlugin.class);<br/>
+<br/>
+  private int counter = 0;<br/>
+<br/>
+  @Override<br/>
+  protected String processResponse(String response, PluginContext context) {<br/>
+    log.info("processResponse() called");<br/>
+    counter++;<br/>
+    log.info("There have been " + counter + " responses");<br/>
+    return response;<br/>
+  }<br/>
+<br/>
+  @Override<br/>
+  public void onEnabled() {<br/>
+    log.info("resetting counter");<br/>
+    counter = 0;<br/>
+  }<br/>
+<br/>
+  @Override<br/>
+  public void onDisabled() {<br/>
+    log.info("onDisabled() called");<br/>
+  }<br/>
+<br/>
+}<br/>
+  </pre>
+    <h3>Example plugin.properties</h3>
+    <pre>
+request.plugin = com.nwalex.sponge.demo.DemoRequestPlugin<br/>
+request.plugin.name = Request Counter<br/>
+request.plugin.enabled = false<br/>
+<br/>
+response.plugin = com.nwalex.sponge.demo.DemoResponsePlugin<br/>
+response.plugin.name = Response Counter<br/>
+response.plugin.enabled = false<br/>
+    </pre>
+  </body>
+</html>
