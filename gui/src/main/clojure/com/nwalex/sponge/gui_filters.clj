@@ -135,6 +135,7 @@
      (ref-set plugin-store (assoc @plugin-store (hash plugin)
                                   (partial plugin-filter plugin))))
     (log/info (format "Currently registered plugins for %s: %s" phase @plugin-store)))
+  (.onEnabled plugin)
   (reload-filters))
 
 (defn- deregister-plugin [phase plugin]
@@ -144,6 +145,7 @@
      (ref-set plugin-store (dissoc @plugin-store (hash plugin))))
     (log/info (format "Currently registered plugins for phase %s: %s"
                       phase @plugin-store)))
+  (.onDisabled plugin)
   (reload-filters))
 
 (defn enable-plugin [plugin]

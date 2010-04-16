@@ -21,8 +21,8 @@ public abstract class Plugin {
 
   // lifecycle methods
   public abstract LifecyclePoint getLifecyclePoint();
-  public abstract void onEnabled(PluginContext context);
-  public abstract void onDisabled(PluginContext context);
+  public abstract void onEnabled();
+  public abstract void onDisabled();
 
   /**
    * this is called by the application

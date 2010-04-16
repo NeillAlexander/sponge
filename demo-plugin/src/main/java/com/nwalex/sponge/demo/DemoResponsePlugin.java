@@ -28,13 +28,13 @@ public class DemoResponsePlugin extends ResponsePlugin {
   }
 
   @Override
-  public void onEnabled(PluginContext context) {
-    throw new UnsupportedOperationException("Not supported yet.");
+  public void onEnabled() {
+    log.info("onEnabled() callled");
   }
 
   @Override
-  public void onDisabled(PluginContext context) {
-    throw new UnsupportedOperationException("Not supported yet.");
+  public void onDisabled() {
+    log.info("onDisabled() called");
   }
 
 }

@@ -28,12 +28,12 @@ public class DemoRequestPlugin extends RequestPlugin {
   }
 
   @Override
-  public void onEnabled(PluginContext context) {
+  public void onEnabled() {
     log.info("enabled() called");
   }
 
   @Override
-  public void onDisabled(PluginContext context) {
+  public void onDisabled() {
     log.info("disabled() called");
   }
 }
