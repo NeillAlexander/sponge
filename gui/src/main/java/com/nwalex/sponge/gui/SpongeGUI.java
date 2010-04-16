@@ -9,9 +9,13 @@
  */
 package com.nwalex.sponge.gui;
 
+import com.nwalex.sponge.gui.plugins.LoadedPlugin;
+import com.nwalex.sponge.gui.plugins.PluginController;
 import com.nwalex.sponge.gui.plugins.PluginManager;
+import com.nwalex.sponge.plugin.Plugin;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -20,7 +24,7 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.InputMap;
-import javax.swing.JComponent;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -46,16 +50,15 @@ public class SpongeGUI extends javax.swing.JFrame {
   private final FindDialogController findController;
   private HelpManager helper;
   private static final Logger log = Logger.getLogger(SpongeGUI.class);
-  private PluginManager pluginManager;
 
   /** Creates new form SpongeGUI */
-  public SpongeGUI(final SpongeGUIController controller) {
+  public SpongeGUI(final SpongeGUIController controller, final PluginController pluginController) {
     this.controller = controller;
     this.findController = new FindDialogController(this);
     this.helper = new HelpManager(this);
-
-    initPlugins();
+    
     initComponents();
+    initPlugins(pluginController);
 
     setExtendedState(JFrame.MAXIMIZED_BOTH);
 
@@ -126,8 +129,27 @@ public class SpongeGUI extends javax.swing.JFrame {
     });
   }
 
-  private void initPlugins() {
-    this.pluginManager = new PluginManager().init();
+  private void initPlugins(final PluginController pluginController) {
+    PluginManager pluginManager = pluginController.getPluginManager().init();
+
+    for (LoadedPlugin loadedPlugin : pluginManager.getAllLoadedPlugins()) {
+      final Plugin plugin = loadedPlugin.getPlugin();
+      JCheckBoxMenuItem pluginMenuItem = new JCheckBoxMenuItem(loadedPlugin.getName(), loadedPlugin.isEnabled());
+      pluginMenuItem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          JCheckBoxMenuItem mi = (JCheckBoxMenuItem) e.getSource();
+          System.out.println("Selected = " + mi.isSelected());
+          if (mi.isSelected()) {
+            pluginController.pluginEnabled(plugin);
+          } else {
+            pluginController.pluginDisabled(plugin);
+          }
+        }
+      });
+
+      pluginMenu.add(pluginMenuItem);
+    }
   }
 
   private void initFindAction() {
@@ -251,7 +273,6 @@ public class SpongeGUI extends javax.swing.JFrame {
     replayOrForwardMenuItem = new javax.swing.JRadioButtonMenuItem();
     replayOrFailMenuItem = new javax.swing.JRadioButtonMenuItem();
     pluginMenu = new javax.swing.JMenu();
-    jMenuItem1 = new javax.swing.JMenuItem();
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
     replMenuItem.setAction(controller.getStartReplAction());
@@ -408,11 +429,6 @@ public class SpongeGUI extends javax.swing.JFrame {
       menuBar.add(modeMenu);
 
       pluginMenu.setText("Plugins");
-
-      jMenuItem1.setAction(pluginManager.getFindPluginsAction());
-      jMenuItem1.setText("Find Plugins");
-      pluginMenu.add(jMenuItem1);
-
       menuBar.add(pluginMenu);
 
       replMenu.setText("REPL");
@@ -471,7 +487,6 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JRadioButtonMenuItem forwardAllMenuItem;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenu jMenu2;
-  private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JPopupMenu.Separator jSeparator1;
   private javax.swing.JSplitPane jSplitPane1;

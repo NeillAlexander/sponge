@@ -18,7 +18,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import org.apache.log4j.Logger;
@@ -30,6 +29,8 @@ import org.apache.log4j.Logger;
 public class PluginManager {
 
   private static final Logger log = Logger.getLogger(PluginManager.class);
+
+  private List<LoadedPlugin> allPlugins = new ArrayList<LoadedPlugin>();
 
   public PluginManager init() {
     findAllPlugins();
@@ -94,7 +95,6 @@ public class PluginManager {
       Properties pluginProperties = new Properties();
       pluginProperties.load(pluginClassLoader.getResourceAsStream("plugin.properties"));
 
-      List<LoadedPlugin> allPlugins = new ArrayList<LoadedPlugin>();
       for (String pluginProperty : pluginProperties.stringPropertyNames()) {
         if (pluginProperty.endsWith(".plugin")) {
           LoadedPlugin newPlugin = loadPlugin(pluginProperty, pluginProperties, pluginClassLoader);
@@ -107,5 +107,12 @@ public class PluginManager {
     } catch (IOException ex) {
       log.warn("Failed to find plugins in " + file.getAbsolutePath(), ex);
     }
+  }
+
+  /**
+   * @return the allPlugins
+   */
+  public List<LoadedPlugin> getAllLoadedPlugins() {
+    return allPlugins;
   }
 }
