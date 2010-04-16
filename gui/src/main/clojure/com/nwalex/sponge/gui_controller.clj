@@ -70,10 +70,12 @@
                                 (server/make-server
                                  (:port config)
                                  (:target config)
-                                 :request-filters (filters/get-request-filters-for-mode
-                                                   (state/get-mode))
-                                 :response-filters (filters/get-response-filters-for-mode
-                                                    (state/get-mode))))))
+                                 :request-filters
+                                 (filters/get-request-filters-for-mode
+                                  (state/get-mode))
+                                 :response-filters
+                                 (filters/get-response-filters-for-mode
+                                  (state/get-mode))))))
   (toggle-started))
 
 (defn- start-repl [event]
@@ -112,17 +114,6 @@
       :resend-request (ref nil)
       :update-request (ref nil)
       :update-response (ref nil)})
-
-(defn- set-mode [mode]  
-  (state/set-mode! mode)
-  (if (server/running? (state/current-server))
-    (do
-      (server/update-request-filters (state/current-server)
-                                     (filters/get-request-filters-for-mode
-                                      (state/get-mode)))
-      (server/update-response-filters (state/current-server)
-                                      (filters/get-response-filters-for-mode
-                                       (state/get-mode))))))
 
 (defn- make-table-action [table key proxy-maker]
   (if-not @(key action-map)    
@@ -172,7 +163,7 @@
                                     (make-multi-row-action
                                      model/set-as-default-response! table))
        (getMode [] (state/get-mode))
-       (setMode [mode] (set-mode mode))
+       (setMode [mode] (filters/set-mode mode))
        (getDeleteRowAction [table] (make-multi-row-action
                                     model/delete-rows! table))
        (getResendRequestAction [table] (resend-request-action table))

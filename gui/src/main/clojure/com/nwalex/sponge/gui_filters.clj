@@ -11,6 +11,7 @@
    [com.nwalex.sponge.gui-state :as state]
    [com.nwalex.sponge.table-model :as model]
    [com.nwalex.sponge.plugins :as plugins]
+   [com.nwalex.sponge.server :as server]
    [clojure.contrib.logging :as log])
   (:use
    [com.nwalex.sponge.filters :only [continue return abort]]))
@@ -71,3 +72,18 @@
                                (plugins/get-plugin-filters :response)))]
     (log/info (format "response-filters-for-mode %s are: %s" mode response-filters))
     response-filters))
+
+(defn reload-filters []
+  (log/info "Reloading filters...")
+  (if (server/running? (state/current-server))
+    (do
+      (server/update-request-filters (state/current-server)
+                                     (get-request-filters-for-mode
+                                      (state/get-mode)))
+      (server/update-response-filters (state/current-server)
+                                      (get-response-filters-for-mode
+                                       (state/get-mode))))))
+
+(defn set-mode [mode]  
+  (state/set-mode! mode)
+  (reload-filters))

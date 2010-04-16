@@ -1,5 +1,6 @@
 (ns com.nwalex.sponge.plugins
   (:require
+   [com.nwalex.sponge.gui-filters :as filters]
    [clojure.contrib.logging :as log]))
 
 (def plugin-manager (ref nil))
@@ -44,14 +45,17 @@
     (dosync
      (ref-set plugin-store (assoc @plugin-store (hash plugin)
                                   (partial plugin-filter plugin))))
-    (log/info (format "Currently registered plugins for %s: %s" phase @plugin-store))))
+    (log/info (format "Currently registered plugins for %s: %s" phase @plugin-store)))
+  (filters/reload-filters))
 
 (defn- deregister-plugin [phase plugin]
-  (log/info (format "De-register plugin %s for phasef %s" plugin phase))
+  (log/info (format "De-register plugin %s for phase %s" plugin phase))
   (let [plugin-store (lifecycle-store-mapping phase)]
     (dosync
      (ref-set plugin-store (dissoc @plugin-store (hash plugin))))
-    (log/info (format "Currently registered plugins for %s: %s" phase @plugin-store))))
+    (log/info (format "Currently registered plugins for phase %s: %s"
+                      phase @plugin-store)))
+  (filters/reload-filters))
 
 (defn enable-plugin [plugin]
   (let [lifecycle-point (lifecycle-mapping (.getLifecyclePoint plugin))]
