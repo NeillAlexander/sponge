@@ -1,20 +1,23 @@
 /**
-* Copyright (c) Neill Alexander. All rights reserved.
-* The use and distribution terms for this software are covered by the
-* Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-* which can be found in the file epl-v10.html at the root of this distribution.
-* By using this software in any fashion, you are agreeing to be bound by
-* the terms of this license.
-* You must not remove this notice, or any other, from this software
-*/
+ * Copyright (c) Neill Alexander. All rights reserved.
+ * The use and distribution terms for this software are covered by the
+ * Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+ * which can be found in the file epl-v10.html at the root of this distribution.
+ * By using this software in any fashion, you are agreeing to be bound by
+ * the terms of this license.
+ * You must not remove this notice, or any other, from this software
+ */
 package com.nwalex.sponge.gui.plugins;
 
+import com.nwalex.sponge.plugin.Plugin;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -35,7 +38,7 @@ public class PluginManager {
 
   private void findAllPlugins() {
     File pluginDir = new File(System.getProperty("sponge.home"), "plugins");
-    System.out.println("ready to find all plugins in: " + pluginDir.getAbsolutePath());
+    log.info("Searching for plugins in: " + pluginDir.getAbsolutePath());
 
     if (!pluginDir.exists()) {
       throw new RuntimeException("Plugin directory does not exist: " + pluginDir.getAbsolutePath());
@@ -49,6 +52,7 @@ public class PluginManager {
 
   public Action getFindPluginsAction() {
     return new AbstractAction() {
+
       @Override
       public void actionPerformed(ActionEvent e) {
         findAllPlugins();
@@ -56,30 +60,52 @@ public class PluginManager {
     };
   }
 
-  private void findPluginsInJarFile(File file) {
-    
-    try {
-      System.out.println("Checking for plugins in: " + file.getAbsolutePath());
-      JarFile jarFile = new JarFile(file);
+  private LoadedPlugin loadPlugin(String pluginId, Properties pluginProperties, URLClassLoader pluginClassLoader) {
 
-      Enumeration<JarEntry> entries = jarFile.entries();
-      
-      while (entries.hasMoreElements()) {
-        JarEntry entry = entries.nextElement();
-        System.out.println("Checking entry: " + entry.getName());
+    log.info("Trying to load plugin: " + pluginId);
+    LoadedPlugin loadedPlugin = null;
+
+    boolean enabled = Boolean.valueOf(pluginProperties.getProperty(pluginId + ".enabled", "false"));
+    String name = pluginProperties.getProperty(pluginId + ".name", null);
+    String pluginClassName = pluginProperties.getProperty(pluginId);
+
+    try {
+      Class pluginClass = pluginClassLoader.loadClass(pluginClassName);
+      Plugin plugin = (Plugin) pluginClass.newInstance();
+
+      loadedPlugin = new LoadedPlugin(plugin, name, enabled);
+
+    } catch (Exception ex) {
+      log.error("Failed to load plugin class: " + pluginClassName, ex);
+    }
+
+    log.info("New plugin [" + pluginId + "]: " + loadedPlugin);
+    return loadedPlugin;
+  }
+
+  private void findPluginsInJarFile(File file) {
+    try {
+      URL jarFileUrl = file.toURI().toURL();
+      log.info("Looking for plugins in: " + jarFileUrl);
+
+      URLClassLoader pluginClassLoader = new URLClassLoader(new URL[] {jarFileUrl},
+              getClass().getClassLoader());
+
+      Properties pluginProperties = new Properties();
+      pluginProperties.load(pluginClassLoader.getResourceAsStream("plugin.properties"));
+
+      List<LoadedPlugin> allPlugins = new ArrayList<LoadedPlugin>();
+      for (String pluginProperty : pluginProperties.stringPropertyNames()) {
+        if (pluginProperty.endsWith(".plugin")) {
+          LoadedPlugin newPlugin = loadPlugin(pluginProperty, pluginProperties, pluginClassLoader);
+          if (newPlugin != null) {
+            allPlugins.add(newPlugin);
+          }
+        }
       }
 
-      // TODO: create a classloader for every plugin jar
-      // TODO: use the classloader to try to load every class
-      // TODO: once class loaded check that it's non-abstract, and implements Plugin
-      // TODO: if so add to the list of available plugins
-      // TODO: also register the name of the plugin with the classloader
-      // TODO: give it a unique internal id to reference it by?
-      // TODO: then when enabled use the classloader to load it (or just load once found)
-      // TODO: would this be really slow for large jar files???
-
     } catch (IOException ex) {
-      log.warn("Failed to load plugins from: " + file.getAbsolutePath(), ex);
+      log.warn("Failed to find plugins in " + file.getAbsolutePath(), ex);
     }
   }
 }
