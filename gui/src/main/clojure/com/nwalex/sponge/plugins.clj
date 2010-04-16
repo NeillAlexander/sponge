@@ -44,14 +44,14 @@
     (dosync
      (ref-set plugin-store (assoc @plugin-store (hash plugin)
                                   (partial plugin-filter plugin))))
-    (println @plugin-store)))
+    (log/info (format "Currently registered plugins for %s: %s" phase @plugin-store))))
 
 (defn- deregister-plugin [phase plugin]
   (log/info (format "De-register plugin %s for phasef %s" plugin phase))
   (let [plugin-store (lifecycle-store-mapping phase)]
     (dosync
      (ref-set plugin-store (dissoc @plugin-store (hash plugin))))
-    (println @plugin-store)))
+    (log/info (format "Currently registered plugins for %s: %s" phase @plugin-store))))
 
 (defn enable-plugin [plugin]
   (let [lifecycle-point (lifecycle-mapping (.getLifecyclePoint plugin))]

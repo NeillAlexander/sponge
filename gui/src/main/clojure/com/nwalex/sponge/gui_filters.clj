@@ -10,7 +10,8 @@
   (:require
    [com.nwalex.sponge.gui-state :as state]
    [com.nwalex.sponge.table-model :as model]
-   [com.nwalex.sponge.plugins :as plugins])
+   [com.nwalex.sponge.plugins :as plugins]
+   [clojure.contrib.logging :as log])
   (:use
    [com.nwalex.sponge.filters :only [continue return abort]]))
 
@@ -57,8 +58,16 @@
 
 ;; note plugin filters happen before others on request
 (defn get-request-filters-for-mode [mode]
-  (vec (concat (plugins/get-plugin-filters :request) (request-filter-map mode))))
+  (let [request-filters (vec (concat
+                              (plugins/get-plugin-filters :request)
+                              (request-filter-map mode)))]
+    (log/info (format "request-filters-for-mode %s are: %s" mode request-filters))
+    request-filters))
 
 ;; note plugin fitlers happen after others on response
 (defn get-response-filters-for-mode [mode]
-  (vec (concat (response-filter-map mode) (plugins/get-plugin-filters :response))))
+  (let [response-filters (vec (concat
+                               (response-filter-map mode)
+                               (plugins/get-plugin-filters :response)))]
+    (log/info (format "response-filters-for-mode %s are: %s" mode response-filters))
+    response-filters))

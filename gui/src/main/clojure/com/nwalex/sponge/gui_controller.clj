@@ -116,9 +116,13 @@
 (defn- set-mode [mode]  
   (state/set-mode! mode)
   (if (server/running? (state/current-server))
-    (server/update-request-filters (state/current-server)
-                                   (filters/get-request-filters-for-mode
-                                    (state/get-mode)))))
+    (do
+      (server/update-request-filters (state/current-server)
+                                     (filters/get-request-filters-for-mode
+                                      (state/get-mode)))
+      (server/update-response-filters (state/current-server)
+                                      (filters/get-response-filters-for-mode
+                                       (state/get-mode))))))
 
 (defn- make-table-action [table key proxy-maker]
   (if-not @(key action-map)    

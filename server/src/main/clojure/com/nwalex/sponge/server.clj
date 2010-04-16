@@ -77,14 +77,17 @@
 (defn- make-request-filters [filters]
   (conj filters forwarding-request-filter))
 
-(defn- update-filters [server filters-vec key]
-  (dosync (ref-set (key server) (make-request-filters filters-vec))))
+(defn- make-response-filters [filters]
+  (conj filters returning-response-filter))
+
+(defn- update-filters [server filters-vec key make-filters-fn]
+  (dosync (ref-set (key server) (make-filters-fn filters-vec))))
 
 (defn update-request-filters [server new-filters-vec]
-  (update-filters server new-filters-vec :request-filters))
+  (update-filters server new-filters-vec :request-filters make-request-filters))
 
 (defn update-response-filters [server new-filters-vec]
-  (update-filters server new-filters-vec :response-filters))
+  (update-filters server new-filters-vec :response-filters make-response-filters))
 
 (defn make-server
   "Create an instance of the Sponge server. Options are as follows:
@@ -94,13 +97,9 @@
   (let [opts-map (apply array-map opts)
         server {:port port :target target :jetty nil
                 :request-filters (ref (make-request-filters
-                                       (vec (:request-filters opts-map))))
-                :request-filters (ref (conj
-                                       (vec (:request-filters opts-map))
-                                       forwarding-request-filter))
-                :response-filters (ref (conj
-                                        (vec (:response-filters opts-map))    
-                                        returning-response-filter))}]
+                                       (vec (:request-filters opts-map))))             
+                :response-filters (ref (make-response-filters
+                                        (vec (:response-filters opts-map))))}]
     server))
 
 (defn start [server]
