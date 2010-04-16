@@ -21,9 +21,9 @@ public abstract class ResponsePlugin extends Plugin {
   }
 
   @Override
-  public Object doPluginTask(String data, PluginContext context) {
-    return processResponse(data, context);
+  public final Object doPluginTask(String data, PluginContext context) {
+    return context.getResponseBuilder().buildContinueResponse(processResponse(data, context));
   }
 
-  protected abstract Object processResponse(String response, PluginContext context);
+  protected abstract String processResponse(String response, PluginContext context);
 }

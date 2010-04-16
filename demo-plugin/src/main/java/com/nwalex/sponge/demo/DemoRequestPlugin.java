@@ -21,15 +21,18 @@ public class DemoRequestPlugin extends RequestPlugin {
 
   private static final Logger log = Logger.getLogger(DemoRequestPlugin.class);
 
-  public Object processRequest(String soapRequest, PluginContext context) {
+  @Override
+  public String processRequest(String soapRequest, PluginContext context) {
     log.info("processRequest() called");
-    return context.getResponseBuilder().buildContinueResponse(soapRequest);
+    return soapRequest;
   }
 
+  @Override
   public void onEnabled(PluginContext context) {
     log.info("enabled() called");
   }
 
+  @Override
   public void onDisabled(PluginContext context) {
     log.info("disabled() called");
   }

@@ -21,15 +21,18 @@ public class DemoResponsePlugin extends ResponsePlugin {
 
   private static final Logger log = Logger.getLogger(DemoResponsePlugin.class);
 
-  protected Object processResponse(String response, PluginContext context) {
+  @Override
+  protected String processResponse(String response, PluginContext context) {
     log.info("processResponse() called");
-    return context.getResponseBuilder().buildContinueResponse(response);
+    return response;
   }
 
+  @Override
   public void onEnabled(PluginContext context) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
+  @Override
   public void onDisabled(PluginContext context) {
     throw new UnsupportedOperationException("Not supported yet.");
   }

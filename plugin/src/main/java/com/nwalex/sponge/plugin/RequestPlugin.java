@@ -21,8 +21,8 @@ public abstract class RequestPlugin extends Plugin {
   }
 
   @Override
-  public Object doPluginTask(String data, PluginContext context) {
-    return processRequest(data, context);
+  public final Object doPluginTask(String data, PluginContext context) {
+    return context.getResponseBuilder().buildContinueResponse(processRequest(data, context));
   }
 
   /**
@@ -31,5 +31,5 @@ public abstract class RequestPlugin extends Plugin {
    * @param context
    * @return
    */
-  public abstract Object processRequest(String soapRequest, PluginContext context);
+  public abstract String processRequest(String soapRequest, PluginContext context);
 }

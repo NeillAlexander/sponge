@@ -17,7 +17,6 @@
    [com.nwalex.sponge.label-controller :as label]
    [com.nwalex.sponge.config-controller :as config]
    [com.nwalex.sponge.exchange :as exchange]
-   [com.nwalex.sponge.plugins :as plugins]
    [clojure.contrib.swing-utils :as swing]
    [clojure.contrib.logging :as log]))
 
@@ -180,5 +179,5 @@
 (defn make-gui [& args]
   (swing/do-swing
    (state/set-gui!
-    (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller plugins/plugin-controller)
+    (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller filters/plugin-controller)
                      (.setVisible true)))))

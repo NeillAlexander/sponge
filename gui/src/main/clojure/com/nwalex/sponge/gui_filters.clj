@@ -10,11 +10,23 @@
   (:require
    [com.nwalex.sponge.gui-state :as state]
    [com.nwalex.sponge.table-model :as model]
-   [com.nwalex.sponge.plugins :as plugins]
    [com.nwalex.sponge.server :as server]
    [clojure.contrib.logging :as log])
   (:use
    [com.nwalex.sponge.filters :only [continue return abort]]))
+
+(def plugin-manager (ref nil))
+
+(def request-plugins (ref {}))
+(def response-plugins (ref {}))
+
+(def lifecycle-mapping
+     {com.nwalex.sponge.plugin.LifecyclePoint/BEFORE_REQUEST :request
+      com.nwalex.sponge.plugin.LifecyclePoint/AFTER_RESPONSE :response})
+
+(def lifecycle-store-mapping
+     {:request request-plugins
+      :response response-plugins})
 
 (defn display-exchange-filter [server exchange key]
   (continue (model/add-exchange! server exchange key)))
@@ -57,10 +69,15 @@
       [display-non-replay-response-filter]
       })
 
+(defn get-plugin-filters
+  "phase is either :request or :response"
+  [phase]
+  (vec (vals (deref (lifecycle-store-mapping phase)))))
+
 ;; note plugin filters happen before others on request
 (defn get-request-filters-for-mode [mode]
   (let [request-filters (vec (concat
-                              (plugins/get-plugin-filters :request)
+                              (get-plugin-filters :request)
                               (request-filter-map mode)))]
     (log/info (format "request-filters-for-mode %s are: %s" mode request-filters))
     request-filters))
@@ -69,7 +86,7 @@
 (defn get-response-filters-for-mode [mode]
   (let [response-filters (vec (concat
                                (response-filter-map mode)
-                               (plugins/get-plugin-filters :response)))]
+                               (get-plugin-filters :response)))]
     (log/info (format "response-filters-for-mode %s are: %s" mode response-filters))
     response-filters))
 
@@ -87,3 +104,64 @@
 (defn set-mode [mode]  
   (state/set-mode! mode)
   (reload-filters))
+
+(defn- build-response [exchange key data]
+  {key (assoc exchange key data)})
+
+(defn- response-builder [exchange phase]
+  (proxy [com.nwalex.sponge.plugin.PluginResponseBuilder] []
+    (buildContinueResponse [data] (build-response exchange :continue data))
+    (buildReturnResponse [data] (build-response exchange :return data))
+    (buildAbortResponse [data] (build-response exchange :return data))))
+
+(defn- plugin-context [builder]
+     (proxy [com.nwalex.sponge.plugin.PluginContext] []
+       (getResponseBuilder [] builder)
+       (isValidResponse [response]                        
+                        (or (contains? response :return)
+                            (contains? response :abort)
+                            (contains? response :continue)))))
+
+(defn- plugin-filter [plugin server exchange phase]
+  (let [body (:body (exchange phase))
+        builder (partial response-builder exchange phase)
+        context (partial plugin-context (builder))]
+    (.execute plugin body (context))))
+
+(defn- register-plugin [phase plugin]
+  (log/info (format "Register plugin %s for phasef %s" plugin phase))
+  (let [plugin-store (lifecycle-store-mapping phase)]
+    (dosync
+     (ref-set plugin-store (assoc @plugin-store (hash plugin)
+                                  (partial plugin-filter plugin))))
+    (log/info (format "Currently registered plugins for %s: %s" phase @plugin-store)))
+  (reload-filters))
+
+(defn- deregister-plugin [phase plugin]
+  (log/info (format "De-register plugin %s for phase %s" plugin phase))
+  (let [plugin-store (lifecycle-store-mapping phase)]
+    (dosync
+     (ref-set plugin-store (dissoc @plugin-store (hash plugin))))
+    (log/info (format "Currently registered plugins for phase %s: %s"
+                      phase @plugin-store)))
+  (reload-filters))
+
+(defn enable-plugin [plugin]
+  (let [lifecycle-point (lifecycle-mapping (.getLifecyclePoint plugin))]
+    (register-plugin lifecycle-point plugin)))
+
+(defn disable-plugin [plugin]
+  (let [lifecycle-point (lifecycle-mapping (.getLifecyclePoint plugin))]
+    (deregister-plugin lifecycle-point plugin)))
+
+(def plugin-controller
+     (proxy [com.nwalex.sponge.gui.plugins.PluginController] []
+       (pluginEnabled [plugin] (enable-plugin plugin))
+       (pluginDisabled [plugin] (disable-plugin plugin))
+       (getPluginManager []
+                         (if-not @plugin-manager
+                           (dosync
+                            (ref-set plugin-manager
+                                     (com.nwalex.sponge.gui.plugins.PluginManager.
+                                      plugin-controller))))
+                         @plugin-manager)))
