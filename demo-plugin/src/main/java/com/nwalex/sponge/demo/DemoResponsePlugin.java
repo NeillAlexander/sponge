@@ -21,15 +21,20 @@ public class DemoResponsePlugin extends ResponsePlugin {
 
   private static final Logger log = Logger.getLogger(DemoResponsePlugin.class);
 
+  private int counter = 0;
+
   @Override
   protected String processResponse(String response, PluginContext context) {
     log.info("processResponse() called");
+    counter++;
+    log.info("There have been " + counter + " responses");
     return response;
   }
 
   @Override
   public void onEnabled() {
-    log.info("onEnabled() callled");
+    log.info("resetting counter");
+    counter = 0;
   }
 
   @Override

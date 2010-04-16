@@ -21,19 +21,24 @@ public class DemoRequestPlugin extends RequestPlugin {
 
   private static final Logger log = Logger.getLogger(DemoRequestPlugin.class);
 
+  private int counter = 0;
+
   @Override
   public String processRequest(String soapRequest, PluginContext context) {
     log.info("processRequest() called");
+    counter++;
+    log.info("There have been " + counter + " requests");
     return soapRequest;
   }
 
   @Override
   public void onEnabled() {
-    log.info("enabled() called");
+    log.info("resetting counter");
+    counter = 0;
   }
 
   @Override
   public void onDisabled() {
-    log.info("disabled() called");
+    log.info("onDisabled() called");
   }
 }
