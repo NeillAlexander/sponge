@@ -35,18 +35,8 @@
 (defn- plugin-filter [plugin server exchange phase]
   (let [body (:body (exchange phase))
         builder (partial response-builder exchange phase)
-        context (partial plugin-context (builder))
-        response (.execute plugin body (context))
-        response-key (first (keys response))
-        updated-phase
-        {response-key (assoc (exchange phase) :body (response response-key))}
-        updated-exchange (assoc exchange phase updated-phase)]
-    ;; we have {:continue "request body here"}
-    ;; need to update the exchange body and use
-    ;; the key for the response
-    (println (format "Response key: %s" response-key))
-    (println (format "Exchange before: %s\nExchange after: %s" exchange updated-exchange))
-   updated-exchange))
+        context (partial plugin-context (builder))]
+    (.execute plugin body (context))))
 
 (defn- register-plugin [phase plugin]
   (log/info (format "Register plugin %s for phasef %s" plugin phase))
