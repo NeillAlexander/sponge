@@ -466,12 +466,12 @@ public class SpongeGUI extends javax.swing.JFrame {
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 889, Short.MAX_VALUE)
+        .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING)
       );
       layout.setVerticalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
         .addGroup(layout.createSequentialGroup()
-          .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 957, Short.MAX_VALUE)
+          .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
           .addContainerGap())
       );
 
