@@ -235,5 +235,5 @@
     (if response-id
       (let [exchange (exchange/get-exchange response-id)]
         (exchange/inc-replays! exchange)
-        (notify-data-changed)
+        (notify-row-changed 0 (dec (count @data-id-store)))
         (:response exchange)))))
