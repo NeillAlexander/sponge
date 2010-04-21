@@ -258,7 +258,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     jSplitPane1 = new javax.swing.JSplitPane();
     jScrollPane2 = new javax.swing.JScrollPane();
     exchangeTable = new JXTable(controller.getExchangeTableModel());
-    ((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});
+    //((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});
     ((JXTable) exchangeTable).setColumnControlVisible(true);
     jSplitPane2 = new javax.swing.JSplitPane();
     requestPanel = new BodyPanel(controller.getUpdateRequestBodyAction((JXTable) exchangeTable));
