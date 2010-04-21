@@ -85,8 +85,8 @@
 ;; note plugin fitlers happen after others on response
 (defn get-response-filters-for-mode [mode]
   (let [response-filters (vec (concat
-                               (response-filter-map mode)
-                               (get-plugin-filters :response)))]
+                               (get-plugin-filters :response)
+                               (response-filter-map mode)))]
     (log/info (format "response-filters-for-mode %s are: %s" mode response-filters))
     response-filters))
 
