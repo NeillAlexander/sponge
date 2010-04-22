@@ -9,7 +9,8 @@
 (ns com.nwalex.sponge.soap
   (:require
    [clojure.zip :as zip]
-   [clojure.xml :as xml]))
+   [clojure.xml :as xml]
+   [clojure.contrib.logging :as log]))
 
 ;; this is a bit hacky and may break!! Relying on the fact that
 ;; always have xmlns in the body and that the soap method is the
@@ -18,10 +19,15 @@
 ;; Basically, I don't understand the zipper functions yet
 ;; TODO: tidy this up
 (defn parse-soap [request]
-  (let [zipped (zip/xml-zip (xml/parse (java.io.ByteArrayInputStream.
-                                        (.getBytes (:body request)))))]
-    {:namespace (:xmlns (:attrs
-                           (first (:content (first (:content (first zipped)))))))
-     :soap-method (.substring (str
-                            (:tag (first (:content
-                                          (first (:content (first zipped))))))) 1)}))
+  (try
+   (let [zipped (zip/xml-zip (xml/parse (java.io.ByteArrayInputStream.
+                                         (.getBytes (:body request)))))]
+     {:namespace (:xmlns (:attrs
+                          (first (:content (first (:content (first zipped)))))))
+      :soap-method (.substring (str
+                                (:tag (first (:content
+                                              (first (:content
+                                                      (first zipped))))))) 1)})
+   (catch Exception ex
+     (log/error "Error parsing soap" ex)
+     {:namespace "Unknown" :soap-method "Unknown"})))

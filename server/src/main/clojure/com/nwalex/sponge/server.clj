@@ -23,7 +23,8 @@
   (loop [exchange-filter (first filters)
          remaining-filters (rest filters)
          filter-arg exchange]
-    (log/info (format "Processing %s..." exchange-key))
+    (log/info (format "Processing %s through filter %s..." exchange-key
+                      exchange-filter))
     (let [result (exchange-filter server filter-arg exchange-key)]
       ;; check the responses to determine whether to continue etc
       (cond
@@ -71,7 +72,7 @@
                     (:id exchange)
                     (:soap-method exchange)))
   (let [r-exchange (dissoc exchange :id :response :replayed :num-replays
-                           :namespace :soap-method)]        
+                           :namespace :soap-method :started :ended)]        
     (process-response server (process-request server r-exchange))))
 
 (defn- make-request-filters [filters]

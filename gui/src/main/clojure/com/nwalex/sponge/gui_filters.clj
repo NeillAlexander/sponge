@@ -29,6 +29,7 @@
       :response response-plugins})
 
 (defn display-exchange-filter [server exchange key]
+  (log/info "Ready to display exchange")
   (continue (model/add-exchange! server exchange key)))
 
 (defn display-non-replay-response-filter [server exchange key]
@@ -105,14 +106,17 @@
   (state/set-mode! mode)
   (reload-filters))
 
-(defn- build-response [exchange key data]
-  {key (assoc exchange key data)})
+(defn- build-response [exchange phase key body]
+  (log/info (format "in build-response: %s" phase))
+  (let [updated-exchange (assoc-in exchange [phase :body] body)]
+    {key updated-exchange}))
+  
 
 (defn- response-builder [exchange phase]
   (proxy [com.nwalex.sponge.plugin.PluginResponseBuilder] []
-    (buildContinueResponse [data] (build-response exchange :continue data))
-    (buildReturnResponse [data] (build-response exchange :return data))
-    (buildAbortResponse [data] (build-response exchange :return data))))
+    (buildContinueResponse [data] (build-response exchange phase :continue data))
+    (buildReturnResponse [data] (build-response exchange phase :return data))
+    (buildAbortResponse [data] (build-response exchange phase :return data))))
 
 (defn- plugin-context [builder]
      (proxy [com.nwalex.sponge.plugin.PluginContext] []
@@ -125,8 +129,9 @@
 (defn- plugin-filter [plugin server exchange phase]
   (let [body (:body (exchange phase))
         builder (partial response-builder exchange phase)
-        context (partial plugin-context (builder))]
-    (.execute plugin body (context))))
+        context (partial plugin-context (builder))
+        response (.execute plugin body (context))]
+    response))
 
 (defn- register-plugin [phase plugin]
   (log/info (format "Register plugin %s for phasef %s" plugin phase))
