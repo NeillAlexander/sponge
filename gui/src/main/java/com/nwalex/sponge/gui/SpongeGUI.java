@@ -17,6 +17,8 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Enumeration;
@@ -30,6 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -37,8 +40,6 @@ import javax.swing.event.TableModelListener;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
-import org.jdesktop.swingx.decorator.Highlighter;
-import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jdesktop.swingx.decorator.PatternPredicate;
 
 /**
@@ -125,6 +126,22 @@ public class SpongeGUI extends javax.swing.JFrame {
           }
         } catch (Exception ex) {
           log.error("Exception while getting updated data", ex);
+        }
+      }
+    });
+
+    // set up a listener to highlight row on right click
+    exchangeTable.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        if (SwingUtilities.isRightMouseButton(e)) {
+          int row = exchangeTable.rowAtPoint(e.getPoint());
+          if (row > -1) {
+            exchangeTable.getSelectionModel().setSelectionInterval(row, row);
+            tablePopup.show(exchangeTable, e.getPoint().x, e.getPoint().y);
+          } else {
+            e.consume();
+          }
         }
       }
     });
@@ -322,7 +339,6 @@ public class SpongeGUI extends javax.swing.JFrame {
     jScrollPane2.setPreferredSize(new java.awt.Dimension(800, 280));
 
     exchangeTable.setModel(controller.getExchangeTableModel());
-    exchangeTable.setComponentPopupMenu(tablePopup);
     exchangeTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     exchangeTable.getSelectionModel().addListSelectionListener(
       new ListSelectionListener() {
