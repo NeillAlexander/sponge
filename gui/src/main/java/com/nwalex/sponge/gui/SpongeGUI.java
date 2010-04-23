@@ -303,6 +303,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     jMenu2 = new javax.swing.JMenu();
     keyboardShortcutsHelp = new javax.swing.JMenuItem();
     jMenuItem1 = new javax.swing.JMenuItem();
+    aboutMenuItem = new javax.swing.JMenuItem();
 
     attachLabelItem.setAction(controller.getLabelExchangeAction((JXTable) exchangeTable));
     attachLabelItem.setText("Label...");
@@ -474,6 +475,14 @@ public class SpongeGUI extends javax.swing.JFrame {
       jMenuItem1.setText("Writing Plugins");
       jMenu2.add(jMenuItem1);
 
+      aboutMenuItem.setText("About");
+      aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+          aboutMenuItemActionPerformed(evt);
+        }
+      });
+      jMenu2.add(aboutMenuItem);
+
       menuBar.add(jMenu2);
 
       setJMenuBar(menuBar);
@@ -505,7 +514,15 @@ public class SpongeGUI extends javax.swing.JFrame {
     private void replayOrFailMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrFailMenuItemActionPerformed
       modeSelected(evt);
     }//GEN-LAST:event_replayOrFailMenuItemActionPerformed
+
+    private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
+      AboutDialog ad = new AboutDialog(this, true);
+      ad.setLocationRelativeTo(null);
+      ad.setVisible(true);
+    }//GEN-LAST:event_aboutMenuItemActionPerformed
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
+  private javax.swing.JMenuItem aboutMenuItem;
   private javax.swing.JMenuItem attachLabelItem;
   private javax.swing.JMenuItem configureMenuItem;
   private javax.swing.JMenuItem delete;
