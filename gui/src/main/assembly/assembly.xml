@@ -31,6 +31,13 @@
         <exclude>**/*</exclude>
       </excludes>
     </fileSet>
+    <fileSet>
+      <directory>../demo-plugin/target/</directory>
+      <outputDirectory>src</outputDirectory>
+      <includes>
+        <include>sponge-demo-plugin*-sources.jar</include>
+      </includes>
+    </fileSet>
   </fileSets>
   <dependencySets>
     <dependencySet>
