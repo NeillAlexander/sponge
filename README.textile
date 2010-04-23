@@ -1,0 +1,1 @@
+See "http://www.maybetechnology.com/2010/04/sponge-for-when-youre-using-soap.html":http://www.maybetechnology.com/2010/04/sponge-for-when-youre-using-soap.html for an overview of Sponge. There is also built-in documentation under the Help menu.
