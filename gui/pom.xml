@@ -39,23 +39,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>sponge-server</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-      <version>1.6.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.swinglabs</groupId>
-      <artifactId>swingx</artifactId>
-      <version>1.6</version>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-      <artifactId>sponge-server</artifactId>
-      <groupId>com.nwalex</groupId>
-      <type>jar</type>
-      <version>1.2.0-SNAPSHOT</version>
       <exclusions>
         <exclusion>
           <artifactId>clj-html</artifactId>
@@ -70,6 +53,17 @@
           <groupId>org.clojure</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.swinglabs</groupId>
+      <artifactId>swingx</artifactId>
+      <version>1.6</version>
+      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>org.clojure</groupId>
