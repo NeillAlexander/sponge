@@ -132,15 +132,22 @@ public class SpongeGUI extends javax.swing.JFrame {
 
     // set up a listener to highlight row on right click
     exchangeTable.addMouseListener(new MouseAdapter() {
+
       @Override
       public void mouseClicked(MouseEvent e) {
         if (SwingUtilities.isRightMouseButton(e)) {
-          int row = exchangeTable.rowAtPoint(e.getPoint());
-          if (row > -1) {
-            exchangeTable.getSelectionModel().setSelectionInterval(row, row);
+          // ignore if there are multiple rows selected
+          int clickedRow = exchangeTable.rowAtPoint(e.getPoint());
+
+          if (exchangeTable.getSelectedRowCount() > 1 && exchangeTable.isRowSelected(clickedRow)) {
             tablePopup.show(exchangeTable, e.getPoint().x, e.getPoint().y);
-          } else {
-            e.consume();
+          } else {            
+            if (clickedRow > -1) {
+              exchangeTable.getSelectionModel().setSelectionInterval(clickedRow, clickedRow);
+              tablePopup.show(exchangeTable, e.getPoint().x, e.getPoint().y);
+            } else {
+              e.consume();
+            }
           }
         }
       }
@@ -520,7 +527,6 @@ public class SpongeGUI extends javax.swing.JFrame {
       ad.setLocationRelativeTo(null);
       ad.setVisible(true);
     }//GEN-LAST:event_aboutMenuItemActionPerformed
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem aboutMenuItem;
   private javax.swing.JMenuItem attachLabelItem;
