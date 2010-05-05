@@ -205,6 +205,9 @@ public class SpongeGUI extends javax.swing.JFrame {
           selectedRow = selectedRow - 1;
         }
 
+        // TODO; fix the bug here caused by the fact that the exchangeTable doesn't
+        // yet know about the rows that have been deleted, and therefore the mapping
+        // from the table row to the model row is incorrect
         if (numRows > 0) {
           if (selectedRow < numRows) {
             exchangeTable.setRowSelectionInterval(selectedRow, selectedRow);
