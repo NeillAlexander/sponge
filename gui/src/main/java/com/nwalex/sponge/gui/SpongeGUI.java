@@ -52,6 +52,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   private final FindDialogController findController;
   private HelpManager helper;
   private static final Logger log = Logger.getLogger(SpongeGUI.class);
+  private int rowSelectedBeforeDelete = -1;
 
   /** Creates new form SpongeGUI */
   public SpongeGUI(final SpongeGUIController controller, final PluginController pluginController) {
@@ -141,7 +142,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
           if (exchangeTable.getSelectedRowCount() > 1 && exchangeTable.isRowSelected(clickedRow)) {
             tablePopup.show(exchangeTable, e.getPoint().x, e.getPoint().y);
-          } else {            
+          } else {
             if (clickedRow > -1) {
               exchangeTable.getSelectionModel().setSelectionInterval(clickedRow, clickedRow);
               tablePopup.show(exchangeTable, e.getPoint().x, e.getPoint().y);
@@ -152,6 +153,35 @@ public class SpongeGUI extends javax.swing.JFrame {
         }
       }
     });
+  }
+
+  private JTable createExchangeTable() {
+    return new JXTable(controller.getExchangeTableModel()) {
+
+      @Override
+      public void tableChanged(TableModelEvent ev) {
+        super.tableChanged(ev);
+
+        // when a delete is done, keep the current row highlighted (if possible)
+        if (ev.getType() == TableModelEvent.DELETE) {
+          int numRows = exchangeTable.getRowCount();
+          int selectedRow = rowSelectedBeforeDelete;
+
+          if (numRows > 0) {
+            if (selectedRow < numRows) {
+              exchangeTable.setRowSelectionInterval(selectedRow, selectedRow);
+              updateDisplayedData(selectedRow);
+            } else {
+              exchangeTable.setRowSelectionInterval(numRows - 1, numRows - 1);
+              updateDisplayedData(numRows - 1);
+            }
+          } else {
+            requestPanel.setText("", -1);
+            responsePanel.setText("", -1);
+          }
+        }
+      }
+    };
   }
 
   private void initPlugins(final PluginController pluginController) {
@@ -196,33 +226,10 @@ public class SpongeGUI extends javax.swing.JFrame {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        int selectedRow = exchangeTable.getSelectedRow();
+        rowSelectedBeforeDelete = exchangeTable.getSelectedRow();
         deleteRowAction.actionPerformed(e);
-
-        int numRows = exchangeTable.getRowCount();
-
-        if (selectedRow > 0) {
-          selectedRow = selectedRow - 1;
-        }
-
-        // TODO; fix the bug here caused by the fact that the exchangeTable doesn't
-        // yet know about the rows that have been deleted, and therefore the mapping
-        // from the table row to the model row is incorrect
-        if (numRows > 0) {
-          if (selectedRow < numRows) {
-            exchangeTable.setRowSelectionInterval(selectedRow, selectedRow);
-            updateDisplayedData(selectedRow);
-          } else {
-            exchangeTable.setRowSelectionInterval(numRows - 1, numRows - 1);
-            updateDisplayedData(numRows - 1);
-          }
-        } else {
-          requestPanel.setText("", -1);
-          responsePanel.setText("", -1);
-        }
       }
     };
-
 
     deleteRowAction.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -284,7 +291,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     modeButtonGroup = new javax.swing.ButtonGroup();
     jSplitPane1 = new javax.swing.JSplitPane();
     jScrollPane2 = new javax.swing.JScrollPane();
-    exchangeTable = new JXTable(controller.getExchangeTableModel());
+    exchangeTable = createExchangeTable();
     //((JXTable) exchangeTable).setHighlighters(new Highlighter[] {HighlighterFactory.createSimpleStriping()});
     ((JXTable) exchangeTable).setColumnControlVisible(true);
     jSplitPane2 = new javax.swing.JSplitPane();
