@@ -244,7 +244,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     return wrappedDeleteAction;
   }
 
-  private void updateSelectedMode(final SpongeGUIController controller) {
+  public void updateSelectedMode(final SpongeGUIController controller) {
     // set the mode
     Enumeration<AbstractButton> en = modeButtonGroup.getElements();
     while (en.hasMoreElements()) {

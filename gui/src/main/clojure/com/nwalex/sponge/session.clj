@@ -21,6 +21,9 @@
 (defn has-file []
   (not (nil? @session-file)))
 
+(defn get-session-file []
+  @session-file)
+
 (defn- choose-file
   "Launches JFileChooser. Remembers directory of chosen file for next time"
   [text]
@@ -35,17 +38,21 @@
                           (.getParent (.getSelectedFile file-chooser)))
         (.getSelectedFile file-chooser)))))
 
-(defn load-session! [event]
-  (let [file (choose-file "Load")]
-    (if file
-      (with-open [in (java.io.PushbackReader.
+(defn load-session-from-file! [file]
+  (log/info (format "Loading session from file: %s" file))
+  (with-open [in (java.io.PushbackReader.
                       (io/reader (java.util.zip.GZIPInputStream.
                                   (java.io.FileInputStream. file))))]
         (let [persistence-map (read in)]          
           (state/load-from-persistence-map! (:gui-state persistence-map))
           (model/load-from-persistence-map! (:table-model persistence-map))
           (exchange/load-from-persistence-map! (:exchange persistence-map))
-          (compare-and-set! session-file @session-file file)))      
+          (compare-and-set! session-file @session-file file))))
+
+(defn load-session! [event]
+  (let [file (choose-file "Load")]
+    (if file
+      (load-session-from-file! file)      
       (log/info "No file chosen"))))
 
 (defn- save-session-to-file [file]

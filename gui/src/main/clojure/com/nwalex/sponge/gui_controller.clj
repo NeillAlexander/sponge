@@ -18,7 +18,8 @@
    [com.nwalex.sponge.config-controller :as config]
    [com.nwalex.sponge.exchange :as exchange]
    [clojure.contrib.swing-utils :as swing]
-   [clojure.contrib.logging :as log]))
+   [clojure.contrib.logging :as log]
+   [clojure.contrib.java-utils :as util]))
 
 (declare action-map)
 
@@ -176,8 +177,62 @@
                                        model/duplicate-rows! table))))
 
 
+(defn- load-properties [into from]
+  (let [cl (.getClassLoader clojure.main)
+        from-resource (.getResourceAsStream cl from)]
+    (if-not (nil? from-resource)
+      (try
+       (.load into from-resource)
+       (catch Exception e
+         (log/warn (format "Failed to load config from: %s" from))))
+      (log/info (format "File not found: %s" from)))
+    into))
+
+(defn- load-config-files []
+  (let [config-props (java.util.Properties.)]
+    (load-properties config-props "sponge.properties")
+    (load-properties config-props "user.sponge.properties")
+    (load-properties config-props "last.sponge.properties")))
+
+(defn- load-session [props]
+  (let [do-load-prop (.getProperty props "sponge.reload.previous" "false")]
+    (if (= do-load-prop "true")
+      (let [file (java.io.File. (.getProperty props "sponge.last.session" ""))]
+        (if (and (not (nil? file)) (.exists file))
+          (do
+            (session/load-session-from-file! file)
+            (.setEnabled (:save action-map) (session/has-file)))
+          (log/info (format "Session file not found: %s" file))))
+      (log/info "sponge.reload.previous not set. Not loading previous session"))))
+
+(defn- load-config! []
+  (try
+   (let [config-props (load-config-files)]
+     (load-session config-props)
+     (state/set-config!
+      (.getProperty config-props
+                    "sponge.default.port" "8139")
+      (.getProperty config-props
+                    "sponge.default.target" "http://services.aonaware.com")))
+   (catch Exception ex
+     (log/warn (format "Failed to load config") ex))))
+
+(defn- store-last-session-properties []
+  (log/info "Storing properties prior to shutdown")
+  (util/write-properties
+   {"sponge.default.port" ((state/config) :port)
+    "sponge.default.target" ((state/config) :target)
+    "sponge.last.session" (session/get-session-file)}
+   (format "%s/config/last.sponge.properties" (System/getProperty "sponge.home"))))
+
+(defn- create-shutdown-hook! []
+  (.addShutdownHook (Runtime/getRuntime) (Thread. store-last-session-properties)))
+
 (defn make-gui [& args]
   (swing/do-swing
    (state/set-gui!
-    (doto (com.nwalex.sponge.gui.SpongeGUI. sponge-controller filters/plugin-controller)
-                     (.setVisible true)))))
+    (com.nwalex.sponge.gui.SpongeGUI. sponge-controller filters/plugin-controller))
+   (load-config!)
+   (.updateSelectedMode (state/gui) sponge-controller)
+   (create-shutdown-hook!)
+   (.setVisible (state/gui) true)))

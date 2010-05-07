@@ -36,9 +36,10 @@
 
 (defn set-config! [port target]
   (log/info (format "Setting server config to: port = %s, target = %s" port target))
-  (java.net.URL. target)
+  ;; force a quick exception if the values are invalid
+  (java.net.URL. target)     
   (dosync
-   (ref-set port-store port)
+   (ref-set port-store (if (integer? port) port (Integer/parseInt port)))
    (ref-set target-store target)
    (set-title)))
 
