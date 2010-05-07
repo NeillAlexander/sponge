@@ -11,7 +11,7 @@ can ignore/delete are marked IGNORE (they are specific to the Sponge build.
   <parent>
     <artifactId>sponge</artifactId>
     <groupId>com.nwalex</groupId>
-    <version>1.1.3-SNAPSHOT</version>
+    <version>1.1.2</version>
   </parent>
 
   <!-- 
@@ -19,7 +19,7 @@ can ignore/delete are marked IGNORE (they are specific to the Sponge build.
   -->
   <groupId>com.nwalex</groupId>
   <artifactId>sponge-demo-plugin</artifactId>
-  <version>1.1.3-SNAPSHOT</version>
+  <version>1.1.2</version>
   <name>Sponge Demo Plugin</name>
 
   <!-- 
