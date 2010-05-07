@@ -3,11 +3,11 @@
   <parent>
     <artifactId>sponge</artifactId>
     <groupId>com.nwalex</groupId>
-    <version>1.1.2-SNAPSHOT</version>
+    <version>1.1.2</version>
   </parent>
   <groupId>com.nwalex</groupId>
   <artifactId>sponge-plugin</artifactId>
-  <version>1.1.2-SNAPSHOT</version>
+  <version>1.1.2</version>
   <name>Sponge Plugin</name>
   <url>http://maven.apache.org</url>
   <build>
