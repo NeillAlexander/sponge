@@ -18,6 +18,7 @@
 
 (def #^{:private true} default-responses (ref {}))
 (def #^{:private true} data-id-store (ref []))
+(def #^{:private true} active-data-id-store (ref []))
 
 (def #^{:private true} columns ["Status" "Namespace" "URL" "Soap Method"
                                 "Start" "End" "Time (ms)" "Info"
@@ -27,8 +28,17 @@
      (proxy [javax.swing.table.AbstractTableModel] []
        (getColumnCount [] (count columns))
        (getColumnName [i] (columns i))
-       (getRowCount [] (count @data-id-store))
-       (getValueAt [row col] (get-value-at row col))))
+       (getRowCount []
+                    ;; store the reference used when row count
+                    ;; returned so that we can use the same when
+                    ;; call comes in to getValueAt
+                    (dosync
+                     (ref-set active-data-id-store @data-id-store)
+                     (count @active-data-id-store)))
+       (getValueAt [row col]
+                   ;; use the same reference that was used when row
+                   ;; count calculated                   
+                   (get-value-at (@active-data-id-store row) col))))
 
 (defn get-persistence-map []
   {:data-id-store @data-id-store
@@ -43,9 +53,9 @@
 (defn get-exchange-for-row [row]
   (exchange/get-exchange (@data-id-store row)))
 
-(defn get-value-at [row col]
+(defn get-value-at [exchange-id col]
   ;; see the columns vector above
-  (let [exchange (get-exchange-for-row row)]    
+  (let [exchange (exchange/get-exchange exchange-id)]    
     (cond
      (= col 0) (exchange/get-status exchange)     
      (= col 1) (exchange/get-namespace exchange)
@@ -80,27 +90,35 @@
   (swing/do-swing
    (.fireTableDataChanged exchange-table-model)))
 
+(defn- do-notification
+  "Simple function to ensure the notification is always called start < end"
+  [notification-fn a b]
+  (let [start (if (< a b) a b)
+        end (if (> b a) b a)]
+    (log/info (format "Doing notification on range: %d %d" start end))
+    (swing/do-swing
+     (notification-fn start end))))
+
 (defn- notify-row-changed
   ([row]
      (notify-row-changed row row))
   ([start end]
-     (swing/do-swing
-      (.fireTableRowsUpdated exchange-table-model start end))))
+     (log/info (format "notify-row-changed %d %d" start end))
+     (do-notification #(.fireTableRowsUpdated exchange-table-model %1 %2) start end)))
 
 (defn- notify-row-added
   ([row]
      (notify-row-added row row))
   ([start end]
-     (swing/do-swing
-      (.fireTableRowsInserted exchange-table-model start end))))
+     (do-notification #(.fireTableRowsInserted exchange-table-model %1 %2) start end)))
 
 (defn- notify-row-deleted
   ([row]
      (log/info (format "Notify row deleted: %d" row))
      (notify-row-deleted row row))
   ([start end]
-     (swing/do-swing
-      (.fireTableRowsDeleted exchange-table-model start start))))
+     (log/info (format "Notify rows deleted: %d to %d" start end))
+     (do-notification #(.fireTableRowsDeleted exchange-table-model %1 %2) start end)))
 
 (defn add-exchange!
   "Add the exchange represented by map m"
@@ -150,15 +168,16 @@
       (commute default-responses
                dissoc (make-default-response-key exchange)))))
 
-(defn- row-loop [rows row-fn notify-fn]
-  (loop [idx (first rows)
-         rem (rest rows)]
-    (if idx
-      (do
-        (row-fn idx)
-        (recur (first rem) (rest rem)))))
-  (if notify-fn
-    (notify-fn (first rows) (last rows))))
+(defn- row-loop [row-indices row-fn notify-fn]
+  (let [rows (reverse (sort row-indices))]
+    (loop [idx (first rows)
+           rem (rest rows)]
+      (if idx
+        (do
+          (row-fn idx)
+          (recur (first rem) (rest rem)))))
+    (if notify-fn
+      (notify-fn (last rows) (first rows)))))
 
 (defn- duplicate-row!
   [row]
@@ -174,7 +193,7 @@
   0)
 
 (defn duplicate-rows! [rows]
-  (row-loop (reverse rows) duplicate-row! nil))
+  (row-loop rows duplicate-row! nil))
 
 (defn- delete-row! [row]
   (log/info (format "Deleting row %d" row))
@@ -191,7 +210,8 @@
     (log/info (format "Num rows after delete = %d" (count @data-id-store)))))
 
 (defn delete-rows! [rows]
-  (row-loop (reverse rows) delete-row! notify-row-deleted))
+  (log/info (format "Delete rows: %s" rows))
+  (row-loop rows delete-row! notify-row-deleted))
 
 (defn get-label-for-row [row]
   (let [exchange (get-exchange-for-row row)]
