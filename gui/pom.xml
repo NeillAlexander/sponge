@@ -3,11 +3,11 @@
   <parent>
     <artifactId>sponge</artifactId>
     <groupId>com.nwalex</groupId>
-    <version>1.1.2</version>
+    <version>1.1.2-SNAPSHOT</version>
   </parent>
   <groupId>com.nwalex</groupId>
   <artifactId>sponge-gui</artifactId>
-  <version>1.1.2</version>
+  <version>1.1.2-SNAPSHOT</version>
   <name>Sponge GUI Module</name>
 
   <dependencies>
