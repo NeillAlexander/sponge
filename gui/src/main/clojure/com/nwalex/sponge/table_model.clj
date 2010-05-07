@@ -18,6 +18,7 @@
 
 (def #^{:private true} default-responses (ref {}))
 (def #^{:private true} data-id-store (ref []))
+(def #^{:private true} active-data-id-store (ref []))
 
 (def #^{:private true} columns ["Status" "Namespace" "URL" "Soap Method"
                                 "Start" "End" "Time (ms)" "Info"
@@ -27,8 +28,17 @@
      (proxy [javax.swing.table.AbstractTableModel] []
        (getColumnCount [] (count columns))
        (getColumnName [i] (columns i))
-       (getRowCount [] (count @data-id-store))
-       (getValueAt [row col] (get-value-at row col))))
+       (getRowCount []
+                    ;; store the reference used when row count
+                    ;; returned so that we can use the same when
+                    ;; call comes in to getValueAt
+                    (dosync
+                     (ref-set active-data-id-store @data-id-store)
+                     (count @active-data-id-store)))
+       (getValueAt [row col]
+                   ;; use the same reference that was used when row
+                   ;; count calculated                   
+                   (get-value-at (@active-data-id-store row) col))))
 
 (defn get-persistence-map []
   {:data-id-store @data-id-store
@@ -43,9 +53,9 @@
 (defn get-exchange-for-row [row]
   (exchange/get-exchange (@data-id-store row)))
 
-(defn get-value-at [row col]
+(defn get-value-at [exchange-id col]
   ;; see the columns vector above
-  (let [exchange (get-exchange-for-row row)]    
+  (let [exchange (exchange/get-exchange exchange-id)]    
     (cond
      (= col 0) (exchange/get-status exchange)     
      (= col 1) (exchange/get-namespace exchange)
