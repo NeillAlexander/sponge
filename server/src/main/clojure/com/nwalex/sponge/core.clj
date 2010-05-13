@@ -18,11 +18,6 @@
    )
   (:gen-class :main true :name com.nwalex.sponge.Server)) 
 
-(declare *server*)
-
-(defn get-server []
-  *server*)
-
 (defn start-repl
   "Start the server wrapped in a repl. Use this to embed swank in your code."
   ([port]
@@ -61,9 +56,7 @@
                         :response-filters response-filters))
              swank-port-num (if swank-port (Integer/parseInt swank-port) 4006)]         
          (if swank?
-           (do
-             (start-repl swank-port-num)
-             (def *server* server)))         
+           (start-repl swank-port-num))         
          server)
        (catch NumberFormatException ex
          (println (format "Invalid port number: %s" port)))))))
