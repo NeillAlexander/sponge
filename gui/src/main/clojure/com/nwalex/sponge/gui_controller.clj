@@ -106,7 +106,7 @@
   [session]
   {:start-server (make-safe-action "Start Server" (partial start-server session) true)
    :stop-server (make-safe-action "Stop Server" (partial stop-server session) false)
-   :configure (make-safe-action "Configure" config/configure true)
+   :configure (make-safe-action "Configure" (partial config/configure session) true)
    :exit (make-safe-action "Exit" exit true)
    :start-repl (make-safe-action "Start Repl" (partial start-repl session) true)
    :load (make-safe-action "Load Session..."

@@ -14,6 +14,10 @@
    [clojure.contrib.logging :as log]
    [clojure.contrib.duck-streams :as io]))
 
+;;----------------------------------------------------
+;; This is central to the multi-session Sponge
+;;----------------------------------------------------
+
 (defn make-session
   "Create the session data structure"
   []
@@ -21,6 +25,8 @@
    :gui-controller (ref nil)
    :action-map (ref nil)
    :sessions-dir (ref (System/getProperty "sponge.sessions"))})
+
+;;----------------------------------------------------
 
 (defn get-session-file [session]
   @(:file session))
