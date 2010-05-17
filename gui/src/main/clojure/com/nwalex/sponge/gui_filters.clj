@@ -15,78 +15,72 @@
   (:use
    [com.nwalex.sponge.filters :only [continue return abort]]))
 
-(def plugin-manager (ref nil))
-
-(def request-plugins (ref {}))
-(def response-plugins (ref {}))
-
 (def lifecycle-mapping
      {com.nwalex.sponge.plugin.LifecyclePoint/BEFORE_REQUEST :request
       com.nwalex.sponge.plugin.LifecyclePoint/AFTER_RESPONSE :response})
 
-(def lifecycle-store-mapping
-     {:request request-plugins
-      :response response-plugins})
+(defn- lifecycle-store-mapping [session]
+  {:request (:request-plugins session)
+   :response (:response-plugins session)})
 
-(defn display-exchange-filter [server exchange key]
+(defn display-exchange-filter [session server exchange key]
   (log/info "Ready to display exchange")
-  (continue (model/add-exchange! server exchange key)))
+  (continue (model/add-exchange! session server exchange key)))
 
-(defn display-non-replay-response-filter [server exchange key]
+(defn display-non-replay-response-filter [session server exchange key]
   (if (not (:replayed exchange))
-    (continue (model/add-exchange! server exchange key))
+    (continue (model/add-exchange! session server exchange key))
     (continue exchange)))
 
-(defn replay-filter [server exchange key]
-  (let [response (model/replay-response exchange)]
+(defn replay-filter [session server exchange key]
+  (let [response (model/replay-response session exchange)]
     (if response
       (return (assoc exchange
                 :response response
                 :replayed true))
       (continue exchange))))
 
-(defn fail-filter [server exchange key]
+(defn fail-filter [session server exchange key]
   (abort exchange))
 
-(def #^{:private true} request-filter-map
-     {com.nwalex.sponge.gui.SpongeGUIController/FORWARD_ALL
-      [display-exchange-filter]
+(defn- request-filter-map [session]
+  {com.nwalex.sponge.gui.SpongeGUIController/FORWARD_ALL
+   [(partial display-exchange-filter session)]
+   
+   com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FAIL
+   [(partial replay-filter session) (partial fail-filter session)]
+   
+   com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD
+   [(partial replay-filter session) (partial display-exchange-filter session)]
+   })
 
-      com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FAIL
-      [replay-filter fail-filter]
+(defn- response-filter-map [session]
+  {com.nwalex.sponge.gui.SpongeGUIController/FORWARD_ALL
+   [(partial display-exchange-filter session)]
+   
+   com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FAIL
+   [(partial display-non-replay-response-filter session)]
+   
+   com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD
+   [(partial display-non-replay-response-filter session)]})
 
-      com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD
-      [replay-filter display-exchange-filter]
-      })
-
-(def #^{:private true} response-filter-map
-     {com.nwalex.sponge.gui.SpongeGUIController/FORWARD_ALL
-      [display-exchange-filter]
-
-      com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FAIL
-      [display-non-replay-response-filter]
-
-      com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD
-      [display-non-replay-response-filter]
-      })
-
-(defn get-plugin-filters
+(defn- get-plugin-filters
   "phase is either :request or :response"
-  [phase]
-  (vec (vals (deref (lifecycle-store-mapping phase)))))
+  [session phase]
+  (vec (vals (deref ((lifecycle-store-mapping session) phase)))))
 
 ;; note plugin filters happen before others on request
-(defn get-request-filters-for-mode [mode]
+(defn get-request-filters-for-mode [session mode]
   (let [request-filters (vec (concat
-                              (get-plugin-filters :request)
+                              (get-plugin-filters session :request)
                               (request-filter-map mode)))]
     (log/info (format "request-filters-for-mode %s are: %s" mode request-filters))
     request-filters))
 
 ;; note plugin fitlers happen after others on response
-(defn get-response-filters-for-mode [mode]
+(defn get-response-filters-for-mode [session mode]
   (let [response-filters (vec (concat
-                               (get-plugin-filters :response)
+                               (get-plugin-filters session :response)
                                (response-filter-map mode)))]
     (log/info (format "response-filters-for-mode %s are: %s" mode response-filters))
     response-filters))
@@ -133,9 +127,9 @@
         response (.execute plugin body (context))]
     response))
 
-(defn- register-plugin [phase plugin]
+(defn- register-plugin [session phase plugin]
   (log/info (format "Register plugin %s for phasef %s" plugin phase))
-  (let [plugin-store (lifecycle-store-mapping phase)]
+  (let [plugin-store ((lifecycle-store-mapping session) phase)]
     (dosync
      (ref-set plugin-store (assoc @plugin-store (hash plugin)
                                   (partial plugin-filter plugin))))
@@ -143,9 +137,9 @@
   (.onEnabled plugin)
   (reload-filters))
 
-(defn- deregister-plugin [phase plugin]
+(defn- deregister-plugin [session phase plugin]
   (log/info (format "De-register plugin %s for phase %s" plugin phase))
-  (let [plugin-store (lifecycle-store-mapping phase)]
+  (let [plugin-store ((lifecycle-store-mapping session) phase)]
     (dosync
      (ref-set plugin-store (dissoc @plugin-store (hash plugin))))
     (log/info (format "Currently registered plugins for phase %s: %s"
@@ -153,25 +147,29 @@
   (.onDisabled plugin)
   (reload-filters))
 
-(defn enable-plugin [plugin]
+(defn enable-plugin [session plugin]
   (let [lifecycle-point (lifecycle-mapping (.getLifecyclePoint plugin))]
     (try
-     (register-plugin lifecycle-point plugin)
+     (register-plugin session lifecycle-point plugin)
      (catch Exception ex
-       (deregister-plugin lifecycle-point plugin)))))
+       (deregister-plugin session lifecycle-point plugin)))))
 
-(defn disable-plugin [plugin]
+(defn disable-plugin [session plugin]
   (let [lifecycle-point (lifecycle-mapping (.getLifecyclePoint plugin))]
-    (deregister-plugin lifecycle-point plugin)))
+    (deregister-plugin session lifecycle-point plugin)))
 
-(def plugin-controller
-     (proxy [com.nwalex.sponge.gui.plugins.PluginController] []
-       (pluginEnabled [plugin] (enable-plugin plugin))
-       (pluginDisabled [plugin] (disable-plugin plugin))
-       (getPluginManager []
-                         (if-not @plugin-manager
-                           (dosync
-                            (ref-set plugin-manager
-                                     (com.nwalex.sponge.gui.plugins.PluginManager.
-                                      plugin-controller))))
-                         @plugin-manager)))
+(defn make-plugin-controller [session]
+  (let [controller (proxy [com.nwalex.sponge.gui.plugins.PluginController] []
+                     (pluginEnabled [plugin] (enable-plugin session plugin))
+                     (pluginDisabled [plugin] (disable-plugin session plugin))
+                     (getPluginManager []
+                                       (if-not @(:plugin-manager session)
+                                         (dosync
+                                          (ref-set
+                                           (:plugin-manager session)
+                                           (com.nwalex.sponge.gui.plugins.PluginManager.
+                                            @(:plugin-controller session)))))
+                                       @(:plugin-manager session)))]
+    (dosync
+     (ref-set (:plugin-controller session) controller))
+    controller))

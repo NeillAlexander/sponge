@@ -24,7 +24,13 @@
   {:file (ref nil)
    :gui-controller (ref nil)
    :action-map (ref nil)
-   :sessions-dir (ref (System/getProperty "sponge.sessions"))})
+   :sessions-dir (ref (System/getProperty "sponge.sessions"))
+   :default-responses (ref {})
+   :exchange-table-model (ref nil)
+   :plugin-controller (ref nil)
+   :plugin-manager (ref nil)
+   :request-plugins (ref {})
+   :response-plugins (ref {})})
 
 ;;----------------------------------------------------
 
@@ -42,6 +48,13 @@
   (dosync
    (ref-set (:gui-controller session) gui-controller)
    (ref-set (:action-map session) action-map)))
+
+(defn init-table-model! [session model]
+  (dosync
+   (ref-set (:exchange-table-model session) model)))
+
+(defn table-model [session]
+  @(:exchange-table-model session))
 
 (defn sessions-dir [session]
   @(:sessions-dir session))
@@ -76,7 +89,7 @@
                                   (java.io.FileInputStream. file))))]
         (let [persistence-map (read in)]          
           (state/load-from-persistence-map! (:gui-state persistence-map))
-          (model/load-from-persistence-map! (:table-model persistence-map))
+          (model/load-from-persistence-map! session (:table-model persistence-map))
           (exchange/load-from-persistence-map! (:exchange persistence-map))
           (update-session-file! session file))))
 
@@ -90,7 +103,7 @@
   (if file
     (let [persistence-map (assoc {}
                             :gui-state (state/get-persistence-map)
-                            :table-model (model/get-persistence-map)
+                            :table-model (model/get-persistence-map session)
                             :exchange (exchange/get-persistence-map))]
       (log/info (format "Ready to save in file %s" file))
       (with-open [out (io/writer (java.io.BufferedOutputStream.

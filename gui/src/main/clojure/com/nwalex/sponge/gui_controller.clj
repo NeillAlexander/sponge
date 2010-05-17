@@ -73,10 +73,10 @@
                                  (:target config)
                                  :request-filters
                                  (filters/get-request-filters-for-mode
-                                  (state/get-mode))
+                                  session (state/get-mode))
                                  :response-filters
                                  (filters/get-response-filters-for-mode
-                                  (state/get-mode))))))
+                                  session (state/get-mode))))))
   (toggle-started session))
 
 (defn- start-repl [session event]
@@ -141,17 +141,17 @@
                                             (server/running?
                                              (state/current-server)))))))
 
-(defn- save-body-action [key table]
+(defn- save-body-action [session key table]
   (proxy [com.nwalex.sponge.gui.BodyPanel$SaveAction] [table]
     (saveText [text row]
               (log-action (format "save-body %s" key))
-              (model/update-exchange-body! text key row))))
+              (model/update-exchange-body! session text key row))))
 
 (defn- resend-request-action [session table]
   (make-table-action session table :resend-request resend-request-proxy))
 
 (defn- update-body-action [session table key action-key]
-  (make-table-action session table action-key (partial save-body-action key)))
+  (make-table-action session table action-key (partial save-body-action session key)))
 
 (defn- sponge-controller-fn
   [session action-map]
@@ -160,22 +160,25 @@
        (getStopServerAction [] (:stop-server action-map))
        (getConfigureAction [] (:configure action-map))
        (getExitAction [] (:exit action-map))
-       (getExchangeTableModel [] (model/get-table-model))
+       (getExchangeTableModel [] (session/table-model session))
        (getStartReplAction [] (:start-repl action-map))
        (getRequestDataForRow [row] (model/get-data-for-row row :request))
        (getResponseDataForRow [row] (model/get-data-for-row row :response))       
-       (getLabelExchangeAction [table] (make-multi-row-action label/do-label table))
-       (getDeleteLabelAction [table] (make-multi-row-action label/delete-label table))
+       (getLabelExchangeAction [table] (make-multi-row-action
+                                        (partial label/do-label session) table))
+       (getDeleteLabelAction [table] (make-multi-row-action
+                                      (partial label/delete-label session) table))
        (getLoadAction [] (:load action-map))
        (getSaveAction [] (:save action-map))
        (getSaveAsAction [] (:save-as action-map))
        (getSetDefaultResponseAction [table]
                                     (make-multi-row-action
-                                     model/set-as-default-response! table))
+                                     (partial model/set-as-default-response! session)
+                                     table))
        (getMode [] (state/get-mode))
        (setMode [mode] (filters/set-mode mode))
        (getDeleteRowAction [table] (make-multi-row-action
-                                    model/delete-rows! table))
+                                    (partial model/delete-rows! session) table))
        (getResendRequestAction [table] (resend-request-action session table))
        (getUpdateRequestBodyAction [table] (update-body-action session
                                                                table
@@ -186,7 +189,8 @@
                                                                 :response
                                                                 :update-response))
        (getDuplicateRowAction [table] (make-multi-row-action
-                                       model/duplicate-rows! table))))
+                                       (partial model/duplicate-rows! session)
+                                       table))))
 
 
 (defn- load-properties [into from]
@@ -244,14 +248,17 @@
                                                    ))))
 
 (defn make-gui [& args]
-  (let [session-instance (session/make-session)
-        action-map (action-map-fn session-instance)
-        gui-controller (sponge-controller-fn session-instance action-map)]
-    (session/init-gui! session-instance gui-controller action-map)
+  (let [session (session/make-session)
+        action-map (action-map-fn session)
+        gui-controller (sponge-controller-fn session action-map)]
+    (session/init-gui! session gui-controller action-map)
+    (session/init-table-model! session
+                              (model/make-exchange-table-model session))
     (swing/do-swing
      (state/set-gui!
-      (com.nwalex.sponge.gui.SpongeGUI. gui-controller filters/plugin-controller))
-     (load-config! session-instance)
+      (com.nwalex.sponge.gui.SpongeGUI. gui-controller
+                                        (filters/make-plugin-controller session)))
+     (load-config! session)
      (.updateSelectedMode (state/gui) gui-controller)
-     (create-shutdown-hook! session-instance)
+     (create-shutdown-hook! session)
      (.setVisible (state/gui) true))))

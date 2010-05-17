@@ -11,15 +11,18 @@
    [com.nwalex.sponge.table-model :as model]
    [com.nwalex.sponge.gui-state :as state]))
 
-(def controller
-     (proxy [com.nwalex.sponge.gui.LabelDialogController] []
-       (setLabel [label row-indices] (model/set-label-on-rows! label row-indices))
-       (getLabel [row] (model/get-label-for-row row))))
+(defn- new-controller [session]
+  (proxy [com.nwalex.sponge.gui.LabelDialogController] []
+    (setLabel [label row-indices] (model/set-label-on-rows! session label row-indices))
+    (getLabel [row] (model/get-label-for-row row))))
 
-(defn do-label [rows]
-  (doto (com.nwalex.sponge.gui.LabelDialog. (state/gui) true controller rows)
+(defn do-label [session rows]
+  (doto (com.nwalex.sponge.gui.LabelDialog. (state/gui)
+                                            true
+                                            (new-controller session)
+                                            rows)
     (.setLocationRelativeTo (state/gui))
     (.setVisible true)))
 
-(defn delete-label [rows]
-  (model/delete-label-on-rows! rows))
+(defn delete-label [session rows]
+  (model/delete-label-on-rows! session rows))
