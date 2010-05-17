@@ -73,7 +73,7 @@
 (defn get-request-filters-for-mode [session mode]
   (let [request-filters (vec (concat
                               (get-plugin-filters session :request)
-                              (request-filter-map mode)))]
+                              ((request-filter-map session) mode)))]
     (log/info (format "request-filters-for-mode %s are: %s" mode request-filters))
     request-filters))
 
@@ -81,24 +81,24 @@
 (defn get-response-filters-for-mode [session mode]
   (let [response-filters (vec (concat
                                (get-plugin-filters session :response)
-                               (response-filter-map mode)))]
+                               ((response-filter-map session) mode)))]
     (log/info (format "response-filters-for-mode %s are: %s" mode response-filters))
     response-filters))
 
-(defn reload-filters []
+(defn reload-filters [session]
   (log/info "Reloading filters...")
   (if (server/running? (state/current-server))
     (do
       (server/update-request-filters (state/current-server)
                                      (get-request-filters-for-mode
-                                      (state/get-mode)))
+                                      session (state/get-mode)))
       (server/update-response-filters (state/current-server)
                                       (get-response-filters-for-mode
-                                       (state/get-mode))))))
+                                       session (state/get-mode))))))
 
-(defn set-mode [mode]  
+(defn set-mode [session mode]  
   (state/set-mode! mode)
-  (reload-filters))
+  (reload-filters session))
 
 (defn- build-response [exchange phase key body]
   (log/info (format "in build-response: %s" phase))
@@ -135,7 +135,7 @@
                                   (partial plugin-filter plugin))))
     (log/info (format "Currently registered plugins for %s: %s" phase @plugin-store)))
   (.onEnabled plugin)
-  (reload-filters))
+  (reload-filters session))
 
 (defn- deregister-plugin [session phase plugin]
   (log/info (format "De-register plugin %s for phase %s" plugin phase))
@@ -145,7 +145,7 @@
     (log/info (format "Currently registered plugins for phase %s: %s"
                       phase @plugin-store)))
   (.onDisabled plugin)
-  (reload-filters))
+  (reload-filters session))
 
 (defn enable-plugin [session plugin]
   (let [lifecycle-point (lifecycle-mapping (.getLifecyclePoint plugin))]

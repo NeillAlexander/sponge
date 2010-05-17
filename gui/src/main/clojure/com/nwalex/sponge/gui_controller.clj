@@ -176,7 +176,7 @@
                                      (partial model/set-as-default-response! session)
                                      table))
        (getMode [] (state/get-mode))
-       (setMode [mode] (filters/set-mode mode))
+       (setMode [mode] (filters/set-mode session mode))
        (getDeleteRowAction [table] (make-multi-row-action
                                     (partial model/delete-rows! session) table))
        (getResendRequestAction [table] (resend-request-action session table))
