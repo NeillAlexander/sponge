@@ -19,10 +19,8 @@
   []
   {:file (ref nil)
    :gui-controller (ref nil)
-   :action-map (ref nil)})
-
-(def #^{:private true} sponge-sessions-dir
-     (atom (System/getProperty "sponge.sessions")))
+   :action-map (ref nil)
+   :sessions-dir (ref (System/getProperty "sponge.sessions"))})
 
 (defn get-session-file [session]
   @(:file session))
@@ -39,6 +37,13 @@
    (ref-set (:gui-controller session) gui-controller)
    (ref-set (:action-map session) action-map)))
 
+(defn sessions-dir [session]
+  @(:sessions-dir session))
+
+(defn update-sessions-dir! [session dir]
+  (dosync
+   (ref-set (:sessions-dir session) dir)))
+
 (defn gui-controller [session]
   @(:gui-controller session))
 
@@ -47,16 +52,15 @@
 
 (defn- choose-file
   "Launches JFileChooser. Remembers directory of chosen file for next time"
-  [text]
+  [session text]
   (let [file-chooser (doto (javax.swing.JFileChooser.)
                        (.setApproveButtonText text)
                        (.setCurrentDirectory
-                        (java.io.File. @sponge-sessions-dir)))
+                        (java.io.File. (sessions-dir session))))
         response (.showOpenDialog file-chooser (state/gui))]
     (if (= response javax.swing.JFileChooser/APPROVE_OPTION)
       (do
-        (compare-and-set! sponge-sessions-dir @sponge-sessions-dir
-                          (.getParent (.getSelectedFile file-chooser)))
+        (update-sessions-dir! session (.getParent (.getSelectedFile file-chooser)))
         (.getSelectedFile file-chooser)))))
 
 (defn load-session-from-file![session file]
@@ -71,7 +75,7 @@
           (update-session-file! session file))))
 
 (defn load-session! [session event]
-  (let [file (choose-file "Load")]
+  (let [file (choose-file session "Load")]
     (if file
       (load-session-from-file! session file)      
       (log/info "No file chosen"))))
@@ -96,5 +100,5 @@
   (save-session-to-file session (get-session-file session)))
 
 (defn save-session-as [session event]
-  (let [file (choose-file "Save")]
+  (let [file (choose-file session "Save")]
     (save-session-to-file session file)))
