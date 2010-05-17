@@ -14,7 +14,7 @@
 (defn- new-controller [session]
   (proxy [com.nwalex.sponge.gui.LabelDialogController] []
     (setLabel [label row-indices] (model/set-label-on-rows! session label row-indices))
-    (getLabel [row] (model/get-label-for-row row))))
+    (getLabel [row] (model/get-label-for-row session row))))
 
 (defn do-label [session rows]
   (doto (com.nwalex.sponge.gui.LabelDialog. (state/gui)

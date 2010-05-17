@@ -89,13 +89,13 @@
 (defn- exit [event]
   (System/exit 1))
 
-(defn- resend-request [row]
-  (let [exchange (model/get-exchange-for-row row)]
+(defn- resend-request [session row]
+  (let [exchange (model/get-exchange-for-row session row)]
     (future (server/resend-request exchange (state/current-server))))
   0)
 
-(defn- resend-all-requests [rows]
-  (amap rows idx ret (resend-request (aget rows idx))))
+(defn- resend-all-requests [session rows]
+  (amap rows idx ret (resend-request session (aget rows idx))))
 
 (defn- wrap-session-action [session f event]
   (f event)
@@ -131,11 +131,11 @@
                 (proxy-maker table))))
     @(key action-map)))
 
-(defn- resend-request-proxy [table]
+(defn- resend-request-proxy [session table]
   (proxy [com.nwalex.sponge.gui.JXTableMultiRowAction] [table]
     (multiRowActionPerformed [rows]
                              (log-action "resend-request")
-                             (resend-all-requests rows))
+                             (resend-all-requests session rows))
     (setEnabled [enabled] (proxy-super setEnabled
                                        (and enabled
                                             (server/running?
@@ -148,7 +148,8 @@
               (model/update-exchange-body! session text key row))))
 
 (defn- resend-request-action [session table]
-  (make-table-action session table :resend-request resend-request-proxy))
+  (make-table-action session table :resend-request
+                     (partial resend-request-proxy session)))
 
 (defn- update-body-action [session table key action-key]
   (make-table-action session table action-key (partial save-body-action session key)))
@@ -162,8 +163,10 @@
        (getExitAction [] (:exit action-map))
        (getExchangeTableModel [] (session/table-model session))
        (getStartReplAction [] (:start-repl action-map))
-       (getRequestDataForRow [row] (model/get-data-for-row row :request))
-       (getResponseDataForRow [row] (model/get-data-for-row row :response))       
+       (getRequestDataForRow [row] (model/get-data-for-row session
+                                                           row :request))
+       (getResponseDataForRow [row] (model/get-data-for-row session
+                                                            row :response))       
        (getLabelExchangeAction [table] (make-multi-row-action
                                         (partial label/do-label session) table))
        (getDeleteLabelAction [table] (make-multi-row-action

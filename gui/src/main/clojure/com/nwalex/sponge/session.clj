@@ -16,6 +16,7 @@
 
 ;;----------------------------------------------------
 ;; This is central to the multi-session Sponge
+;; TODO: refactor into multi-layered map instead of flat
 ;;----------------------------------------------------
 
 (defn make-session
@@ -30,7 +31,9 @@
    :plugin-controller (ref nil)
    :plugin-manager (ref nil)
    :request-plugins (ref {})
-   :response-plugins (ref {})})
+   :response-plugins (ref {})
+   :data-id-store (ref [])
+   :active-data-id-store (ref [])})
 
 ;;----------------------------------------------------
 
