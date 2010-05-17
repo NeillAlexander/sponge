@@ -14,15 +14,36 @@
    [clojure.contrib.logging :as log]
    [clojure.contrib.duck-streams :as io]))
 
-(def #^{:private true} session-file (atom nil))
+(defn make-session
+  "Create the session data structure"
+  []
+  {:file (ref nil)
+   :gui-controller (ref nil)
+   :action-map (ref nil)})
+
 (def #^{:private true} sponge-sessions-dir
      (atom (System/getProperty "sponge.sessions")))
 
-(defn has-file []
-  (not (nil? @session-file)))
+(defn get-session-file [session]
+  @(:file session))
 
-(defn get-session-file []
-  @session-file)
+(defn has-file [session]
+  (not (nil? (get-session-file session))))
+
+(defn- update-session-file! [session file]
+  (dosync
+   (ref-set (:file session) file)))
+
+(defn init-gui! [session gui-controller action-map]
+  (dosync
+   (ref-set (:gui-controller session) gui-controller)
+   (ref-set (:action-map session) action-map)))
+
+(defn gui-controller [session]
+  @(:gui-controller session))
+
+(defn action-map [session]
+  @(:action-map session))
 
 (defn- choose-file
   "Launches JFileChooser. Remembers directory of chosen file for next time"
@@ -38,7 +59,7 @@
                           (.getParent (.getSelectedFile file-chooser)))
         (.getSelectedFile file-chooser)))))
 
-(defn load-session-from-file! [file]
+(defn load-session-from-file![session file]
   (log/info (format "Loading session from file: %s" file))
   (with-open [in (java.io.PushbackReader.
                       (io/reader (java.util.zip.GZIPInputStream.
@@ -47,15 +68,15 @@
           (state/load-from-persistence-map! (:gui-state persistence-map))
           (model/load-from-persistence-map! (:table-model persistence-map))
           (exchange/load-from-persistence-map! (:exchange persistence-map))
-          (compare-and-set! session-file @session-file file))))
+          (update-session-file! session file))))
 
-(defn load-session! [event]
+(defn load-session! [session event]
   (let [file (choose-file "Load")]
     (if file
-      (load-session-from-file! file)      
+      (load-session-from-file! session file)      
       (log/info "No file chosen"))))
 
-(defn- save-session-to-file [file]
+(defn- save-session-to-file [session file]
   (if file
     (let [persistence-map (assoc {}
                             :gui-state (state/get-persistence-map)
@@ -66,14 +87,14 @@
                                   (java.util.zip.GZIPOutputStream.
                                    (java.io.FileOutputStream. file))))]
         (.write out (str persistence-map))
-        (.write out "\n"))      
-      (compare-and-set! session-file @session-file file)
+        (.write out "\n"))
+      (update-session-file! session file)
       (log/info "Done"))      
     (log/info "No file chosen")))
 
-(defn save-session [event]
-  (save-session-to-file @session-file))
+(defn save-session [session event]
+  (save-session-to-file session (get-session-file session)))
 
-(defn save-session-as [event]
+(defn save-session-as [session event]
   (let [file (choose-file "Save")]
-    (save-session-to-file file)))
+    (save-session-to-file session file)))

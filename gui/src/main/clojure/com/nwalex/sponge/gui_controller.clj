@@ -53,18 +53,19 @@
 (defn- toggle-action [action]
   (.setEnabled action (not (.isEnabled action))))
 
-(defn- toggle-started []
-  (toggle-action (:stop-server action-map))
-  (toggle-action (:start-server action-map))
-  (toggle-action (:configure action-map))
-  (toggle-action (:load action-map)))
+(defn- toggle-started [session]
+  (let [action-map (session/action-map session)]
+    (toggle-action (:stop-server action-map))
+    (toggle-action (:start-server action-map))
+    (toggle-action (:configure action-map))
+    (toggle-action (:load action-map))))
 
-(defn- stop-server [event]  
+(defn- stop-server [session event]  
   (server/stop (state/current-server))
-  (toggle-started)
+  (toggle-started session)
   (state/set-current-server! nil))
 
-(defn- start-server [event]
+(defn- start-server [session event]
   (let [config (state/config)]
     (state/set-current-server! (server/start
                                 (server/make-server
@@ -76,13 +77,14 @@
                                  :response-filters
                                  (filters/get-response-filters-for-mode
                                   (state/get-mode))))))
-  (toggle-started))
+  (toggle-started session))
 
-(defn- start-repl [event]
-  (toggle-action (:start-repl action-map))
-  (state/repl-started!)
-  (future   
-   (core/start-repl 4006)))
+(defn- start-repl [session event]
+  (let [action-map (session/action-map session)]
+    (toggle-action (:start-repl action-map))
+    (state/repl-started!)
+    (future   
+     (core/start-repl 4006))))
 
 (defn- exit [event]
   (System/exit 1))
@@ -95,32 +97,39 @@
 (defn- resend-all-requests [rows]
   (amap rows idx ret (resend-request (aget rows idx))))
 
-(defn- wrap-session-action [f event]
+(defn- wrap-session-action [session f event]
   (f event)
-  (.setEnabled (:save action-map) (session/has-file)))
+  (.setEnabled (:save (session/action-map session)) (session/has-file session)))
 
-(def action-map
-     {:start-server (make-safe-action "Start Server" start-server true)
-      :stop-server (make-safe-action "Stop Server" stop-server false)
-      :configure (make-safe-action "Configure" config/configure true)
-      :exit (make-safe-action "Exit" exit true)
-      :start-repl (make-safe-action "Start Repl" start-repl true)
-      :load (make-safe-action "Load Session..."
-                         #(wrap-session-action session/load-session! %1) true)
-      :save (make-safe-action "Save Session" session/save-session false)
-      :save-as (make-safe-action "Save Session As..."
-                            #(wrap-session-action session/save-session-as %1)
-                            true)
-      :resend-request (ref nil)
-      :update-request (ref nil)
-      :update-response (ref nil)})
+(defn action-map-fn
+  "Designed to be called as a partial to bake in the session"
+  [session]
+  {:start-server (make-safe-action "Start Server" (partial start-server session) true)
+   :stop-server (make-safe-action "Stop Server" (partial stop-server session) false)
+   :configure (make-safe-action "Configure" config/configure true)
+   :exit (make-safe-action "Exit" exit true)
+   :start-repl (make-safe-action "Start Repl" (partial start-repl session) true)
+   :load (make-safe-action "Load Session..."
+                           #(wrap-session-action session
+                                                 (partial session/load-session! session)
+                                                 %1) true)
+   :save (make-safe-action "Save Session" (partial session/save-session session) false)
+   :save-as (make-safe-action "Save Session As..."
+                              #(wrap-session-action
+                                session
+                                (partial session/save-session-as session) %1)
+                              true)
+   :resend-request (ref nil)
+   :update-request (ref nil)
+   :update-response (ref nil)})
 
-(defn- make-table-action [table key proxy-maker]
-  (if-not @(key action-map)    
-    (dosync
-     (ref-set (key action-map)
-              (proxy-maker table))))
-  @(key action-map))
+(defn- make-table-action [session table key proxy-maker]
+  (let [action-map (session/action-map session)]
+    (if-not @(key action-map)    
+      (dosync
+       (ref-set (key action-map)
+                (proxy-maker table))))
+    @(key action-map)))
 
 (defn- resend-request-proxy [table]
   (proxy [com.nwalex.sponge.gui.JXTableMultiRowAction] [table]
@@ -138,13 +147,14 @@
               (log-action (format "save-body %s" key))
               (model/update-exchange-body! text key row))))
 
-(defn- resend-request-action [table]
-  (make-table-action table :resend-request resend-request-proxy))
+(defn- resend-request-action [session table]
+  (make-table-action session table :resend-request resend-request-proxy))
 
-(defn- update-body-action [table key action-key]
-  (make-table-action table action-key (partial save-body-action key)))
+(defn- update-body-action [session table key action-key]
+  (make-table-action session table action-key (partial save-body-action key)))
 
-(def sponge-controller
+(defn- sponge-controller-fn
+  [session action-map]
      (proxy [com.nwalex.sponge.gui.SpongeGUIController] []
        (getStartServerAction [] (:start-server action-map))
        (getStopServerAction [] (:stop-server action-map))
@@ -166,11 +176,13 @@
        (setMode [mode] (filters/set-mode mode))
        (getDeleteRowAction [table] (make-multi-row-action
                                     model/delete-rows! table))
-       (getResendRequestAction [table] (resend-request-action table))
-       (getUpdateRequestBodyAction [table] (update-body-action table
+       (getResendRequestAction [table] (resend-request-action session table))
+       (getUpdateRequestBodyAction [table] (update-body-action session
+                                                               table
                                                                :request
                                                                :update-request))
-       (getUpdateResponseBodyAction [table] (update-body-action table
+       (getUpdateResponseBodyAction [table] (update-body-action session
+                                                                table
                                                                 :response
                                                                 :update-response))
        (getDuplicateRowAction [table] (make-multi-row-action
@@ -194,21 +206,22 @@
     (load-properties config-props "user.sponge.properties")
     (load-properties config-props "last.sponge.properties")))
 
-(defn- load-session [props]
+(defn- load-session [session props]
   (let [do-load-prop (.getProperty props "sponge.reload.previous" "false")]
     (if (= do-load-prop "true")
       (let [file (java.io.File. (.getProperty props "sponge.last.session" ""))]
         (if (and (not (nil? file)) (.exists file))
           (do
             (session/load-session-from-file! file)
-            (.setEnabled (:save action-map) (session/has-file)))
+            (.setEnabled (:save (session/action-map session))
+                         (session/has-file session)))
           (log/info (format "Session file not found: %s" file))))
       (log/info "sponge.reload.previous not set. Not loading previous session"))))
 
-(defn- load-config! []
+(defn- load-config! [session]
   (try
    (let [config-props (load-config-files)]
-     (load-session config-props)
+     (load-session session config-props)
      (state/set-config!
       (.getProperty config-props
                     "sponge.default.port" "8139")
@@ -217,22 +230,28 @@
    (catch Exception ex
      (log/warn (format "Failed to load config") ex))))
 
-(defn- store-last-session-properties []
+(defn- store-last-session-properties [session]
   (log/info "Storing properties prior to shutdown")
   (util/write-properties
    {"sponge.default.port" ((state/config) :port)
     "sponge.default.target" ((state/config) :target)
-    "sponge.last.session" (session/get-session-file)}
+    "sponge.last.session" (session/get-session-file session)}
    (format "%s/config/last.sponge.properties" (System/getProperty "sponge.home"))))
 
-(defn- create-shutdown-hook! []
-  (.addShutdownHook (Runtime/getRuntime) (Thread. store-last-session-properties)))
+(defn- create-shutdown-hook! [session]
+  (.addShutdownHook (Runtime/getRuntime) (Thread.
+                                          (partial store-last-session-properties session
+                                                   ))))
 
 (defn make-gui [& args]
-  (swing/do-swing
-   (state/set-gui!
-    (com.nwalex.sponge.gui.SpongeGUI. sponge-controller filters/plugin-controller))
-   (load-config!)
-   (.updateSelectedMode (state/gui) sponge-controller)
-   (create-shutdown-hook!)
-   (.setVisible (state/gui) true)))
+  (let [session-instance (session/make-session)
+        action-map (action-map-fn session-instance)
+        gui-controller (sponge-controller-fn session-instance action-map)]
+    (session/init-gui! session-instance gui-controller action-map)
+    (swing/do-swing
+     (state/set-gui!
+      (com.nwalex.sponge.gui.SpongeGUI. gui-controller filters/plugin-controller))
+     (load-config! session-instance)
+     (.updateSelectedMode (state/gui) gui-controller)
+     (create-shutdown-hook! session-instance)
+     (.setVisible (state/gui) true))))
