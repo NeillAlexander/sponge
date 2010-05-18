@@ -34,7 +34,9 @@
    :response-plugins (ref {})
    :data-id-store (ref [])
    :active-data-id-store (ref [])
-   :exchange-store (ref {})})
+   :exchange-store (ref {})
+   :next-exchange-id (ref (java.util.concurrent.atomic.AtomicLong.))
+   :replay-count (ref {})})
 
 ;;----------------------------------------------------
 

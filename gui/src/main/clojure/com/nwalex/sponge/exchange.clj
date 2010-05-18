@@ -19,15 +19,11 @@
 from the server"
   {:request request-body :response nil})
 
-(def #^{:private true} next-exchange-id
-     (ref (java.util.concurrent.atomic.AtomicLong.)))
-(def #^{:private true} replay-count (ref {}))
-
-(defn- assign-id-to [exchange]
+(defn- assign-id-to [session exchange]
   (if (:id exchange)
     exchange
     (do
-      (assoc exchange :id (.getAndIncrement @next-exchange-id)))))
+      (assoc exchange :id (.getAndIncrement @(:next-exchange-id session))))))
 
 (defn- new-data [exchange]
   "Create the data structure that represents the exchange"
@@ -40,7 +36,7 @@ from the server"
   "Initialize the exchange from the raw map m"
   [session m key]  
   (let [exchange-store (:exchange-store session)
-        exchange (assign-id-to m)
+        exchange (assign-id-to session m)
         data (if (@exchange-store (:id exchange))
                (@exchange-store (:id exchange))               
                (new-data exchange))
@@ -71,7 +67,7 @@ from the server"
   (log/info (format "Deleting exchange id: %s" (get-id exchange)))
   (dosync
    (commute (:exchange-store session) dissoc (:id exchange))
-   (commute replay-count dissoc (:id exchange))))
+   (commute (:replay-count session) dissoc (:id exchange))))
 
 (defn get-exchange
   "Return the exchange with the specified id"
@@ -79,7 +75,7 @@ from the server"
   (@(:exchange-store session) id))
 
 (defn duplicate [session exchange]
-  (let [dup (assign-id-to (dissoc exchange :id))]
+  (let [dup (assign-id-to session (dissoc exchange :id))]
     (save! session (assoc dup :num-replays 0))
     (get-exchange session (:id dup))))
 
@@ -96,15 +92,16 @@ from the server"
      (commute exchange-store assoc-in [(:id exchange) key :body] text)
      (commute exchange-store assoc-in [(:id exchange) key :pretty-printed] false))))
 
-(defn get-num-replays [exchange]
-  (let [count (replay-count (:id exchange))]
+(defn get-num-replays [session exchange]
+  (let [count ((:replay-count session) (:id exchange))]
     (if count count 0)))
 
 (defn inc-replays!
   "Increment the replay account on the exchange"
-  [exchange]
+  [session exchange]
   (dosync
-   (commute replay-count assoc (:id exchange) (inc (get-num-replays exchange)))))
+   (commute (:replay-count session)
+            assoc (:id exchange) (inc (get-num-replays exchange)))))
 
 (defn set-label!
   [session exchange label]
@@ -193,11 +190,11 @@ from the server"
 
 (defn get-persistence-map [session]
   {:exchange-store @(:exchange-store session)
-   :next-exchange-id (.get @next-exchange-id)})
+   :next-exchange-id (.get @(:next-exchange-id session))})
 
 (defn load-from-persistence-map! [session persistence-map]  
   (dosync   
    (ref-set (:exchange-store session) (:exchange-store persistence-map))
-   (ref-set next-exchange-id (java.util.concurrent.atomic.AtomicLong.
-                              (:next-exchange-id persistence-map)))))
+   (ref-set (:next-exchange-id session) (java.util.concurrent.atomic.AtomicLong.
+                                 (:next-exchange-id persistence-map)))))
 

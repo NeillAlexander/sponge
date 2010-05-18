@@ -66,7 +66,7 @@
                         (make-default-response-key exchange)))
                  "R"
                  "")
-     (= col 8) (exchange/get-num-replays exchange)
+     (= col 8) (exchange/get-num-replays session exchange)
      (= col 9) (exchange/get-label exchange))))
 
 (defn get-data-for-row
@@ -257,6 +257,6 @@
   (let [response-id (get-default-response session exchange)]
     (if response-id
       (let [exchange (exchange/get-exchange session response-id)]
-        (exchange/inc-replays! exchange)
+        (exchange/inc-replays! session exchange)
         (notify-row-changed session 0 (dec (count @(:data-id-store session))))
         (:response exchange)))))
