@@ -32,6 +32,13 @@
       </excludes>
     </fileSet>
     <fileSet>
+      <directory>target/</directory>
+      <outputDirectory>plugins</outputDirectory>
+      <excludes>
+        <exclude>**/*</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
       <directory>../demo-plugin/target/</directory>
       <outputDirectory>src</outputDirectory>
       <includes>
@@ -47,7 +54,7 @@
       </excludes>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>plugins</outputDirectory>
+      <outputDirectory>example-plugin</outputDirectory>
       <includes>
         <include>com.nwalex:sponge-demo-plugin</include>
       </includes>

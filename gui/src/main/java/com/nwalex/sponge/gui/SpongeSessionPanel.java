@@ -25,6 +25,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.DefaultListModel;
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JOptionPane;
@@ -158,6 +159,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     updateSelectedMode(controller);
 
     modeSelector.addItemListener(new ItemListener() {
+
       @Override
       public void itemStateChanged(ItemEvent evt) {
         if (evt.getStateChange() == ItemEvent.SELECTED) {
@@ -273,7 +275,28 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
         }
       });
 
-      pluginSelector.add(pluginMenuItem);
+      pluginPopup.add(pluginMenuItem);
+    }
+
+    if (pluginManager.getAllLoadedPlugins().size() == 0) {
+      controlPanel.remove(pluginSelector);
+    } else {
+      pluginSelector.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mousePressed(MouseEvent e) {
+          maybeShowPopup(e);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+          maybeShowPopup(e);
+        }
+
+        private void maybeShowPopup(MouseEvent e) {
+          pluginPopup.show(e.getComponent(),
+                  e.getX(), e.getY());
+        }
+      });
     }
   }
 
@@ -299,6 +322,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     jSeparator1 = new javax.swing.JPopupMenu.Separator();
     delete = new javax.swing.JMenuItem();
     modeButtonGroup = new javax.swing.ButtonGroup();
+    pluginPopup = new javax.swing.JPopupMenu();
     jSplitPane1 = new javax.swing.JSplitPane();
     jScrollPane2 = new javax.swing.JScrollPane();
     exchangeTable = createExchangeTable();
@@ -307,13 +331,13 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     jSplitPane2 = new javax.swing.JSplitPane();
     requestPanel = new BodyPanel(controller.getUpdateRequestBodyAction((JXTable) exchangeTable));
     responsePanel = new BodyPanel(controller.getUpdateResponseBodyAction((JXTable) exchangeTable));
-    jPanel1 = new javax.swing.JPanel();
+    controlPanel = new javax.swing.JPanel();
     configLabel = new javax.swing.JLabel();
     jButton1 = new javax.swing.JButton();
     startStopServerButton = new javax.swing.JButton();
     jButton2 = new javax.swing.JButton();
     modeSelector = new javax.swing.JComboBox();
-    pluginSelector = new javax.swing.JComboBox();
+    pluginSelector = new javax.swing.JButton();
     loadButton = new javax.swing.JButton();
     saveButton = new javax.swing.JButton();
 
@@ -392,39 +416,40 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
       jSplitPane1.setBottomComponent(jSplitPane2);
 
       configLabel.setText("Configuration info to go here...");
-      jPanel1.add(configLabel);
+      controlPanel.add(configLabel);
 
       jButton1.setAction(controller.getConfigureAction());
       jButton1.setText("Configure...");
-      jPanel1.add(jButton1);
+      controlPanel.add(jButton1);
 
       startStopServerButton.setAction(controller.getStartServerAction());
       startStopServerButton.setText("Start Server");
-      jPanel1.add(startStopServerButton);
+      controlPanel.add(startStopServerButton);
 
       jButton2.setAction(controller.getStopServerAction());
       jButton2.setText("Stop Server");
-      jPanel1.add(jButton2);
+      controlPanel.add(jButton2);
 
       modeSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Modes" }));
-      jPanel1.add(modeSelector);
+      controlPanel.add(modeSelector);
 
-      pluginSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-      jPanel1.add(pluginSelector);
+      pluginSelector.setText("Plugins...");
+      pluginSelector.setComponentPopupMenu(pluginPopup);
+      controlPanel.add(pluginSelector);
 
       loadButton.setAction(getLoadSessionAction());
       loadButton.setText("Load Session...");
-      jPanel1.add(loadButton);
+      controlPanel.add(loadButton);
 
       saveButton.setAction(controller.getSaveAsAction());
       saveButton.setText("Save Session As...");
-      jPanel1.add(saveButton);
+      controlPanel.add(saveButton);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
       this.setLayout(layout);
       layout.setHorizontalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 934, Short.MAX_VALUE)
+        .addComponent(controlPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 934, Short.MAX_VALUE)
         .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 934, Short.MAX_VALUE)
       );
       layout.setVerticalGroup(
@@ -432,19 +457,19 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
           .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-          .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+          .addComponent(controlPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
       );
     }// </editor-fold>//GEN-END:initComponents
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem attachLabelItem;
   private javax.swing.JLabel configLabel;
+  private javax.swing.JPanel controlPanel;
   private javax.swing.JMenuItem delete;
   private javax.swing.JMenuItem deleteLabelItem;
   private javax.swing.JMenuItem duplicate;
   private javax.swing.JTable exchangeTable;
   private javax.swing.JButton jButton1;
   private javax.swing.JButton jButton2;
-  private javax.swing.JPanel jPanel1;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JPopupMenu.Separator jSeparator1;
   private javax.swing.JSplitPane jSplitPane1;
@@ -452,7 +477,8 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
   private javax.swing.JButton loadButton;
   private javax.swing.ButtonGroup modeButtonGroup;
   private javax.swing.JComboBox modeSelector;
-  private javax.swing.JComboBox pluginSelector;
+  private javax.swing.JPopupMenu pluginPopup;
+  private javax.swing.JButton pluginSelector;
   private com.nwalex.sponge.gui.BodyPanel requestPanel;
   private javax.swing.JMenuItem resendRequestItem;
   private com.nwalex.sponge.gui.BodyPanel responsePanel;
