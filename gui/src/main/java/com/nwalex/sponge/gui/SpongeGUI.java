@@ -10,11 +10,9 @@
 package com.nwalex.sponge.gui;
 
 import com.nwalex.sponge.gui.plugins.PluginController;
-import java.awt.event.ActionEvent;
+import java.awt.BorderLayout;
 import java.util.Enumeration;
-import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
-import javax.swing.Action;
 import javax.swing.JFrame;
 import org.apache.log4j.Logger;
 
@@ -24,16 +22,20 @@ import org.apache.log4j.Logger;
  */
 public class SpongeGUI extends javax.swing.JFrame {
 
+  private final SpongeGUIController controller;
   private HelpManager helper;
   private static final Logger log = Logger.getLogger(SpongeGUI.class);  
 
   /** Creates new form SpongeGUI */
   public SpongeGUI(final SpongeGUIController controller, final PluginController pluginController) {
+    this.controller = controller;
     this.helper = new HelpManager(this);
 
     initComponents();
 
     setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+    this.add(new SpongeSessionPanel(this, controller, pluginController), BorderLayout.CENTER);
   }
 
   public void updateSelectedMode(final SpongeGUIController controller) {
@@ -47,17 +49,6 @@ public class SpongeGUI extends javax.swing.JFrame {
     }
   }
 
-  private Action getLoadSessionAction() {
-    return new AbstractAction() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        controller.getLoadAction().actionPerformed(e);
-        updateSelectedMode(controller);
-      }
-    };
-  }
-
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
@@ -69,21 +60,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     modeButtonGroup = new javax.swing.ButtonGroup();
     menuBar = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
-    loadMenuItem = new javax.swing.JMenuItem();
-    saveMenuItem = new javax.swing.JMenuItem();
-    saveAsMenuItem = new javax.swing.JMenuItem();
     serverMenu = new javax.swing.JMenu();
-    startServerMenuItem = new javax.swing.JMenuItem();
-    startServerMenuItem.setAction(controller.getStartServerAction());
-    stopServerMenuItem = new javax.swing.JMenuItem();
-    stopServerMenuItem.setAction(controller.getStopServerAction());
-    configureMenuItem = new javax.swing.JMenuItem();
-    configureMenuItem.setAction(controller.getConfigureAction());
-    modeMenu = new javax.swing.JMenu();
-    forwardAllMenuItem = new javax.swing.JRadioButtonMenuItem();
-    replayOrForwardMenuItem = new javax.swing.JRadioButtonMenuItem();
-    replayOrFailMenuItem = new javax.swing.JRadioButtonMenuItem();
-    pluginMenu = new javax.swing.JMenu();
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
     replMenuItem.setAction(controller.getStartReplAction());
@@ -95,79 +72,10 @@ public class SpongeGUI extends javax.swing.JFrame {
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
     jMenu1.setText("File");
-
-    loadMenuItem.setAction(getLoadSessionAction());
-    loadMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
-    loadMenuItem.setText("Load Session...");
-    jMenu1.add(loadMenuItem);
-
-    saveMenuItem.setAction(controller.getSaveAction());
-    saveMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
-    saveMenuItem.setText("Save Session");
-    jMenu1.add(saveMenuItem);
-
-    saveAsMenuItem.setAction(controller.getSaveAsAction());
-    saveAsMenuItem.setText("Save Session As...");
-    jMenu1.add(saveAsMenuItem);
-
     menuBar.add(jMenu1);
 
     serverMenu.setText("Server");
-
-    startServerMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, java.awt.event.InputEvent.CTRL_MASK));
-    startServerMenuItem.setText("Start Server");
-    serverMenu.add(startServerMenuItem);
-
-    stopServerMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
-    stopServerMenuItem.setText("Stop Server");
-    serverMenu.add(stopServerMenuItem);
-
-    configureMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_PERIOD, java.awt.event.InputEvent.CTRL_MASK));
-    configureMenuItem.setText("Configure...");
-    serverMenu.add(configureMenuItem);
-
     menuBar.add(serverMenu);
-
-    modeMenu.setText("Mode");
-
-    forwardAllMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_1, java.awt.event.InputEvent.CTRL_MASK));
-    modeButtonGroup.add(forwardAllMenuItem);
-    forwardAllMenuItem.setSelected(true);
-    forwardAllMenuItem.setText("Forward All");
-    forwardAllMenuItem.setActionCommand(SpongeGUIController.FORWARD_ALL);
-    forwardAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        modeSelected(evt);
-      }
-    });
-    modeMenu.add(forwardAllMenuItem);
-
-    replayOrForwardMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_2, java.awt.event.InputEvent.CTRL_MASK));
-    modeButtonGroup.add(replayOrForwardMenuItem);
-    replayOrForwardMenuItem.setText("Replay or Forward");
-    replayOrForwardMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_FORWARD);
-    replayOrForwardMenuItem.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        replayOrForwardMenuItemActionPerformed(evt);
-      }
-    });
-    modeMenu.add(replayOrForwardMenuItem);
-
-    replayOrFailMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_3, java.awt.event.InputEvent.CTRL_MASK));
-    modeButtonGroup.add(replayOrFailMenuItem);
-    replayOrFailMenuItem.setText("Replay or Fail");
-    replayOrFailMenuItem.setActionCommand(SpongeGUIController.REPLAY_OR_FAIL);
-    replayOrFailMenuItem.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent evt) {
-        replayOrFailMenuItemActionPerformed(evt);
-      }
-    });
-    modeMenu.add(replayOrFailMenuItem);
-
-    menuBar.add(modeMenu);
-
-    pluginMenu.setText("Plugins");
-    menuBar.add(pluginMenu);
 
     replMenu.setText("REPL");
 
@@ -200,31 +108,8 @@ public class SpongeGUI extends javax.swing.JFrame {
 
     setJMenuBar(menuBar);
 
-    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-    getContentPane().setLayout(layout);
-    layout.setHorizontalGroup(
-      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 802, Short.MAX_VALUE)
-    );
-    layout.setVerticalGroup(
-      layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-      .addGap(0, 578, Short.MAX_VALUE)
-    );
-
     pack();
   }// </editor-fold>//GEN-END:initComponents
-
-    private void modeSelected(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modeSelected
-      controller.setMode(modeButtonGroup.getSelection().getActionCommand());
-    }//GEN-LAST:event_modeSelected
-
-    private void replayOrForwardMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrForwardMenuItemActionPerformed
-      modeSelected(evt);
-    }//GEN-LAST:event_replayOrForwardMenuItemActionPerformed
-
-    private void replayOrFailMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replayOrFailMenuItemActionPerformed
-      modeSelected(evt);
-    }//GEN-LAST:event_replayOrFailMenuItemActionPerformed
 
     private void aboutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutMenuItemActionPerformed
       AboutDialog ad = new AboutDialog(this, true);
@@ -233,25 +118,14 @@ public class SpongeGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_aboutMenuItemActionPerformed
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem aboutMenuItem;
-  private javax.swing.JMenuItem configureMenuItem;
-  private javax.swing.JRadioButtonMenuItem forwardAllMenuItem;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenu jMenu2;
   private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JMenuItem keyboardShortcutsHelp;
-  private javax.swing.JMenuItem loadMenuItem;
   private javax.swing.JMenuBar menuBar;
   private javax.swing.ButtonGroup modeButtonGroup;
-  private javax.swing.JMenu modeMenu;
-  private javax.swing.JMenu pluginMenu;
   private javax.swing.JMenu replMenu;
   private javax.swing.JMenuItem replMenuItem;
-  private javax.swing.JRadioButtonMenuItem replayOrFailMenuItem;
-  private javax.swing.JRadioButtonMenuItem replayOrForwardMenuItem;
-  private javax.swing.JMenuItem saveAsMenuItem;
-  private javax.swing.JMenuItem saveMenuItem;
   private javax.swing.JMenu serverMenu;
-  private javax.swing.JMenuItem startServerMenuItem;
-  private javax.swing.JMenuItem stopServerMenuItem;
   // End of variables declaration//GEN-END:variables
 }

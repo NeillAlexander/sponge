@@ -150,6 +150,17 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     });
   }
 
+  private Action getLoadSessionAction() {
+    return new AbstractAction() {
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        controller.getLoadAction().actionPerformed(e);
+        parent.updateSelectedMode(controller);
+      }
+    };
+  }
+
   private Action getWrappedDeleteAction() {
     final Action deleteRowAction = controller.getDeleteRowAction((JXTable) exchangeTable);
 
