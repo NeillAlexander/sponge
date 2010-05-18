@@ -16,17 +16,16 @@ import com.nwalex.sponge.plugin.Plugin;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Enumeration;
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.InputMap;
-import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -48,11 +47,9 @@ import org.jdesktop.swingx.decorator.PatternPredicate;
 public class SpongeSessionPanel extends javax.swing.JPanel {
 
   private static final Logger log = Logger.getLogger(SpongeSessionPanel.class);
-
   private final SpongeGUIController controller;
   private final FindDialogController findController;
   private final SpongeGUI parent;
-
   private int rowSelectedBeforeDelete = -1;
 
   public SpongeSessionPanel(final SpongeGUI parent, final SpongeGUIController controller, final PluginController pluginController) {
@@ -62,6 +59,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
 
     initComponents();
     initPlugins(pluginController);
+    initModeSelector();
 
     // set up the key handlers
     exchangeTable.getActionMap().put("LABEL_EX", controller.getLabelExchangeAction((JXTable) exchangeTable));
@@ -153,19 +151,29 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     });
   }
 
-  void updateSelectedMode(final SpongeGUIController controller) {
-    // set the mode
-    Enumeration<AbstractButton> en = modeButtonGroup.getElements();
-    while (en.hasMoreElements()) {
-      AbstractButton button = en.nextElement();
-      if (button.getActionCommand().equals(controller.getMode())) {
-        modeButtonGroup.setSelected(button.getModel(), true);
+  private void initModeSelector() {
+    modeSelector.removeAllItems();
+    modeSelector.addItem(SpongeGUIController.FORWARD_ALL);
+    modeSelector.addItem(SpongeGUIController.REPLAY_OR_FORWARD);
+    updateSelectedMode(controller);
+
+    modeSelector.addItemListener(new ItemListener() {
+      @Override
+      public void itemStateChanged(ItemEvent evt) {
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+          controller.setMode((String) evt.getItem());
+        }
       }
-    }
+    });
+  }
+
+  void updateSelectedMode(final SpongeGUIController controller) {
+    modeSelector.setSelectedItem(controller.getMode());
   }
 
   private Action getLoadSessionAction() {
     return new AbstractAction() {
+
       @Override
       public void actionPerformed(ActionEvent e) {
         controller.getLoadAction().actionPerformed(e);
@@ -398,7 +406,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
       jButton2.setText("Stop Server");
       jPanel1.add(jButton2);
 
-      modeSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+      modeSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Modes" }));
       jPanel1.add(modeSelector);
 
       pluginSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -422,12 +430,11 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
       layout.setVerticalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-          .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
+          .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
           .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
       );
     }// </editor-fold>//GEN-END:initComponents
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem attachLabelItem;
   private javax.swing.JLabel configLabel;
