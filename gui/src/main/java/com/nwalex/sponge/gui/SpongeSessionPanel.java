@@ -21,7 +21,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Enumeration;
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
@@ -103,7 +105,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
             new PatternPredicate("R", 7),
             new Color(213, 234, 212), Color.BLACK));
 
-    parent.updateSelectedMode(controller);
+    updateSelectedMode(controller);
 
     // set up listener to update display panels when data changes
     exchangeTable.getModel().addTableModelListener(new TableModelListener() {
@@ -150,13 +152,23 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     });
   }
 
+  void updateSelectedMode(final SpongeGUIController controller) {
+    // set the mode
+    Enumeration<AbstractButton> en = modeButtonGroup.getElements();
+    while (en.hasMoreElements()) {
+      AbstractButton button = en.nextElement();
+      if (button.getActionCommand().equals(controller.getMode())) {
+        modeButtonGroup.setSelected(button.getModel(), true);
+      }
+    }
+  }
+
   private Action getLoadSessionAction() {
     return new AbstractAction() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         controller.getLoadAction().actionPerformed(e);
-        parent.updateSelectedMode(controller);
+        updateSelectedMode(controller);
       }
     };
   }
@@ -273,6 +285,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     duplicate = new javax.swing.JMenuItem();
     jSeparator1 = new javax.swing.JPopupMenu.Separator();
     delete = new javax.swing.JMenuItem();
+    modeButtonGroup = new javax.swing.ButtonGroup();
     jSplitPane1 = new javax.swing.JSplitPane();
     jScrollPane2 = new javax.swing.JScrollPane();
     exchangeTable = createExchangeTable();
@@ -287,7 +300,9 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     saveButton = new javax.swing.JButton();
     jPanel4 = new javax.swing.JPanel();
     jPanel2 = new javax.swing.JPanel();
+    modeSelector = new javax.swing.JComboBox();
     startStopServerButton = new javax.swing.JButton();
+    jButton1 = new javax.swing.JButton();
     pluginSelector = new javax.swing.JComboBox();
 
     attachLabelItem.setAction(controller.getLabelExchangeAction((JXTable) exchangeTable));
@@ -364,6 +379,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
 
       jSplitPane1.setBottomComponent(jSplitPane2);
 
+      loadButton.setAction(getLoadSessionAction());
       loadButton.setText("Load Session...");
       jPanel1.add(loadButton);
 
@@ -387,8 +403,15 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
           .addContainerGap())
       );
 
+      modeSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+      jPanel2.add(modeSelector);
+
       startStopServerButton.setText("Start Server");
       jPanel2.add(startStopServerButton);
+
+      jButton1.setAction(controller.getConfigureAction());
+      jButton1.setText("Configure...");
+      jPanel2.add(jButton1);
 
       pluginSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
       jPanel2.add(pluginSelector);
@@ -423,11 +446,11 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
       layout.setVerticalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-          .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 589, Short.MAX_VALUE)
+          .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
           .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)))
       );
 
       layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jPanel3, jPanel4});
@@ -440,6 +463,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
   private javax.swing.JMenuItem deleteLabelItem;
   private javax.swing.JMenuItem duplicate;
   private javax.swing.JTable exchangeTable;
+  private javax.swing.JButton jButton1;
   private javax.swing.JPanel jPanel1;
   private javax.swing.JPanel jPanel2;
   private javax.swing.JPanel jPanel3;
@@ -449,6 +473,8 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
   private javax.swing.JSplitPane jSplitPane1;
   private javax.swing.JSplitPane jSplitPane2;
   private javax.swing.JButton loadButton;
+  private javax.swing.ButtonGroup modeButtonGroup;
+  private javax.swing.JComboBox modeSelector;
   private javax.swing.JComboBox pluginSelector;
   private com.nwalex.sponge.gui.BodyPanel requestPanel;
   private javax.swing.JMenuItem resendRequestItem;

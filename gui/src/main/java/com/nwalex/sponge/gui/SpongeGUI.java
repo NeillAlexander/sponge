@@ -11,8 +11,8 @@ package com.nwalex.sponge.gui;
 
 import com.nwalex.sponge.gui.plugins.PluginController;
 import java.awt.BorderLayout;
-import java.util.Enumeration;
-import javax.swing.AbstractButton;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JFrame;
 import org.apache.log4j.Logger;
 
@@ -24,7 +24,10 @@ public class SpongeGUI extends javax.swing.JFrame {
 
   private final SpongeGUIController controller;
   private HelpManager helper;
-  private static final Logger log = Logger.getLogger(SpongeGUI.class);  
+  private static final Logger log = Logger.getLogger(SpongeGUI.class);
+
+  private Map<SpongeGUIController, SpongeSessionPanel> sessionMap =
+          new HashMap<SpongeGUIController, SpongeSessionPanel>();
 
   /** Creates new form SpongeGUI */
   public SpongeGUI(final SpongeGUIController controller, final PluginController pluginController) {
@@ -35,17 +38,15 @@ public class SpongeGUI extends javax.swing.JFrame {
 
     setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-    this.add(new SpongeSessionPanel(this, controller, pluginController), BorderLayout.CENTER);
+    sessionMap.put(controller, new SpongeSessionPanel(this, controller, pluginController));
+    this.add(sessionMap.get(controller), BorderLayout.CENTER);
   }
 
   public void updateSelectedMode(final SpongeGUIController controller) {
-    // set the mode
-    Enumeration<AbstractButton> en = modeButtonGroup.getElements();
-    while (en.hasMoreElements()) {
-      AbstractButton button = en.nextElement();
-      if (button.getActionCommand().equals(controller.getMode())) {
-        modeButtonGroup.setSelected(button.getModel(), true);
-      }
+    if (sessionMap.containsKey(controller)) {
+      sessionMap.get(controller).updateSelectedMode(controller);
+    } else {
+      log.warn("updateSelectedMode called for " + controller + " but I don't have a reference to it!");
     }
   }
 
@@ -57,7 +58,6 @@ public class SpongeGUI extends javax.swing.JFrame {
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
-    modeButtonGroup = new javax.swing.ButtonGroup();
     menuBar = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     serverMenu = new javax.swing.JMenu();
@@ -123,7 +123,6 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenuItem jMenuItem1;
   private javax.swing.JMenuItem keyboardShortcutsHelp;
   private javax.swing.JMenuBar menuBar;
-  private javax.swing.ButtonGroup modeButtonGroup;
   private javax.swing.JMenu replMenu;
   private javax.swing.JMenuItem replMenuItem;
   private javax.swing.JMenu serverMenu;
