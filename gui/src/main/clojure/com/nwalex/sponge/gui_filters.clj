@@ -87,17 +87,18 @@
 
 (defn reload-filters [session]
   (log/info "Reloading filters...")
-  (if (server/running? (state/current-server))
-    (do
-      (server/update-request-filters (state/current-server)
-                                     (get-request-filters-for-mode
-                                      session (state/get-mode)))
-      (server/update-response-filters (state/current-server)
-                                      (get-response-filters-for-mode
-                                       session (state/get-mode))))))
+  (let [current-server (state/current-server session)]
+    (if (server/running? current-server)
+      (do
+        (server/update-request-filters current-server
+                                       (get-request-filters-for-mode
+                                        session (state/get-mode session)))
+        (server/update-response-filters current-server
+                                        (get-response-filters-for-mode
+                                         session (state/get-mode session)))))))
 
 (defn set-mode [session mode]  
-  (state/set-mode! mode)
+  (state/set-mode! session mode)
   (reload-filters session))
 
 (defn- build-response [exchange phase key body]

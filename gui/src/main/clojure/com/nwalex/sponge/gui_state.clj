@@ -11,65 +11,58 @@
    [com.nwalex.sponge.server :as server]
    [clojure.contrib.logging :as log]))
 
-;; the currently running server
-(def #^{:private true} repl-running (atom false))
-(def #^{:private true} current-server-store (atom nil))
-(def #^{:private true} gui-frame-store (atom nil))
-(def #^{:private true} port-store (ref 8139))
-(def #^{:private true} target-store (ref "http://services.aonaware.com"))
-(def #^{:private true}
-     mode (atom
-           com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD))
+(defn gui [session] @(:gui-frame-store session))
 
-(defn gui [] @gui-frame-store)
+(defn get-mode [session]
+  @(:mode session))
 
-(defn get-mode []
-  @mode)
-
-(defn- set-title []
+(defn- set-title [session]
   (.setTitle
-   (gui)
+   (gui session)
    (format "Sponge  [%s]  [http://localhost:%s --> %s]  [%s]  [%s]"
-           (if (server/running? @current-server-store) "Running" "Stopped")
-           @port-store @target-store (get-mode)           
-           (if @repl-running "REPL" ""))))
+           (if (server/running? @(:current-server-store session)) "Running" "Stopped")
+           @(:port-store session) @(:target-store session) (get-mode session)
+           (if @(:repl-running session) "REPL" ""))))
 
-(defn set-config! [port target]
+(defn set-config! [session port target]
   (log/info (format "Setting server config to: port = %s, target = %s" port target))
   ;; force a quick exception if the values are invalid
   (java.net.URL. target)     
   (dosync
-   (ref-set port-store (if (integer? port) port (Integer/parseInt port)))
-   (ref-set target-store target)
-   (set-title)))
+   (ref-set (:port-store session) (if (integer? port) port (Integer/parseInt port)))
+   (ref-set (:target-store session) target)
+   (set-title session)))
 
-(defn set-mode! [new-mode]
+(defn set-mode! [session new-mode]
   (log/info (format "Setting mode to \"%s\"" new-mode))
-  (compare-and-set! mode @mode new-mode)
-  (set-title))
+  (compare-and-set! (:mode session) @(:mode session) new-mode)
+  (set-title session))
 
-(defn load-from-persistence-map! [persistence-map]
-  (set-config! (:port persistence-map) (:target persistence-map))
-  (set-mode! (:mode persistence-map)))
+(defn load-from-persistence-map! [session persistence-map]
+  (set-config! session (:port persistence-map) (:target persistence-map))
+  (set-mode! session (:mode persistence-map)))
 
-(defn get-persistence-map []
-  {:port @port-store :target @target-store :mode @mode})
+(defn get-persistence-map [session]
+  {:port @(:port-store session) :target
+   @(:target-store session) :mode @(:mode session)})
 
-(defn set-gui! [gui]
-  (compare-and-set! gui-frame-store @gui-frame-store gui)
-  (set-title)
-  gui)
+(defn set-gui! [session gui]
+  (let [gui-frame-store (:gui-frame-store session)]
+    (compare-and-set! gui-frame-store @gui-frame-store gui)
+    (set-title session)
+    gui))
 
-(defn set-current-server! [server]
-  (compare-and-set! current-server-store @current-server-store server)
-  (set-title))
+(defn set-current-server! [session server]
+  (compare-and-set! (:current-server-store session)
+                    @(:current-server-store session) server)
+  (set-title session))
 
-(defn current-server []
-  @current-server-store)
+(defn current-server [session]
+  @(:current-server-store session))
 
-(defn config []
-  {:port @port-store :target @target-store})
+(defn config [session]
+  {:port @(:port-store session) :target @(:target-store session)})
 
-(defn repl-started! []
-  (reset! repl-running true)
-  (set-title))
+(defn repl-started! [session]
+  (reset! (:repl-running session) true)
+  (set-title session))

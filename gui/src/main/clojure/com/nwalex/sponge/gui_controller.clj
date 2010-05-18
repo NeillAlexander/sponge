@@ -33,10 +33,10 @@
                            (f event)))
     (.setEnabled enabled)))
 
-(defn- make-safe-action [name f enabled]
+(defn- make-safe-action [session name f enabled]
   (com.nwalex.sponge.gui.SafeAction.
    (make-action name f enabled)
-   (state/gui)))
+   (state/gui session)))
 
 (defn- make-multi-row-action [f table]
   (proxy [com.nwalex.sponge.gui.JXTableMultiRowAction] [table]
@@ -61,28 +61,29 @@
     (toggle-action (:load action-map))))
 
 (defn- stop-server [session event]  
-  (server/stop (state/current-server))
+  (server/stop (state/current-server session))
   (toggle-started session)
-  (state/set-current-server! nil))
+  (state/set-current-server! session nil))
 
 (defn- start-server [session event]
-  (let [config (state/config)]
-    (state/set-current-server! (server/start
+  (let [config (state/config session)]
+    (state/set-current-server! session
+                               (server/start
                                 (server/make-server
                                  (:port config)
                                  (:target config)
                                  :request-filters
                                  (filters/get-request-filters-for-mode
-                                  session (state/get-mode))
+                                  session (state/get-mode session))
                                  :response-filters
                                  (filters/get-response-filters-for-mode
-                                  session (state/get-mode))))))
+                                  session (state/get-mode session))))))
   (toggle-started session))
 
 (defn- start-repl [session event]
   (let [action-map (session/action-map session)]
     (toggle-action (:start-repl action-map))
-    (state/repl-started!)
+    (state/repl-started! session)
     (future   
      (core/start-repl 4006))))
 
@@ -91,7 +92,7 @@
 
 (defn- resend-request [session row]
   (let [exchange (model/get-exchange-for-row session row)]
-    (future (server/resend-request exchange (state/current-server))))
+    (future (server/resend-request exchange (state/current-server session))))
   0)
 
 (defn- resend-all-requests [session rows]
@@ -104,17 +105,21 @@
 (defn action-map-fn
   "Designed to be called as a partial to bake in the session"
   [session]
-  {:start-server (make-safe-action "Start Server" (partial start-server session) true)
-   :stop-server (make-safe-action "Stop Server" (partial stop-server session) false)
-   :configure (make-safe-action "Configure" (partial config/configure session) true)
-   :exit (make-safe-action "Exit" exit true)
-   :start-repl (make-safe-action "Start Repl" (partial start-repl session) true)
-   :load (make-safe-action "Load Session..."
+  {:start-server (make-safe-action session
+                                   "Start Server" (partial start-server session) true)
+   :stop-server (make-safe-action session
+                                  "Stop Server" (partial stop-server session) false)
+   :configure (make-safe-action session
+                                "Configure" (partial config/configure session) true)
+   :exit (make-safe-action session "Exit" exit true)
+   :start-repl (make-safe-action session "Start Repl" (partial start-repl session) true)
+   :load (make-safe-action session "Load Session..."
                            #(wrap-session-action session
                                                  (partial session/load-session! session)
                                                  %1) true)
-   :save (make-safe-action "Save Session" (partial session/save-session session) false)
-   :save-as (make-safe-action "Save Session As..."
+   :save (make-safe-action session
+                           "Save Session" (partial session/save-session session) false)
+   :save-as (make-safe-action session "Save Session As..."
                               #(wrap-session-action
                                 session
                                 (partial session/save-session-as session) %1)
@@ -139,7 +144,7 @@
     (setEnabled [enabled] (proxy-super setEnabled
                                        (and enabled
                                             (server/running?
-                                             (state/current-server)))))))
+                                             (state/current-server session)))))))
 
 (defn- save-body-action [session key table]
   (proxy [com.nwalex.sponge.gui.BodyPanel$SaveAction] [table]
@@ -178,7 +183,7 @@
                                     (make-multi-row-action
                                      (partial model/set-as-default-response! session)
                                      table))
-       (getMode [] (state/get-mode))
+       (getMode [] (state/get-mode session))
        (setMode [mode] (filters/set-mode session mode))
        (getDeleteRowAction [table] (make-multi-row-action
                                     (partial model/delete-rows! session) table))
@@ -229,7 +234,7 @@
   (try
    (let [config-props (load-config-files)]
      (load-session session config-props)
-     (state/set-config!
+     (state/set-config! session
       (.getProperty config-props
                     "sponge.default.port" "8139")
       (.getProperty config-props
@@ -240,8 +245,8 @@
 (defn- store-last-session-properties [session]
   (log/info "Storing properties prior to shutdown")
   (util/write-properties
-   {"sponge.default.port" ((state/config) :port)
-    "sponge.default.target" ((state/config) :target)
+   {"sponge.default.port" ((state/config session) :port)
+    "sponge.default.target" ((state/config session) :target)
     "sponge.last.session" (session/get-session-file session)}
    (format "%s/config/last.sponge.properties" (System/getProperty "sponge.home"))))
 
@@ -258,10 +263,10 @@
     (session/init-table-model! session
                               (model/make-exchange-table-model session))
     (swing/do-swing
-     (state/set-gui!
+     (state/set-gui! session
       (com.nwalex.sponge.gui.SpongeGUI. gui-controller
                                         (filters/make-plugin-controller session)))
      (load-config! session)
-     (.updateSelectedMode (state/gui) gui-controller)
+     (.updateSelectedMode (state/gui session) gui-controller)
      (create-shutdown-hook! session)
-     (.setVisible (state/gui) true))))
+     (.setVisible (state/gui session) true))))

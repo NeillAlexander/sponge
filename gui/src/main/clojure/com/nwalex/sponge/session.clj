@@ -36,7 +36,13 @@
    :active-data-id-store (ref [])
    :exchange-store (ref {})
    :next-exchange-id (ref (java.util.concurrent.atomic.AtomicLong.))
-   :replay-count (ref {})})
+   :replay-count (ref {})
+   :repl-running (atom false)
+   :current-server-store (atom nil)
+   :gui-frame-store (atom nil)
+   :port-store (ref 8139)
+   :target-store (ref "http://services.aonaware.com")
+   :mode (atom com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD)})
 
 ;;----------------------------------------------------
 
@@ -94,7 +100,7 @@
                       (io/reader (java.util.zip.GZIPInputStream.
                                   (java.io.FileInputStream. file))))]
         (let [persistence-map (read in)]          
-          (state/load-from-persistence-map! (:gui-state persistence-map))
+          (state/load-from-persistence-map! session (:gui-state persistence-map))
           (model/load-from-persistence-map! session (:table-model persistence-map))
           (exchange/load-from-persistence-map! session (:exchange persistence-map))
           (update-session-file! session file))))
@@ -108,7 +114,7 @@
 (defn- save-session-to-file [session file]
   (if file
     (let [persistence-map (assoc {}
-                            :gui-state (state/get-persistence-map)
+                            :gui-state (state/get-persistence-map session)
                             :table-model (model/get-persistence-map session)
                             :exchange (exchange/get-persistence-map session))]
       (log/info (format "Ready to save in file %s" file))

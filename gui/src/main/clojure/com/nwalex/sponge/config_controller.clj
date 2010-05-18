@@ -12,13 +12,13 @@
 
 (defn- new-controller [session]
   (proxy [com.nwalex.sponge.gui.ConfigurationDialogController] []
-    (setConfiguration [port target] (state/set-config! port target))
-    (getCurrentPort [] (:port (state/config)))
-    (getCurrentTarget [] (:target (state/config)))))
+    (setConfiguration [port target] (state/set-config! session port target))
+    (getCurrentPort [] (:port (state/config session)))
+    (getCurrentTarget [] (:target (state/config session)))))
 
 (defn configure [session event]
-  (doto (com.nwalex.sponge.gui.ConfigurationDialog. (state/gui)
+  (doto (com.nwalex.sponge.gui.ConfigurationDialog. (state/gui session)
                                                     true
                                                     (new-controller session))
-    (.setLocationRelativeTo (state/gui))
+    (.setLocationRelativeTo (state/gui session))
     (.setVisible true)))
