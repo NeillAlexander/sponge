@@ -267,6 +267,9 @@
             </Component>
             <Component class="javax.swing.JButton" name="startStopServerButton">
               <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new SwitchAction(controller.getStartServerAction(), &quot;Start Server&quot;, controller.getStopServerAction(), &quot;Stop Server&quot;, startStopServerButton)" type="code"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Start Server"/>
               </Properties>
             </Component>

@@ -26,6 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.InputMap;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -268,6 +269,54 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     }
   }
 
+  static final class SwitchAction extends AbstractAction {
+
+    private final Action first, other;
+    private final String firstText, otherText;
+    private Action activeAction;
+    private final JButton button;
+
+    SwitchAction(Action first, String firstText, Action other, String otherText, JButton button) {
+      this.first = first;
+      this.other = other;
+      this.firstText = firstText;
+      this.otherText = otherText;
+      this.button = button;
+      this.activeAction = first;
+      this.setEnabled(first.isEnabled());
+
+      initListener(first);
+      initListener(other);
+    }
+
+    private void initListener(Action action) {
+      action.addPropertyChangeListener(new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          if (evt.getPropertyName().equals("enabled")) {
+            SwitchAction.this.setEnabled((Boolean ) evt.getNewValue());
+          }
+        }
+      });
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      activeAction.actionPerformed(e);
+      if (activeAction.equals(first)) {
+        activeAction = other;
+        activeAction.setEnabled(other.isEnabled());
+        button.setText(otherText);
+      } else {
+        activeAction = first;
+        activeAction.setEnabled(first.isEnabled());
+        button.setText(firstText);
+      }
+
+      this.setEnabled(activeAction.isEnabled());
+    }
+  }
+
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
@@ -406,6 +455,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
       modeSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
       jPanel2.add(modeSelector);
 
+      startStopServerButton.setAction(new SwitchAction(controller.getStartServerAction(), "Start Server", controller.getStopServerAction(), "Stop Server", startStopServerButton));
       startStopServerButton.setText("Start Server");
       jPanel2.add(startStopServerButton);
 
