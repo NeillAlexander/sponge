@@ -269,52 +269,8 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     }
   }
 
-  static final class SwitchAction extends AbstractAction {
-
-    private final Action first, other;
-    private final String firstText, otherText;
-    private Action activeAction;
-    private final JButton button;
-
-    SwitchAction(Action first, String firstText, Action other, String otherText, JButton button) {
-      this.first = first;
-      this.other = other;
-      this.firstText = firstText;
-      this.otherText = otherText;
-      this.button = button;
-      this.activeAction = first;
-      this.setEnabled(first.isEnabled());
-
-      initListener(first);
-      initListener(other);
-    }
-
-    private void initListener(Action action) {
-      action.addPropertyChangeListener(new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-          if (evt.getPropertyName().equals("enabled")) {
-            SwitchAction.this.setEnabled((Boolean ) evt.getNewValue());
-          }
-        }
-      });
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      activeAction.actionPerformed(e);
-      if (activeAction.equals(first)) {
-        activeAction = other;
-        activeAction.setEnabled(other.isEnabled());
-        button.setText(otherText);
-      } else {
-        activeAction = first;
-        activeAction.setEnabled(first.isEnabled());
-        button.setText(firstText);
-      }
-
-      this.setEnabled(activeAction.isEnabled());
-    }
+  void setSessionInfo(String text) {
+    configLabel.setText(text);
   }
 
   /** This method is called from within the constructor to
@@ -343,16 +299,15 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     jSplitPane2 = new javax.swing.JSplitPane();
     requestPanel = new BodyPanel(controller.getUpdateRequestBodyAction((JXTable) exchangeTable));
     responsePanel = new BodyPanel(controller.getUpdateResponseBodyAction((JXTable) exchangeTable));
-    jPanel3 = new javax.swing.JPanel();
     jPanel1 = new javax.swing.JPanel();
+    configLabel = new javax.swing.JLabel();
+    jButton1 = new javax.swing.JButton();
+    startStopServerButton = new javax.swing.JButton();
+    jButton2 = new javax.swing.JButton();
+    modeSelector = new javax.swing.JComboBox();
+    pluginSelector = new javax.swing.JComboBox();
     loadButton = new javax.swing.JButton();
     saveButton = new javax.swing.JButton();
-    jPanel4 = new javax.swing.JPanel();
-    jPanel2 = new javax.swing.JPanel();
-    modeSelector = new javax.swing.JComboBox();
-    startStopServerButton = new javax.swing.JButton();
-    jButton1 = new javax.swing.JButton();
-    pluginSelector = new javax.swing.JComboBox();
 
     attachLabelItem.setAction(controller.getLabelExchangeAction((JXTable) exchangeTable));
     attachLabelItem.setText("Label...");
@@ -428,69 +383,40 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
 
       jSplitPane1.setBottomComponent(jSplitPane2);
 
+      configLabel.setText("Configuration info to go here...");
+      jPanel1.add(configLabel);
+
+      jButton1.setAction(controller.getConfigureAction());
+      jButton1.setText("Configure...");
+      jPanel1.add(jButton1);
+
+      startStopServerButton.setAction(controller.getStartServerAction());
+      startStopServerButton.setText("Start Server");
+      jPanel1.add(startStopServerButton);
+
+      jButton2.setAction(controller.getStopServerAction());
+      jButton2.setText("Stop Server");
+      jPanel1.add(jButton2);
+
+      modeSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+      jPanel1.add(modeSelector);
+
+      pluginSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+      jPanel1.add(pluginSelector);
+
       loadButton.setAction(getLoadSessionAction());
       loadButton.setText("Load Session...");
       jPanel1.add(loadButton);
 
+      saveButton.setAction(controller.getSaveAsAction());
       saveButton.setText("Save Session As...");
       jPanel1.add(saveButton);
-
-      javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-      jPanel3.setLayout(jPanel3Layout);
-      jPanel3Layout.setHorizontalGroup(
-        jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addGroup(jPanel3Layout.createSequentialGroup()
-          .addContainerGap()
-          .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
-          .addContainerGap())
-      );
-      jPanel3Layout.setVerticalGroup(
-        jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addGroup(jPanel3Layout.createSequentialGroup()
-          .addContainerGap()
-          .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addContainerGap())
-      );
-
-      modeSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-      jPanel2.add(modeSelector);
-
-      startStopServerButton.setAction(new SwitchAction(controller.getStartServerAction(), "Start Server", controller.getStopServerAction(), "Stop Server", startStopServerButton));
-      startStopServerButton.setText("Start Server");
-      jPanel2.add(startStopServerButton);
-
-      jButton1.setAction(controller.getConfigureAction());
-      jButton1.setText("Configure...");
-      jPanel2.add(jButton1);
-
-      pluginSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-      jPanel2.add(pluginSelector);
-
-      javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-      jPanel4.setLayout(jPanel4Layout);
-      jPanel4Layout.setHorizontalGroup(
-        jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addGroup(jPanel4Layout.createSequentialGroup()
-          .addContainerGap()
-          .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
-          .addContainerGap())
-      );
-      jPanel4Layout.setVerticalGroup(
-        jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addGroup(jPanel4Layout.createSequentialGroup()
-          .addContainerGap()
-          .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-          .addContainerGap())
-      );
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
       this.setLayout(layout);
       layout.setHorizontalGroup(
         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-        .addGroup(layout.createSequentialGroup()
-          .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-          .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-          .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 934, Short.MAX_VALUE)
         .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 934, Short.MAX_VALUE)
       );
       layout.setVerticalGroup(
@@ -498,26 +424,20 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
           .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 587, Short.MAX_VALUE)
           .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-          .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)))
+          .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
       );
-
-      layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jPanel3, jPanel4});
-
     }// </editor-fold>//GEN-END:initComponents
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem attachLabelItem;
+  private javax.swing.JLabel configLabel;
   private javax.swing.JMenuItem delete;
   private javax.swing.JMenuItem deleteLabelItem;
   private javax.swing.JMenuItem duplicate;
   private javax.swing.JTable exchangeTable;
   private javax.swing.JButton jButton1;
+  private javax.swing.JButton jButton2;
   private javax.swing.JPanel jPanel1;
-  private javax.swing.JPanel jPanel2;
-  private javax.swing.JPanel jPanel3;
-  private javax.swing.JPanel jPanel4;
   private javax.swing.JScrollPane jScrollPane2;
   private javax.swing.JPopupMenu.Separator jSeparator1;
   private javax.swing.JSplitPane jSplitPane1;

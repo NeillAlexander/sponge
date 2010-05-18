@@ -19,10 +19,12 @@
 (defn- set-title [session]
   (.setTitle
    (gui session)
-   (format "Sponge  [%s]  [http://localhost:%s --> %s]  [%s]  [%s]"
-           (if (server/running? @(:current-server-store session)) "Running" "Stopped")
-           @(:port-store session) @(:target-store session) (get-mode session)
-           (if @(:repl-running session) "REPL" ""))))
+   (format "Sponge %s"
+           (if @(:repl-running session) "(REPL Running)" "")))
+  (.setSessionInfo
+   (gui session)
+   (format "Port: %s  Target: %s  "           
+           @(:port-store session) @(:target-store session))))
 
 (defn set-config! [session port target]
   (log/info (format "Setting server config to: port = %s, target = %s" port target))

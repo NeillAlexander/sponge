@@ -84,11 +84,12 @@
 (defn- choose-file
   "Launches JFileChooser. Remembers directory of chosen file for next time"
   [session text]
+  (log/info (format "Prompting to choose a file for mode %s" text))
   (let [file-chooser (doto (javax.swing.JFileChooser.)
                        (.setApproveButtonText text)
                        (.setCurrentDirectory
                         (java.io.File. (sessions-dir session))))
-        response (.showOpenDialog file-chooser (state/gui))]
+        response (.showOpenDialog file-chooser (state/gui session))]
     (if (= response javax.swing.JFileChooser/APPROVE_OPTION)
       (do
         (update-sessions-dir! session (.getParent (.getSelectedFile file-chooser)))
@@ -106,6 +107,7 @@
           (update-session-file! session file))))
 
 (defn load-session! [session event]
+  (log/info "Ready to load session...")
   (let [file (choose-file session "Load")]
     (if file
       (load-session-from-file! session file)      

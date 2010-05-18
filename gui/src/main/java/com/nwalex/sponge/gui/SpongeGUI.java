@@ -50,6 +50,14 @@ public class SpongeGUI extends javax.swing.JFrame {
     }
   }
 
+  public void setSessionInfo(String info) {
+    if (sessionMap.containsKey(controller)) {
+      sessionMap.get(controller).setSessionInfo(info);
+    } else {
+      log.warn("setSessionInfo called for " + controller + " but I don't have a reference to it!");
+    }
+  }
+
   /** This method is called from within the constructor to
    * initialize the form.
    * WARNING: Do NOT modify this code. The content of this method is
