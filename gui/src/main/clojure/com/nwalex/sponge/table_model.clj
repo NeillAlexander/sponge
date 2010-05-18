@@ -48,11 +48,11 @@
   (notify-data-changed session))
 
 (defn get-exchange-for-row [session row]
-  (exchange/get-exchange (@(:data-id-store session) row)))
+  (exchange/get-exchange session (@(:data-id-store session) row)))
 
 (defn get-value-at [session exchange-id col]
   ;; see the columns vector above
-  (let [exchange (exchange/get-exchange exchange-id)]    
+  (let [exchange (exchange/get-exchange session exchange-id)]    
     (cond
      (= col 0) (exchange/get-status exchange)     
      (= col 1) (exchange/get-namespace exchange)
@@ -72,16 +72,16 @@
 (defn get-data-for-row
   "Returns the full xml body for the row"
   [session row key]
-  (exchange/get-pretty-printed-body (get-exchange-for-row session row) key))
+  (exchange/get-pretty-printed-body session (get-exchange-for-row session row) key))
 
 (defn- add-entry!
   [session exchange]
   ;; only add the id once (on request)
   (dosync 
-   (if (not (exchange/known? exchange))
+   (if (not (exchange/known? session exchange))
      (commute (:data-id-store session) conj (exchange/get-id exchange)))
    ;; but always update the data store
-   (exchange/save! exchange)))
+   (exchange/save! session exchange)))
 
 (defn- notify-data-changed [session]
   (swing/do-swing
@@ -126,8 +126,8 @@
 (defn add-exchange!
   "Add the exchange represented by map m"
   [session server m key]
-  (let [exchange (exchange/init m key)
-        known? (exchange/known? exchange)
+  (let [exchange (exchange/init session m key)
+        known? (exchange/known? session exchange)
         data-id-store (:data-id-store session)]    
     (add-entry! session exchange)
     (if known?
@@ -138,7 +138,7 @@
 (defn- set-label-on-row [session label row]
   (log/info (format "Setting label on row %d to %s" row label))
   (let [exchange (get-exchange-for-row session row)]
-    (exchange/set-label! exchange label)
+    (exchange/set-label! session exchange label)
     0))
 
 (defn set-label-on-rows! [session label rows]
@@ -150,7 +150,7 @@
   [session text key row]
   (log/info (format "Updating %s body for row %d" key row))
   (let [exchange (get-exchange-for-row session row)]
-    (exchange/update-body! exchange key text)
+    (exchange/update-body! session exchange key text)
     (notify-row-changed session row)))
 
 (defn- get-default-response
@@ -183,7 +183,7 @@
 (defn- duplicate-row!
   [session row]
   (let [exchange (get-exchange-for-row session row)
-        duplicate (exchange/duplicate exchange)
+        duplicate (exchange/duplicate session exchange)
         data-id-store (:data-id-store session)]
     (log/info (format "Duplicating row: %d" row))
     (dosync
@@ -203,9 +203,9 @@
     (log/info (format "Deleting row %d" row))
     (log/info (format "Num rows before delete = %d" (count @data-id-store)))
     (log/info (format "Num exchanges before delete = %d"
-                      (exchange/get-num-exchanges)))    
+                      (exchange/get-num-exchanges session)))    
     (dosync
-     (exchange/delete! exchange)
+     (exchange/delete! session exchange)
      (ref-set data-id-store
               (vec (concat (subvec @data-id-store 0 row)
                            (subvec @data-id-store (inc row)))))
@@ -256,7 +256,7 @@
 (defn replay-response [session exchange]
   (let [response-id (get-default-response session exchange)]
     (if response-id
-      (let [exchange (exchange/get-exchange response-id)]
+      (let [exchange (exchange/get-exchange session response-id)]
         (exchange/inc-replays! exchange)
         (notify-row-changed session 0 (dec (count @(:data-id-store session))))
         (:response exchange)))))

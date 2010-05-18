@@ -33,7 +33,8 @@
    :request-plugins (ref {})
    :response-plugins (ref {})
    :data-id-store (ref [])
-   :active-data-id-store (ref [])})
+   :active-data-id-store (ref [])
+   :exchange-store (ref {})})
 
 ;;----------------------------------------------------
 
@@ -93,7 +94,7 @@
         (let [persistence-map (read in)]          
           (state/load-from-persistence-map! (:gui-state persistence-map))
           (model/load-from-persistence-map! session (:table-model persistence-map))
-          (exchange/load-from-persistence-map! (:exchange persistence-map))
+          (exchange/load-from-persistence-map! session (:exchange persistence-map))
           (update-session-file! session file))))
 
 (defn load-session! [session event]
@@ -107,7 +108,7 @@
     (let [persistence-map (assoc {}
                             :gui-state (state/get-persistence-map)
                             :table-model (model/get-persistence-map session)
-                            :exchange (exchange/get-persistence-map))]
+                            :exchange (exchange/get-persistence-map session))]
       (log/info (format "Ready to save in file %s" file))
       (with-open [out (io/writer (java.io.BufferedOutputStream.
                                   (java.util.zip.GZIPOutputStream.

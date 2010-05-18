@@ -19,7 +19,6 @@
 from the server"
   {:request request-body :response nil})
 
-(def #^{:private true} exchange-store (ref {}))
 (def #^{:private true} next-exchange-id
      (ref (java.util.concurrent.atomic.AtomicLong.)))
 (def #^{:private true} replay-count (ref {}))
@@ -39,8 +38,9 @@ from the server"
 
 (defn init
   "Initialize the exchange from the raw map m"
-  [m key]
-  (let [exchange (assign-id-to m)
+  [session m key]  
+  (let [exchange-store (:exchange-store session)
+        exchange (assign-id-to m)
         data (if (@exchange-store (:id exchange))
                (@exchange-store (:id exchange))               
                (new-data exchange))
@@ -53,7 +53,7 @@ from the server"
 
 (defn save!
   "Update the exchange to be this new value"
-  [exchange]
+  [session exchange]
   ;; there is a bug that led to corrupt data
   ;; in order to track this down ensure there
   ;; is a request for the exchange and throw
@@ -63,32 +63,25 @@ from the server"
       (log/error (format "Corrupt exchange data:\n%s" exchange))
       (throw (RuntimeException. "Uh oh. Corrupt data detected. Abort, abort!"))))
   (dosync
-   (commute exchange-store assoc (:id exchange) exchange))
+   (commute (:exchange-store session) assoc (:id exchange) exchange))
   exchange)
 
-(defn delete-all!
-  "Delete all the stored exchanges"
-  []
-  (dosync
-   (ref-set exchange-store {})
-   (ref-set replay-count {})))
-
 (defn delete!
-  [exchange]
+  [session exchange]
   (log/info (format "Deleting exchange id: %s" (get-id exchange)))
   (dosync
-   (commute exchange-store dissoc (:id exchange))
+   (commute (:exchange-store session) dissoc (:id exchange))
    (commute replay-count dissoc (:id exchange))))
 
 (defn get-exchange
   "Return the exchange with the specified id"
-  [id]
-  (@exchange-store id))
+  [session id]
+  (@(:exchange-store session) id))
 
-(defn duplicate [exchange]
+(defn duplicate [session exchange]
   (let [dup (assign-id-to (dissoc exchange :id))]
-    (save! (assoc dup :num-replays 0))
-    (get-exchange (:id dup))))
+    (save! session (assoc dup :num-replays 0))
+    (get-exchange session (:id dup))))
 
 (defn get-body
   "Key is either :request or :response"
@@ -97,10 +90,11 @@ from the server"
 
 (defn update-body!
   "Update the body of the exchange"
-  [exchange key text]
-  (dosync
-   (commute exchange-store assoc-in [(:id exchange) key :body] text)
-   (commute exchange-store assoc-in [(:id exchange) key :pretty-printed] false)))
+  [session exchange key text]
+  (let [exchange-store (:exchange-store session)]
+    (dosync
+     (commute exchange-store assoc-in [(:id exchange) key :body] text)
+     (commute exchange-store assoc-in [(:id exchange) key :pretty-printed] false))))
 
 (defn get-num-replays [exchange]
   (let [count (replay-count (:id exchange))]
@@ -113,9 +107,9 @@ from the server"
    (commute replay-count assoc (:id exchange) (inc (get-num-replays exchange)))))
 
 (defn set-label!
-  [exchange label]
+  [session exchange label]
   (dosync
-   (commute exchange-store assoc (:id exchange)
+   (commute (:exchange-store session) assoc (:id exchange)
             (assoc exchange :label label))))
 
 (defn get-label [exchange]
@@ -134,23 +128,23 @@ from the server"
    (catch Exception ex
        body)))
 
-(defn pretty-print [exchange key]
+(defn pretty-print [session exchange key]
   (log/info (format "Pretty printing %s id %d" key (:id exchange)))
   (let [pp-body (do-pretty-print (:body (key exchange)))
         pp-data-key (assoc (key exchange)
                       :body pp-body
                       :pretty-printed true)
         pp-data (assoc exchange key pp-data-key)]
-    (save! pp-data)))
+    (save! session pp-data)))
 
 (defn- has-body? [exchange key]
   (:body (key exchange)))
 
-(defn get-pretty-printed-body [exchange key]  
+(defn get-pretty-printed-body [session exchange key]  
   (if (:pretty-printed (key exchange))
     (:body (key exchange))
     (if (has-body? exchange key)
-      (:body (key (pretty-print exchange key)))
+      (:body (key (pretty-print session exchange key)))
       "")))
 
 (defn get-status
@@ -191,19 +185,19 @@ from the server"
 
 (defn known?
   "Returns true if exchange of this id exists"
-  [exchange]
-  (@exchange-store (:id exchange)))
+  [session exchange]
+  (@(:exchange-store session) (:id exchange)))
 
-(defn get-num-exchanges []
-  (count (keys @exchange-store)))
+(defn get-num-exchanges [session]
+  (count (keys @(:exchange-store session))))
 
-(defn get-persistence-map []
-  {:exchange-store @exchange-store
+(defn get-persistence-map [session]
+  {:exchange-store @(:exchange-store session)
    :next-exchange-id (.get @next-exchange-id)})
 
-(defn load-from-persistence-map! [persistence-map]  
+(defn load-from-persistence-map! [session persistence-map]  
   (dosync   
-   (ref-set exchange-store (:exchange-store persistence-map))
+   (ref-set (:exchange-store session) (:exchange-store persistence-map))
    (ref-set next-exchange-id (java.util.concurrent.atomic.AtomicLong.
                               (:next-exchange-id persistence-map)))))
 
