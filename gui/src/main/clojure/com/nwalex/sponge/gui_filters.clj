@@ -44,24 +44,24 @@
   (abort exchange))
 
 (defn- request-filter-map [session]
-  {com.nwalex.sponge.gui.SpongeGUIController/FORWARD_ALL
+  {com.nwalex.sponge.gui.SpongeSessionController/FORWARD_ALL
    [(partial display-exchange-filter session)]
    
-   com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FAIL
+   com.nwalex.sponge.gui.SpongeSessionController/REPLAY_OR_FAIL
    [(partial replay-filter session) (partial fail-filter session)]
    
-   com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD
+   com.nwalex.sponge.gui.SpongeSessionController/REPLAY_OR_FORWARD
    [(partial replay-filter session) (partial display-exchange-filter session)]
    })
 
 (defn- response-filter-map [session]
-  {com.nwalex.sponge.gui.SpongeGUIController/FORWARD_ALL
+  {com.nwalex.sponge.gui.SpongeSessionController/FORWARD_ALL
    [(partial display-exchange-filter session)]
    
-   com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FAIL
+   com.nwalex.sponge.gui.SpongeSessionController/REPLAY_OR_FAIL
    [(partial display-non-replay-response-filter session)]
    
-   com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD
+   com.nwalex.sponge.gui.SpongeSessionController/REPLAY_OR_FORWARD
    [(partial display-non-replay-response-filter session)]})
 
 (defn- get-plugin-filters

@@ -21,8 +21,9 @@
 
 (defn make-session
   "Create the session data structure"
-  []
-  {:file (ref nil)
+  [workspace]
+  {:workspace workspace
+   :file (ref nil)
    :gui-controller (ref nil)
    :action-map (ref nil)
    :sessions-dir (ref (System/getProperty "sponge.sessions"))
@@ -36,13 +37,11 @@
    :active-data-id-store (ref [])
    :exchange-store (ref {})
    :next-exchange-id (ref (java.util.concurrent.atomic.AtomicLong.))
-   :replay-count (ref {})
-   :repl-running (atom false)
-   :current-server-store (atom nil)
-   :gui-frame-store (atom nil)
+   :replay-count (ref {})   
+   :current-server-store (atom nil)   
    :port-store (ref 8139)
    :target-store (ref "http://services.aonaware.com")
-   :mode (atom com.nwalex.sponge.gui.SpongeGUIController/REPLAY_OR_FORWARD)})
+   :mode (atom com.nwalex.sponge.gui.SpongeSessionController/REPLAY_OR_FORWARD)})
 
 ;;----------------------------------------------------
 
@@ -95,7 +94,7 @@
   [session text]
   (log/info (format "Prompting to choose a file for mode %s" text))
   (let [file-chooser (init-file-chooser session text)
-        response (.showOpenDialog file-chooser (state/gui session))]
+        response (.showOpenDialog file-chooser (state/gui (:workspace session)))]
     (if (= response javax.swing.JFileChooser/APPROVE_OPTION)
       (do
         (update-sessions-dir! session (.getParent (.getSelectedFile file-chooser)))

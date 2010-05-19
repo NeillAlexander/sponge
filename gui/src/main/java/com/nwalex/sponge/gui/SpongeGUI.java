@@ -9,7 +9,6 @@
  */
 package com.nwalex.sponge.gui;
 
-import com.nwalex.sponge.gui.plugins.PluginController;
 import java.awt.BorderLayout;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,27 +21,23 @@ import org.apache.log4j.Logger;
  */
 public class SpongeGUI extends javax.swing.JFrame {
 
-  private final SpongeGUIController controller;
+  private final SpongeController controller;
   private HelpManager helper;
   private static final Logger log = Logger.getLogger(SpongeGUI.class);
-
-  private Map<SpongeGUIController, SpongeSessionPanel> sessionMap =
-          new HashMap<SpongeGUIController, SpongeSessionPanel>();
+  private Map<SpongeSessionController, SpongeSessionPanel> sessionMap =
+          new HashMap<SpongeSessionController, SpongeSessionPanel>();
 
   /** Creates new form SpongeGUI */
-  public SpongeGUI(final SpongeGUIController controller, final PluginController pluginController) {
+  public SpongeGUI(final SpongeController controller) {
     this.controller = controller;
     this.helper = new HelpManager(this);
 
     initComponents();
 
     setExtendedState(JFrame.MAXIMIZED_BOTH);
-
-    sessionMap.put(controller, new SpongeSessionPanel(this, controller, pluginController));
-    this.add(sessionMap.get(controller), BorderLayout.CENTER);
   }
 
-  public void updateSelectedMode(final SpongeGUIController controller) {
+  public void updateSelectedMode(final SpongeSessionController controller) {
     if (sessionMap.containsKey(controller)) {
       sessionMap.get(controller).updateSelectedMode(controller);
     } else {
@@ -68,6 +63,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
     menuBar = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
+    jMenuItem2 = new javax.swing.JMenuItem();
     serverMenu = new javax.swing.JMenu();
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
@@ -79,7 +75,17 @@ public class SpongeGUI extends javax.swing.JFrame {
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-    jMenu1.setText("File");
+    jMenu1.setText("Workspace");
+
+    jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
+    jMenuItem2.setText("New Session");
+    jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        addSession(evt);
+      }
+    });
+    jMenu1.add(jMenuItem2);
+
     menuBar.add(jMenu1);
 
     serverMenu.setText("Server");
@@ -124,11 +130,19 @@ public class SpongeGUI extends javax.swing.JFrame {
       ad.setLocationRelativeTo(null);
       ad.setVisible(true);
     }//GEN-LAST:event_aboutMenuItemActionPerformed
+
+    private void addSession(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSession
+      SpongeSessionController sessionController = controller.createNewSession();
+      sessionMap.put(sessionController, new SpongeSessionPanel(this, sessionController));
+      this.add(sessionMap.get(sessionController), BorderLayout.CENTER);
+      this.validate();
+    }//GEN-LAST:event_addSession
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem aboutMenuItem;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenu jMenu2;
   private javax.swing.JMenuItem jMenuItem1;
+  private javax.swing.JMenuItem jMenuItem2;
   private javax.swing.JMenuItem keyboardShortcutsHelp;
   private javax.swing.JMenuBar menuBar;
   private javax.swing.JMenu replMenu;

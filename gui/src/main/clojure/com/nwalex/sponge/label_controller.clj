@@ -17,11 +17,11 @@
     (getLabel [row] (model/get-label-for-row session row))))
 
 (defn do-label [session rows]
-  (doto (com.nwalex.sponge.gui.LabelDialog. (state/gui session)
+  (doto (com.nwalex.sponge.gui.LabelDialog. (state/gui (:workspace session))
                                             true
                                             (new-controller session)
                                             rows)
-    (.setLocationRelativeTo (state/gui session))
+    (.setLocationRelativeTo (state/gui (:workspace session)))
     (.setVisible true)))
 
 (defn delete-label [session rows]

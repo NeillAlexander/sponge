@@ -11,20 +11,22 @@
    [com.nwalex.sponge.server :as server]
    [clojure.contrib.logging :as log]))
 
-(defn gui [session] @(:gui-frame-store session))
+(defn gui [workspace]
+  @(:gui-frame-store workspace))
 
 (defn get-mode [session]
   @(:mode session))
 
-(defn- set-title [session]
+(defn- set-title [workspace]
   (.setTitle
-   (gui session)
+   (gui workspace)
    (format "Sponge %s"
-           (if @(:repl-running session) "(REPL Running)" "")))
-  (.setSessionInfo
-   (gui session)
-   (format "Port: %s  Target: %s  "           
-           @(:port-store session) @(:target-store session))))
+           (if @(:repl-running workspace) "(REPL Running)" "")))
+;  (.setSessionInfo
+;   (gui session)
+;   (format "Port: %s  Target: %s  "           
+;           @(:port-store session) @(:target-store session)))
+  )
 
 (defn set-config! [session port target]
   (log/info (format "Setting server config to: port = %s, target = %s" port target))
@@ -33,12 +35,12 @@
   (dosync
    (ref-set (:port-store session) (if (integer? port) port (Integer/parseInt port)))
    (ref-set (:target-store session) target)
-   (set-title session)))
+   (set-title (:workspace session))))
 
 (defn set-mode! [session new-mode]
   (log/info (format "Setting mode to \"%s\"" new-mode))
   (compare-and-set! (:mode session) @(:mode session) new-mode)
-  (set-title session))
+  (set-title (:workspace session)))
 
 (defn load-from-persistence-map! [session persistence-map]
   (set-config! session (:port persistence-map) (:target persistence-map))
@@ -48,16 +50,16 @@
   {:port @(:port-store session) :target
    @(:target-store session) :mode @(:mode session)})
 
-(defn set-gui! [session gui]
-  (let [gui-frame-store (:gui-frame-store session)]
+(defn set-gui! [workspace gui]
+  (let [gui-frame-store (:gui-frame-store workspace)]
     (compare-and-set! gui-frame-store @gui-frame-store gui)
-    (set-title session)
+    (set-title workspace)
     gui))
 
 (defn set-current-server! [session server]
   (compare-and-set! (:current-server-store session)
                     @(:current-server-store session) server)
-  (set-title session))
+  (set-title (:workspace session)))
 
 (defn current-server [session]
   @(:current-server-store session))
@@ -65,6 +67,6 @@
 (defn config [session]
   {:port @(:port-store session) :target @(:target-store session)})
 
-(defn repl-started! [session]
-  (reset! (:repl-running session) true)
-  (set-title session))
+(defn repl-started! [workspace]
+  (reset! (:repl-running workspace) true)
+  (set-title workspace))

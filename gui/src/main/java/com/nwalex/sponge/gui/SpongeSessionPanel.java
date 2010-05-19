@@ -25,7 +25,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DefaultListModel;
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JOptionPane;
@@ -48,18 +47,18 @@ import org.jdesktop.swingx.decorator.PatternPredicate;
 public class SpongeSessionPanel extends javax.swing.JPanel {
 
   private static final Logger log = Logger.getLogger(SpongeSessionPanel.class);
-  private final SpongeGUIController controller;
+  private final SpongeSessionController controller;
   private final FindDialogController findController;
   private final SpongeGUI parent;
   private int rowSelectedBeforeDelete = -1;
 
-  public SpongeSessionPanel(final SpongeGUI parent, final SpongeGUIController controller, final PluginController pluginController) {
+  public SpongeSessionPanel(final SpongeGUI parent, final SpongeSessionController controller) {
     this.controller = controller;
     this.parent = parent;
     this.findController = new FindDialogController(parent);
 
     initComponents();
-    initPlugins(pluginController);
+    initPlugins(controller.getPluginController());
     initModeSelector();
 
     // set up the key handlers
@@ -154,8 +153,8 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
 
   private void initModeSelector() {
     modeSelector.removeAllItems();
-    modeSelector.addItem(SpongeGUIController.FORWARD_ALL);
-    modeSelector.addItem(SpongeGUIController.REPLAY_OR_FORWARD);
+    modeSelector.addItem(SpongeSessionController.FORWARD_ALL);
+    modeSelector.addItem(SpongeSessionController.REPLAY_OR_FORWARD);
     updateSelectedMode(controller);
 
     modeSelector.addItemListener(new ItemListener() {
@@ -169,7 +168,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     });
   }
 
-  void updateSelectedMode(final SpongeGUIController controller) {
+  void updateSelectedMode(final SpongeSessionController controller) {
     modeSelector.setSelectedItem(controller.getMode());
   }
 
@@ -438,11 +437,11 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
       controlPanel.add(pluginSelector);
 
       loadButton.setAction(getLoadSessionAction());
-      loadButton.setText("Load Session...");
+      loadButton.setText("Load Data...");
       controlPanel.add(loadButton);
 
       saveButton.setAction(controller.getSaveAsAction());
-      saveButton.setText("Save Session As...");
+      saveButton.setText("Save Data...");
       controlPanel.add(saveButton);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

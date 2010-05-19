@@ -16,6 +16,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
+import org.apache.log4j.Logger;
 
 /**
  * Wraps an action to catch any exceptions and display a nice dialog
@@ -23,6 +24,7 @@ import javax.swing.JOptionPane;
  */
 public class SafeAction extends AbstractAction {
 
+  private static final Logger log = Logger.getLogger(SafeAction.class);
   private final Frame parent;
   private final Action targetAction;
 
@@ -46,6 +48,7 @@ public class SafeAction extends AbstractAction {
     try {
       targetAction.actionPerformed(e);
     } catch (Exception ex) {
+      log.error("An unexpected exception occured: " + ex.getMessage(), ex);
       JOptionPane.showMessageDialog(parent, ex.getClass().getName() + ": " + ex.getMessage(),
               "Exception", JOptionPane.ERROR_MESSAGE);
     }

@@ -17,8 +17,8 @@
     (getCurrentTarget [] (:target (state/config session)))))
 
 (defn configure [session event]
-  (doto (com.nwalex.sponge.gui.ConfigurationDialog. (state/gui session)
+  (doto (com.nwalex.sponge.gui.ConfigurationDialog. (state/gui (:workspace session))
                                                     true
                                                     (new-controller session))
-    (.setLocationRelativeTo (state/gui session))
+    (.setLocationRelativeTo (state/gui (:workspace session)))
     (.setVisible true)))

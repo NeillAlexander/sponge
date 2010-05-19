@@ -8,7 +8,7 @@
 
 (ns com.nwalex.sponge.gui
   (:require
-   [com.nwalex.sponge.gui-controller :as controller]
+   [com.nwalex.sponge.workspace :as workspace]
    [clojure.contrib.logging :as log])
   (:gen-class :main true :name com.nwalex.sponge.Client))
 
@@ -17,4 +17,4 @@
   (log/info "*******************************************************************")
   (log/info "************************** Starting Sponge ************************")
   (log/info "*******************************************************************")  
-  (apply controller/make-gui args))
+  (apply workspace/make-gui args))

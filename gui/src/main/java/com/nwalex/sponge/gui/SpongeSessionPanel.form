@@ -236,7 +236,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="getLoadSessionAction()" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Load Session..."/>
+            <Property name="text" type="java.lang.String" value="Load Data..."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="saveButton">
@@ -244,7 +244,7 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="controller.getSaveAsAction()" type="code"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Save Session As..."/>
+            <Property name="text" type="java.lang.String" value="Save Data..."/>
           </Properties>
         </Component>
       </SubComponents>
