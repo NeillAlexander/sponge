@@ -11,6 +11,7 @@
    [com.nwalex.sponge.gui-state :as state]
    [com.nwalex.sponge.table-model :as model]
    [com.nwalex.sponge.exchange :as exchange]
+   [com.nwalex.sponge.persistence :as persistence]
    [clojure.contrib.logging :as log]
    [clojure.contrib.duck-streams :as io]))
 
@@ -22,11 +23,10 @@
 (defn make-session
   "Create the session data structure"
   [workspace]
-  {:workspace workspace
-   :file (ref nil)
+  {:persistence-cookie (persistence/make-cookie workspace)
+   :workspace workspace
    :gui-controller (ref nil)
    :action-map (ref nil)
-   :sessions-dir (ref (System/getProperty "sponge.sessions"))
    :default-responses (ref {})
    :exchange-table-model (ref nil)
    :plugin-controller (ref nil)
@@ -45,16 +45,6 @@
 
 ;;----------------------------------------------------
 
-(defn get-session-file [session]
-  @(:file session))
-
-(defn has-file [session]
-  (not (nil? (get-session-file session))))
-
-(defn- update-session-file! [session file]
-  (dosync
-   (ref-set (:file session) file)))
-
 (defn init-gui! [session gui-controller action-map]
   (dosync
    (ref-set (:gui-controller session) gui-controller)
@@ -67,76 +57,40 @@
 (defn table-model [session]
   @(:exchange-table-model session))
 
-(defn sessions-dir [session]
-  @(:sessions-dir session))
-
-(defn update-sessions-dir! [session dir]
-  (dosync
-   (ref-set (:sessions-dir session) dir)))
-
 (defn gui-controller [session]
   @(:gui-controller session))
 
 (defn action-map [session]
   @(:action-map session))
 
-(defn- init-file-chooser [session text]
-  (let [file-chooser (doto (javax.swing.JFileChooser.)
-    (.setApproveButtonText text)
-    (.setCurrentDirectory
-     (java.io.File. (sessions-dir session))))]
-    (if (has-file session)
-      (.setSelectedFile file-chooser (get-session-file session)))
-    file-chooser))
+(defn is-loaded? [session]
+  (persistence/has-file? (:persistence-cookie session)))
 
-(defn- choose-file
-  "Launches JFileChooser. Remembers directory of chosen file for next time"
-  [session text]
-  (log/info (format "Prompting to choose a file for mode %s" text))
-  (let [file-chooser (init-file-chooser session text)
-        response (.showOpenDialog file-chooser (state/gui (:workspace session)))]
-    (if (= response javax.swing.JFileChooser/APPROVE_OPTION)
-      (do
-        (update-sessions-dir! session (.getParent (.getSelectedFile file-chooser)))
-        (.getSelectedFile file-chooser)))))
+(defn load-data! [session persistence-map]
+  (state/load-from-persistence-map! session (:gui-state persistence-map))
+  (model/load-from-persistence-map! session (:table-model persistence-map))
+  (exchange/load-from-persistence-map! session (:exchange persistence-map)))
 
-(defn load-session-from-file![session file]
-  (log/info (format "Loading session from file: %s" file))
-  (with-open [in (java.io.PushbackReader.
-                      (io/reader (java.util.zip.GZIPInputStream.
-                                  (java.io.FileInputStream. file))))]
-        (let [persistence-map (read in)]          
-          (state/load-from-persistence-map! session (:gui-state persistence-map))
-          (model/load-from-persistence-map! session (:table-model persistence-map))
-          (exchange/load-from-persistence-map! session (:exchange persistence-map))
-          (update-session-file! session file))))
+(defn- persistence-data [session]
+  (assoc {}
+    :gui-state (state/get-persistence-map session)
+    :table-model (model/get-persistence-map session)
+    :exchange (exchange/get-persistence-map session)))
+
+(defn load-session-from-file! [session file]
+  (log/info "Ready to load session from file")
+  (persistence/load-data (:persistence-cookie session)
+                         (partial load-data! session)
+                         file))
 
 (defn load-session! [session event]
   (log/info "Ready to load session...")
-  (let [file (choose-file session "Load")]
-    (if file
-      (load-session-from-file! session file)      
-      (log/info "No file chosen"))))
-
-(defn- save-session-to-file [session file]
-  (if file
-    (let [persistence-map (assoc {}
-                            :gui-state (state/get-persistence-map session)
-                            :table-model (model/get-persistence-map session)
-                            :exchange (exchange/get-persistence-map session))]
-      (log/info (format "Ready to save in file %s" file))
-      (with-open [out (io/writer (java.io.BufferedOutputStream.
-                                  (java.util.zip.GZIPOutputStream.
-                                   (java.io.FileOutputStream. file))))]
-        (.write out (str persistence-map))
-        (.write out "\n"))
-      (update-session-file! session file)
-      (log/info "Done"))      
-    (log/info "No file chosen")))
+  (persistence/load-data (:persistence-cookie session) (partial load-data! session)))
 
 (defn save-session [session event]
-  (save-session-to-file session (get-session-file session)))
+  (log/info "Loading session...")
+  (persistence/save-data (:persistence-cookie session) (persistence-data session)))
 
 (defn save-session-as [session event]
-  (let [file (choose-file session "Save")]
-    (save-session-to-file session file)))
+  (log/info "Saving session as...")
+  (persistence/save-data-as (:persistence-cookie session) (persistence-data session)))

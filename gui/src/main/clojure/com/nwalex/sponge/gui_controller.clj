@@ -62,7 +62,7 @@
 
 (defn- wrap-session-action [session f event]
   (f event)
-  (.setEnabled (:save (session/action-map session)) (session/has-file session)))
+  (.setEnabled (:save (session/action-map session)) (session/is-loaded? session)))
 
 (defn action-map-fn
   "Designed to be called as a partial to bake in the session"
@@ -168,9 +168,9 @@
       (let [file (java.io.File. (.getProperty props "sponge.last.session" ""))]
         (if (and (not (nil? file)) (.exists file))
           (do
-            (session/load-session-from-file! file)
+            (session/load-session-from-file! session file)
             (.setEnabled (:save (session/action-map session))
-                         (session/has-file session)))
+                         (session/is-loaded? session)))
           (log/info (format "Session file not found: %s" file))))
       (log/info "sponge.reload.previous not set. Not loading previous session"))))
 
