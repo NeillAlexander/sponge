@@ -71,8 +71,11 @@ public class SpongeGUI extends javax.swing.JFrame {
     sessionTabs = new javax.swing.JTabbedPane();
     menuBar = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
-    jMenuItem2 = new javax.swing.JMenuItem();
-    serverMenu = new javax.swing.JMenu();
+    loadWorkspaceMenu = new javax.swing.JMenuItem();
+    saveWorkspaceAsMenu = new javax.swing.JMenuItem();
+    saveWorkspaceMenu = new javax.swing.JMenuItem();
+    jSeparator1 = new javax.swing.JPopupMenu.Separator();
+    newSessionMenu = new javax.swing.JMenuItem();
     replMenu = new javax.swing.JMenu();
     replMenuItem = new javax.swing.JMenuItem();
     replMenuItem.setAction(controller.getStartReplAction());
@@ -98,19 +101,32 @@ public class SpongeGUI extends javax.swing.JFrame {
 
     jMenu1.setText("Workspace");
 
-    jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
-    jMenuItem2.setText("New Session");
-    jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+    loadWorkspaceMenu.setAction(controller.getLoadWorkspaceAction());
+    loadWorkspaceMenu.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+    loadWorkspaceMenu.setText("Load Workspace...");
+    jMenu1.add(loadWorkspaceMenu);
+
+    saveWorkspaceAsMenu.setAction(controller.getSaveWorkspaceAsAction());
+    saveWorkspaceAsMenu.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
+    saveWorkspaceAsMenu.setText("Save Workspace As...");
+    jMenu1.add(saveWorkspaceAsMenu);
+
+    saveWorkspaceMenu.setAction(controller.getSaveWorkspaceAction());
+    saveWorkspaceMenu.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+    saveWorkspaceMenu.setText("Save Workspace");
+    jMenu1.add(saveWorkspaceMenu);
+    jMenu1.add(jSeparator1);
+
+    newSessionMenu.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
+    newSessionMenu.setText("New Session");
+    newSessionMenu.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         addSession(evt);
       }
     });
-    jMenu1.add(jMenuItem2);
+    jMenu1.add(newSessionMenu);
 
     menuBar.add(jMenu1);
-
-    serverMenu.setText("Server");
-    menuBar.add(serverMenu);
 
     replMenu.setText("REPL");
 
@@ -194,12 +210,15 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenu jMenu2;
   private javax.swing.JMenuItem jMenuItem1;
-  private javax.swing.JMenuItem jMenuItem2;
+  private javax.swing.JPopupMenu.Separator jSeparator1;
   private javax.swing.JMenuItem keyboardShortcutsHelp;
+  private javax.swing.JMenuItem loadWorkspaceMenu;
   private javax.swing.JMenuBar menuBar;
+  private javax.swing.JMenuItem newSessionMenu;
   private javax.swing.JMenu replMenu;
   private javax.swing.JMenuItem replMenuItem;
-  private javax.swing.JMenu serverMenu;
+  private javax.swing.JMenuItem saveWorkspaceAsMenu;
+  private javax.swing.JMenuItem saveWorkspaceMenu;
   private javax.swing.JTabbedPane sessionTabs;
   // End of variables declaration//GEN-END:variables
 }

@@ -20,4 +20,8 @@ public interface SpongeController {
   public Action getStartReplAction();
   public SpongeSessionController createNewSession();
   public void deleteSession(SpongeSessionController spc);
+
+  public Action getLoadWorkspaceAction();
+  public Action getSaveWorkspaceAction();
+  public Action getSaveWorkspaceAsAction();
 }

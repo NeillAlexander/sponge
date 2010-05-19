@@ -34,6 +34,7 @@ public class HelpFrame extends javax.swing.JFrame {
     jScrollPane1 = new javax.swing.JScrollPane();
     helpTextPane = new javax.swing.JTextPane();
 
+    setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Sponge Help");
 
     helpTextPane.setContentType("text/html");

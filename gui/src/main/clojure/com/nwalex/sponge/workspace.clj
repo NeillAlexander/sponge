@@ -57,12 +57,26 @@
    (catch Exception ex
      (log/warn (format "Failed to load config") ex))))
 
+(defn- load-workspace [workspace event]
+  (log/info "Ready to load workspace"))
+
+(defn- save-workspace [workspace event]
+  (log/info "ready to save workspace"))
+
+(defn- save-workspace-as [workspace event]
+  (log/info "ready to save workspace as"))
+
 (defn make-action-map [workspace]
-  (let [action-map {:start-repl
-                    (swing/make-safe-action-with-gui
-                      @(:gui-frame-store workspace)
-                      "Start Repl"
-                      (partial start-repl workspace) true)}]
+  (let [gui @(:gui-frame-store workspace)
+        action-map
+        {:start-repl (swing/make-safe-action-with-gui gui "Start Repl"
+                       (partial start-repl workspace) true)
+         :load-workspace (swing/make-safe-action-with-gui gui "Load Workspace"
+                           (partial load-workspace workspace) true)
+         :save-workspace (swing/make-safe-action-with-gui gui "Save Workspace"
+                           (partial save-workspace workspace) true)
+         :save-workspace-as (swing/make-safe-action-with-gui gui "Save Workspace As"
+                              (partial save-workspace-as workspace) true)}]
        (dosync
         (ref-set (:action-map workspace) action-map))
        action-map))
@@ -93,7 +107,10 @@
   (proxy [com.nwalex.sponge.gui.SpongeController] []
     (getStartReplAction [] (:start-repl action-map))
     (createNewSession [] (create-session workspace))
-    (deleteSession [controller] (delete-session workspace controller))))
+    (deleteSession [controller] (delete-session workspace controller))
+    (getLoadWorkspaceAction [] (:load-workspace action-map))
+    (getSaveWorkspaceAction [] (:save-workspace action-map))
+    (getSaveWorkspaceAsAction [] (:save-workspace-as action-map))))
 
 (defn- store-workspace-properties [workspace]
   (log/info "TODO: Store workspace properties prior to shutdown")
