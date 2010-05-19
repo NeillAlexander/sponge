@@ -9,10 +9,13 @@
  */
 package com.nwalex.sponge.gui;
 
-import java.awt.BorderLayout;
-import java.util.HashMap;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.util.Map;
+import java.util.WeakHashMap;
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JPopupMenu;
 import org.apache.log4j.Logger;
 
 /**
@@ -21,11 +24,15 @@ import org.apache.log4j.Logger;
  */
 public class SpongeGUI extends javax.swing.JFrame {
 
+  private int sessionCounter = 1;
   private final SpongeController controller;
   private HelpManager helper;
   private static final Logger log = Logger.getLogger(SpongeGUI.class);
+  
   private Map<SpongeSessionController, SpongeSessionPanel> sessionMap =
-          new HashMap<SpongeSessionController, SpongeSessionPanel>();
+          new WeakHashMap<SpongeSessionController, SpongeSessionPanel>();
+  private Map<Component, SpongeSessionController> tabToControllerMap =
+          new WeakHashMap<Component, SpongeSessionController>();
 
   /** Creates new form SpongeGUI */
   public SpongeGUI(final SpongeController controller) {
@@ -61,6 +68,7 @@ public class SpongeGUI extends javax.swing.JFrame {
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents() {
 
+    sessionTabs = new javax.swing.JTabbedPane();
     menuBar = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenuItem2 = new javax.swing.JMenuItem();
@@ -74,6 +82,19 @@ public class SpongeGUI extends javax.swing.JFrame {
     aboutMenuItem = new javax.swing.JMenuItem();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+    sessionTabs.addMouseListener(new java.awt.event.MouseAdapter() {
+      public void mouseClicked(java.awt.event.MouseEvent evt) {
+        displayTabPopup(evt);
+      }
+      public void mousePressed(java.awt.event.MouseEvent evt) {
+        sessionTabsMousePressed(evt);
+      }
+      public void mouseReleased(java.awt.event.MouseEvent evt) {
+        sessionTabsMouseReleased(evt);
+      }
+    });
+    getContentPane().add(sessionTabs, java.awt.BorderLayout.CENTER);
 
     jMenu1.setText("Workspace");
 
@@ -132,12 +153,42 @@ public class SpongeGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_aboutMenuItemActionPerformed
 
     private void addSession(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSession
-      SpongeSessionController sessionController = controller.createNewSession();
+      final SpongeSessionController sessionController = controller.createNewSession();
       sessionMap.put(sessionController, new SpongeSessionPanel(this, sessionController));
-      this.add(sessionMap.get(sessionController), BorderLayout.CENTER);
+      sessionTabs.add(sessionMap.get(sessionController), "Session " + (sessionCounter++));
+      tabToControllerMap.put(sessionTabs.getComponentAt(sessionTabs.getTabCount() - 1), sessionController);
       sessionController.updateSessionInfo();
       this.validate();
     }//GEN-LAST:event_addSession
+
+    private void displayTabPopup(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayTabPopup
+      if (evt.isPopupTrigger()) {
+        final JPopupMenu menu = new JPopupMenu();
+        final Component tab =
+                sessionTabs.getComponentAt(sessionTabs.indexAtLocation(evt.getX(), evt.getY()));
+
+        menu.add(new AbstractAction("Close") {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            sessionTabs.remove(tab);
+            controller.deleteSession(tabToControllerMap.get(tab));
+            sessionMap.remove(tabToControllerMap.get(tab));
+            tabToControllerMap.remove(tab);
+          }
+        });
+        
+        menu.show(sessionTabs, evt.getX(), evt.getY());
+      }
+    }//GEN-LAST:event_displayTabPopup
+
+    private void sessionTabsMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sessionTabsMousePressed
+      displayTabPopup(evt);
+    }//GEN-LAST:event_sessionTabsMousePressed
+
+    private void sessionTabsMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sessionTabsMouseReleased
+      displayTabPopup(evt);
+    }//GEN-LAST:event_sessionTabsMouseReleased
+
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem aboutMenuItem;
   private javax.swing.JMenu jMenu1;
@@ -149,5 +200,6 @@ public class SpongeGUI extends javax.swing.JFrame {
   private javax.swing.JMenu replMenu;
   private javax.swing.JMenuItem replMenuItem;
   private javax.swing.JMenu serverMenu;
+  private javax.swing.JTabbedPane sessionTabs;
   // End of variables declaration//GEN-END:variables
 }

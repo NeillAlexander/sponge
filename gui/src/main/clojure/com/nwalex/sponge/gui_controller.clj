@@ -122,7 +122,7 @@
 
 (defn- make-sponge-session-controller
   [session action-map plugin-controller]
-  (proxy [com.nwalex.sponge.gui.SpongeSessionController] []
+  (proxy [com.nwalex.sponge.gui.SpongeSessionController] []    
     (updateSessionInfo [] (state/set-session-info session))
     (getPluginController [] plugin-controller)
     (getStartServerAction [] (:start-server action-map))
@@ -198,4 +198,4 @@
                        (get-property @(:config-props workspace)
                                      "sponge.default.target"
                                      "http://services.aonaware.com"))        
-    session-controller))
+    session))

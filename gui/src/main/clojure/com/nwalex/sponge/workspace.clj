@@ -4,6 +4,7 @@
    [com.nwalex.sponge.swing-utils :as swing]
    [com.nwalex.sponge.gui-state :as state]
    [com.nwalex.sponge.core :as core]
+   [com.nwalex.sponge.server :as server]
    [clojure.contrib.swing-utils :as cl-swing]
    [clojure.contrib.logging :as log]))
 
@@ -12,13 +13,15 @@
   []
   {:gui-frame-store (atom nil)
    :repl-running (atom false)
-   :active-sessions (ref {})
+   :active-sessions (ref [])
    :action-map (ref nil)
    :config-props (ref nil)})
 
 (defn- create-session [workspace]  
-  (let [session-controller (session-controller/create-session workspace)]
-    (log/info "TODO: add session to the workspace")
+  (let [session (session-controller/create-session workspace)
+        session-controller @(:gui-controller session)]
+    (dosync
+     (commute (:active-sessions workspace) conj session))
     session-controller))
 
 (defn- start-repl [workspace event]
@@ -64,13 +67,33 @@
         (ref-set (:action-map workspace) action-map))
        action-map))
 
+(defn- clean-up-session [session]
+  (log/info "Cleaning up session...")
+  (server/stop @(:current-server-store session)))
+
+(defn- still-active? [controller-to-delete session-to-test]
+  (if (= controller-to-delete @(:gui-controller session-to-test))
+    (do
+      (clean-up-session session-to-test)
+      false)
+    true))
+
+(defn- delete-session [workspace session-controller]
+  (log/info (format "delete-session called for %s" session-controller))
+  ;; delete the session
+  (let [active-sessions (:active-sessions workspace)]    
+    (dosync
+     (ref-set active-sessions
+              (doall (filter #(still-active? session-controller %1)
+                             @active-sessions))))))
+
 (defn make-sponge-controller
   "The implementation of SpongeController"
   [workspace action-map]
   (proxy [com.nwalex.sponge.gui.SpongeController] []
     (getStartReplAction [] (:start-repl action-map))
     (createNewSession [] (create-session workspace))
-    (deleteSession [session-controller] "deleteSession called")))
+    (deleteSession [controller] (delete-session workspace controller))))
 
 (defn- store-workspace-properties [workspace]
   (log/info "TODO: Store workspace properties prior to shutdown")

@@ -25,7 +25,6 @@
   )
 
 (defn set-session-info [session]
-  (log/info (format "set-session-info: %s" session))
   (.setSessionInfo
    (gui (:workspace session))
    @(:gui-controller session)
@@ -33,8 +32,7 @@
            @(:port-store session) @(:target-store session))))
 
 (defn set-config! [session port target]
-  (log/info (format "Setting server config to: port = %s, target = %s" port target))
-  (log/info (format "session: %s" session))
+  (log/info (format "Setting server config to: port = %s, target = %s" port target))  
   ;; force a quick exception if the values are invalid
   (java.net.URL. target)     
   (dosync

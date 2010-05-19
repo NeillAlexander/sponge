@@ -110,7 +110,10 @@
                         {:port (:port server) :join? false})))
 
 (defn stop [server]
-  (if (:jetty server) (.stop (:jetty server))))
+  (if (:jetty server)
+    (do
+      (log/info (format "Stopping server %s..." (:jetty server)))
+      (.stop (:jetty server)))))
 
 (defn running? [server]
   (if (:jetty server)
