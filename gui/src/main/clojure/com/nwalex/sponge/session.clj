@@ -81,14 +81,20 @@
 (defn action-map [session]
   @(:action-map session))
 
+(defn- init-file-chooser [session text]
+  (let [file-chooser (doto (javax.swing.JFileChooser.)
+    (.setApproveButtonText text)
+    (.setCurrentDirectory
+     (java.io.File. (sessions-dir session))))]
+    (if (has-file session)
+      (.setSelectedFile file-chooser (get-session-file session)))
+    file-chooser))
+
 (defn- choose-file
   "Launches JFileChooser. Remembers directory of chosen file for next time"
   [session text]
   (log/info (format "Prompting to choose a file for mode %s" text))
-  (let [file-chooser (doto (javax.swing.JFileChooser.)
-                       (.setApproveButtonText text)
-                       (.setCurrentDirectory
-                        (java.io.File. (sessions-dir session))))
+  (let [file-chooser (init-file-chooser session text)
         response (.showOpenDialog file-chooser (state/gui session))]
     (if (= response javax.swing.JFileChooser/APPROVE_OPTION)
       (do
