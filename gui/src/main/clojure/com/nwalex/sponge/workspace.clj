@@ -13,7 +13,8 @@
   {:gui-frame-store (atom nil)
    :repl-running (atom false)
    :active-sessions (ref {})
-   :action-map (ref nil)})
+   :action-map (ref nil)
+   :config-props (ref nil)})
 
 (defn- create-session [workspace]  
   (let [session-controller (session-controller/create-session workspace)]
@@ -48,13 +49,8 @@
 (defn- load-config! [workspace]
   (try
    (let [config-props (load-config-files)]
-     ;(load-session session config-props)
-     ;(state/set-config! session
-     ; (.getProperty config-props
-     ;               "sponge.default.port" "8139")
-     ; (.getProperty config-props
-     ;"sponge.default.target" "http://services.aonaware.com"))
-     )
+     (dosync
+      (ref-set (:config-props workspace) config-props)))
    (catch Exception ex
      (log/warn (format "Failed to load config") ex))))
 

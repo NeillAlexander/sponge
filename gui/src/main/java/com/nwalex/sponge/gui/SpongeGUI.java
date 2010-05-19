@@ -45,11 +45,11 @@ public class SpongeGUI extends javax.swing.JFrame {
     }
   }
 
-  public void setSessionInfo(String info) {
-    if (sessionMap.containsKey(controller)) {
-      sessionMap.get(controller).setSessionInfo(info);
+  public void setSessionInfo(SpongeSessionController sessionController, String info) {
+    if (sessionMap.containsKey(sessionController)) {
+      sessionMap.get(sessionController).setSessionInfo(info);
     } else {
-      log.warn("setSessionInfo called for " + controller + " but I don't have a reference to it!");
+      log.warn("setSessionInfo called for " + sessionController + " but I don't have a reference to it!");
     }
   }
 
@@ -135,6 +135,7 @@ public class SpongeGUI extends javax.swing.JFrame {
       SpongeSessionController sessionController = controller.createNewSession();
       sessionMap.put(sessionController, new SpongeSessionPanel(this, sessionController));
       this.add(sessionMap.get(sessionController), BorderLayout.CENTER);
+      sessionController.updateSessionInfo();
       this.validate();
     }//GEN-LAST:event_addSession
   // Variables declaration - do not modify//GEN-BEGIN:variables

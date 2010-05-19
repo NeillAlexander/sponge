@@ -28,6 +28,7 @@ public interface SpongeSessionController {
   public static final String REPLAY_OR_PROMPT = "Replay or Prompt";
 
   public PluginController getPluginController();
+  public void updateSessionInfo();
 
   // multi-row actions
   public Action getLabelExchangeAction(JXTable table);

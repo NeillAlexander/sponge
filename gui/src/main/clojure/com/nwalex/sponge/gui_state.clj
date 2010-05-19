@@ -22,20 +22,25 @@
    (gui workspace)
    (format "Sponge %s"
            (if @(:repl-running workspace) "(REPL Running)" "")))
-;  (.setSessionInfo
-;   (gui session)
-;   (format "Port: %s  Target: %s  "           
-;           @(:port-store session) @(:target-store session)))
   )
+
+(defn set-session-info [session]
+  (log/info (format "set-session-info: %s" session))
+  (.setSessionInfo
+   (gui (:workspace session))
+   @(:gui-controller session)
+   (format "Port: %s  Target: %s  "           
+           @(:port-store session) @(:target-store session))))
 
 (defn set-config! [session port target]
   (log/info (format "Setting server config to: port = %s, target = %s" port target))
+  (log/info (format "session: %s" session))
   ;; force a quick exception if the values are invalid
   (java.net.URL. target)     
   (dosync
    (ref-set (:port-store session) (if (integer? port) port (Integer/parseInt port)))
-   (ref-set (:target-store session) target)
-   (set-title (:workspace session))))
+   (ref-set (:target-store session) target))
+  (set-session-info session))
 
 (defn set-mode! [session new-mode]
   (log/info (format "Setting mode to \"%s\"" new-mode))

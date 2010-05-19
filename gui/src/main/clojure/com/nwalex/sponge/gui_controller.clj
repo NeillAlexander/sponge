@@ -123,6 +123,7 @@
 (defn- make-sponge-session-controller
   [session action-map plugin-controller]
   (proxy [com.nwalex.sponge.gui.SpongeSessionController] []
+    (updateSessionInfo [] (state/set-session-info session))
     (getPluginController [] plugin-controller)
     (getStartServerAction [] (:start-server action-map))
     (getStopServerAction [] (:stop-server action-map))
@@ -174,6 +175,11 @@
       (log/info "sponge.reload.previous not set. Not loading previous session"))))
 
 
+(defn- get-property [props name default]
+  (if props    
+    (.getProperty props name default)
+    default))
+
 (defn create-session [workspace]
   (log/info "Creating session...")
   (let [session (session/make-session workspace)
@@ -184,4 +190,12 @@
     (session/init-gui! session session-controller action-map)
     (session/init-table-model! session
                                (model/make-exchange-table-model session))
+    ;; set the default config
+    (state/set-config! session
+                       (get-property @(:config-props workspace)
+                                     "sponge.default.port"
+                                     "8139")                     
+                       (get-property @(:config-props workspace)
+                                     "sponge.default.target"
+                                     "http://services.aonaware.com"))        
     session-controller))
