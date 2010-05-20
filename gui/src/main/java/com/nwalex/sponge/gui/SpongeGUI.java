@@ -66,11 +66,29 @@ public class SpongeGUI extends javax.swing.JFrame {
     }
   }
 
+  private void deleteTab(Component tab) {
+    sessionTabs.remove(tab);
+    controller.deleteSession(tabToControllerMap.get(tab));
+    sessionMap.remove(tabToControllerMap.get(tab));
+    tabToControllerMap.remove(tab);
+  }
+
+  private void deleteCurrentWorkspaceData() {
+    for (int i = sessionTabs.getTabCount() - 1; i >= 0; i--) {
+      deleteTab(sessionTabs.getComponentAt(i));
+    }
+  }
+
   private Action getLoadWorkspaceAction() {
     return new AbstractAction("Load Workspace") {
       @Override
       public void actionPerformed(ActionEvent e) {
         SpongeSessionController[] sessionControllers = controller.loadWorkspace();
+
+        if (sessionControllers.length > 0) {
+          deleteCurrentWorkspaceData();
+        }
+
         for (SpongeSessionController spongeSessionController : sessionControllers) {
           addSession(spongeSessionController);
         }
