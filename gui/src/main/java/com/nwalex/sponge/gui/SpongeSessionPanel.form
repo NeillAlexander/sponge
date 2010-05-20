@@ -201,7 +201,7 @@
         <Component class="javax.swing.JButton" name="startStopServerButton">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="controller.getStartServerAction()" type="code"/>
+              <Connection code="getSessionAction(&quot;Start server&quot;, controller.getStartServerAction())" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Start Server"/>
           </Properties>
@@ -209,7 +209,7 @@
         <Component class="javax.swing.JButton" name="jButton2">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="controller.getStopServerAction()" type="code"/>
+              <Connection code="getSessionAction(&quot;Stop server&quot;, controller.getStopServerAction())" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Stop Server"/>
           </Properties>
@@ -242,7 +242,7 @@
         <Component class="javax.swing.JButton" name="saveButton">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="controller.getSaveAsAction()" type="code"/>
+              <Connection code="getSessionAction(&quot;Save data&quot;, controller.getSaveAsAction())" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Save Data..."/>
           </Properties>

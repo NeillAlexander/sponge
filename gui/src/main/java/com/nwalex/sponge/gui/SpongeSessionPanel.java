@@ -214,6 +214,28 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
     responsePanel.setText(controller.getResponseDataForRow(selectedIndex), selectedIndex);
   }
 
+  private Action getSessionAction(String name, final Action toTrigger) {
+    final Action sessionAction = new AbstractAction(name) {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        toTrigger.actionPerformed(e);
+        log.info("Requesting update to session info...");
+        controller.updateSessionInfo();
+      }
+    };
+
+    toTrigger.addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("enabled")) {
+          sessionAction.setEnabled((Boolean) evt.getNewValue());
+        }
+      }
+    });
+
+    return sessionAction;
+  }
+
   private void initFindAction() {
     findController.initFindActionOn(exchangeTable);
     findController.initFindActionOn(requestPanel);
@@ -300,7 +322,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
   }
 
   void setSessionInfo(String text) {
-    configLabel.setText(text);
+    configLabel.setText(text);    
   }
 
   /** This method is called from within the constructor to
@@ -421,11 +443,11 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
       jButton1.setText("Configure...");
       controlPanel.add(jButton1);
 
-      startStopServerButton.setAction(controller.getStartServerAction());
+      startStopServerButton.setAction(getSessionAction("Start server", controller.getStartServerAction()));
       startStopServerButton.setText("Start Server");
       controlPanel.add(startStopServerButton);
 
-      jButton2.setAction(controller.getStopServerAction());
+      jButton2.setAction(getSessionAction("Stop server", controller.getStopServerAction()));
       jButton2.setText("Stop Server");
       controlPanel.add(jButton2);
 
@@ -440,7 +462,7 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
       loadButton.setText("Load Data...");
       controlPanel.add(loadButton);
 
-      saveButton.setAction(controller.getSaveAsAction());
+      saveButton.setAction(getSessionAction("Save data", controller.getSaveAsAction()));
       saveButton.setText("Save Data...");
       controlPanel.add(saveButton);
 

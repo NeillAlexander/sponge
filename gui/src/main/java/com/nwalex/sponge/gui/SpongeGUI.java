@@ -31,10 +31,13 @@ public class SpongeGUI extends javax.swing.JFrame {
   private final SpongeController controller;
   private HelpManager helper;
   private static final Logger log = Logger.getLogger(SpongeGUI.class);
+
   private Map<SpongeSessionController, SpongeSessionPanel> sessionMap =
           new WeakHashMap<SpongeSessionController, SpongeSessionPanel>();
   private Map<Component, SpongeSessionController> tabToControllerMap =
           new WeakHashMap<Component, SpongeSessionController>();
+  private Map<SpongeSessionController, Component> controllerToTabMap =
+          new WeakHashMap<SpongeSessionController, Component>();
 
   /** Creates new form SpongeGUI */
   public SpongeGUI(final SpongeController controller) {
@@ -60,9 +63,14 @@ public class SpongeGUI extends javax.swing.JFrame {
     }
   }
 
-  public void setSessionInfo(SpongeSessionController sessionController, String info) {
+  private void updateTabTitle(String title, SpongeSessionController sessionController) {
+    sessionTabs.setTitleAt(sessionTabs.indexOfComponent(controllerToTabMap.get(sessionController)), title);
+  }
+
+  public void setSessionInfo(SpongeSessionController sessionController, String info, String title) {
     if (sessionMap.containsKey(sessionController)) {
       sessionMap.get(sessionController).setSessionInfo(info);
+      updateTabTitle(title, sessionController);
     } else {
       log.warn("setSessionInfo called for " + sessionController + " but I don't have a reference to it!");
     }
@@ -72,7 +80,8 @@ public class SpongeGUI extends javax.swing.JFrame {
     sessionTabs.remove(tab);
     controller.deleteSession(tabToControllerMap.get(tab));
     sessionMap.remove(tabToControllerMap.get(tab));
-    tabToControllerMap.remove(tab);
+    SpongeSessionController sessionController = tabToControllerMap.remove(tab);
+    controllerToTabMap.remove(sessionController);
   }
 
   private void deleteCurrentWorkspaceData() {
@@ -101,7 +110,11 @@ public class SpongeGUI extends javax.swing.JFrame {
   private void addSession(SpongeSessionController sessionController) {
     sessionMap.put(sessionController, new SpongeSessionPanel(this, sessionController));
     sessionTabs.add(sessionMap.get(sessionController), "Session " + (sessionCounter++));
-    tabToControllerMap.put(sessionTabs.getComponentAt(sessionTabs.getTabCount() - 1), sessionController);
+
+    Component tab = sessionTabs.getComponentAt(sessionTabs.getTabCount() - 1);
+    tabToControllerMap.put(tab, sessionController);
+    controllerToTabMap.put(sessionController, tab);
+    
     sessionController.updateSessionInfo();
     this.validate();
   }

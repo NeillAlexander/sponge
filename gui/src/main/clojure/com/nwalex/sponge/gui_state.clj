@@ -17,6 +17,9 @@
 (defn get-mode [session]
   @(:mode session))
 
+(defn current-server [session]
+  @(:current-server-store session))
+
 (defn- set-title [workspace]
   (.setTitle
    (gui workspace)
@@ -24,12 +27,21 @@
            (if @(:repl-running workspace) "(REPL Running)" "")))
   )
 
+(defn- session-title [session]
+  (let [file @(:current-file (:persistence-cookie session))
+        title (if-not file "New Session" (.getName file))]
+    (str title
+         (if (server/running? (current-server session))
+           " [running]"
+           " [stopped]"))))
+
 (defn set-session-info [session]
   (.setSessionInfo
    (gui (:workspace session))
    @(:gui-controller session)
    (format "Port: %s  Target: %s  "           
-           @(:port-store session) @(:target-store session))))
+           @(:port-store session) @(:target-store session))
+   (session-title session)))
 
 (defn set-config! [session port target]
   (log/info (format "Setting server config to: port = %s, target = %s" port target))  
@@ -63,9 +75,6 @@
   (compare-and-set! (:current-server-store session)
                     @(:current-server-store session) server)
   (set-title (:workspace session)))
-
-(defn current-server [session]
-  @(:current-server-store session))
 
 (defn config [session]
   {:port @(:port-store session) :target @(:target-store session)})
