@@ -11,6 +11,8 @@ package com.nwalex.sponge.gui;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import javax.swing.AbstractAction;
@@ -223,13 +225,26 @@ public class SpongeGUI extends javax.swing.JFrame {
                 sessionTabs.getComponentAt(sessionTabs.indexAtLocation(evt.getX(), evt.getY()));
 
         menu.add(new AbstractAction("Close") {
-
           @Override
           public void actionPerformed(ActionEvent e) {
-            sessionTabs.remove(tab);
-            controller.deleteSession(tabToControllerMap.get(tab));
-            sessionMap.remove(tabToControllerMap.get(tab));
-            tabToControllerMap.remove(tab);
+            deleteTab(tab);
+          }
+        });
+
+        menu.add(new AbstractAction("Close Others") {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            List<Component> tabsToClose = new ArrayList<Component>();
+            for (int i = 0; i < sessionTabs.getTabCount(); i++) {
+              Component nextTab = sessionTabs.getComponentAt(i);
+              if (!nextTab.equals(tab)) {
+                tabsToClose.add(nextTab);
+              }
+            }
+
+            for (Component tabToClose : tabsToClose) {
+              deleteTab(tabToClose);
+            }
           }
         });
 
