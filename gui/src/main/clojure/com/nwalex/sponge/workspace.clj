@@ -21,6 +21,10 @@
             :config-props (ref nil)}
         cookie (persistence/make-cookie ws "Sponge Workspace Files" "spw")]
     (dosync (ref-set (:persistence-cookie ws) cookie))
+    (add-watch (:current-file cookie)
+               "wsfile"
+               (fn [key ref old new]
+                 (.setEnabled (:save-workspace @(:action-map ws)) true)))
     ws))
 
 (defn- persistence-data [workspace]
@@ -105,7 +109,7 @@
         {:start-repl (swing/make-safe-action-with-gui gui "Start Repl"
                        (partial start-repl workspace) true)
          :save-workspace (swing/make-safe-action-with-gui gui "Save Workspace"
-                           (partial save-workspace workspace) true)
+                           (partial save-workspace workspace) false)
          :save-workspace-as (swing/make-safe-action-with-gui gui "Save Workspace As"
                               (partial save-workspace-as workspace) true)}]
        (dosync
