@@ -28,7 +28,8 @@ public class SafeAction extends AbstractAction {
   private final Frame parent;
   private final Action targetAction;
 
-  public SafeAction(Action targetAction, Frame parent) {
+  public SafeAction(String name, Action targetAction, Frame parent) {
+    super(name);
     this.targetAction = targetAction;
     this.parent = parent;
     setEnabled(targetAction.isEnabled());

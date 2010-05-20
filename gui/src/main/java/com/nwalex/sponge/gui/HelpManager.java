@@ -41,7 +41,7 @@ public class HelpManager {
   }
 
   public Action makeMenuAction(final String resourceName) {
-    return new SafeAction(new AbstractAction() {
+    return new SafeAction("Display Help", new AbstractAction() {
       @Override
       public void actionPerformed(ActionEvent e) {
         try {

@@ -9,15 +9,19 @@
 (defn log-action [f]
   (log/info (format "ACTION PERFORMED: %s" f)))
 
+(defn- action-str [f name]
+  (format "Name : %s, Function: %s" name f))
+
 (defn make-action [name f enabled]
   (doto (proxy [javax.swing.AbstractAction] [name]          
           (actionPerformed [event]
-                           (log-action f)
+                           (log-action (action-str f name))
                            (f event)))
     (.setEnabled enabled)))
 
 (defn make-safe-action-with-gui [gui name f enabled]
   (com.nwalex.sponge.gui.SafeAction.
+   name
    (make-action name f enabled)
    gui))
 

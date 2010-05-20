@@ -5,17 +5,28 @@
    [com.nwalex.sponge.gui-state :as state]
    [com.nwalex.sponge.core :as core]
    [com.nwalex.sponge.server :as server]
+   [com.nwalex.sponge.persistence :as persistence]
    [clojure.contrib.swing-utils :as cl-swing]
    [clojure.contrib.logging :as log]))
 
 (defn make-workspace
   "The data structure for the app as a whole"
   []
-  {:gui-frame-store (atom nil)
-   :repl-running (atom false)
-   :active-sessions (ref [])
-   :action-map (ref nil)
-   :config-props (ref nil)})
+  (let [ws {:persistence-cookie (ref nil)
+            :gui-frame-store (atom nil)
+            :repl-running (atom false)
+            :active-sessions (ref [])
+            :action-map (ref nil)
+            :config-props (ref nil)}
+        cookie (persistence/make-cookie ws "Sponge Workspace Files" "spw")]
+    (dosync (ref-set (:persistence-cookie ws) cookie))
+    ws))
+
+(defn- persistence-data [workspace]
+  {:test 1})
+
+(defn load-data! [workspace persistence-map]
+  (log/info (format "loaded data %s" persistence-map)))
 
 (defn- create-session [workspace]  
   (let [session (session-controller/create-session workspace)
@@ -57,14 +68,27 @@
    (catch Exception ex
      (log/warn (format "Failed to load config") ex))))
 
+(defn load-workspace-from-file! [file]
+  (log/info "Ready to load workspace from file")
+  ;;(persistence/load-data (:persistence-cookie session)
+  ;;                       (partial load-data! session)
+  ;;                       file)
+  )
+
 (defn- load-workspace [workspace event]
-  (log/info "Ready to load workspace"))
+  (log/info "Ready to load workspace")
+  (persistence/load-data @(:persistence-cookie workspace)
+                         (partial load-data! workspace)))
 
 (defn- save-workspace [workspace event]
-  (log/info "ready to save workspace"))
+  (log/info "ready to save workspace")
+  (persistence/save-data @(:persistence-cookie workspace)
+                         (persistence-data workspace)))
 
 (defn- save-workspace-as [workspace event]
-  (log/info "ready to save workspace as"))
+  (log/info "ready to save workspace as")
+  (persistence/save-data-as @(:persistence-cookie workspace)
+                            (persistence-data workspace)))
 
 (defn make-action-map [workspace]
   (let [gui @(:gui-frame-store workspace)

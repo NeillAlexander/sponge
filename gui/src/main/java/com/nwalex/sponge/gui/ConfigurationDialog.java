@@ -29,7 +29,7 @@ public class ConfigurationDialog extends javax.swing.JDialog {
   public ConfigurationDialog(java.awt.Frame parent, boolean modal, ConfigurationDialogController controller) {
     super(parent, modal);
     this.controller = controller;
-    this.okAction = new SafeAction(new OkAction(), parent);
+    this.okAction = new SafeAction("OK Config", new OkAction(), parent);
 
     initComponents();
 
