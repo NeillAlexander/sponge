@@ -90,8 +90,10 @@
 (defn- load-workspace [workspace]
   (log/info "Ready to load workspace")
   (let [loaded-sessions (persistence/load-data @(:persistence-cookie workspace)
-                         (partial load-data! workspace))]
-    (into-array (map session/gui-controller loaded-sessions))))
+                                               (partial load-data! workspace))]
+    (if (> 0 (count loaded-sessions))
+      (into-array (map session/gui-controller loaded-sessions))
+      (make-array com.nwalex.sponge.gui.SpongeSessionController 0))))
 
 (defn- save-workspace [workspace event]
   (log/info "ready to save workspace")

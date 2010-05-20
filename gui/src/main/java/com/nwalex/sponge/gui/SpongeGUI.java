@@ -121,6 +121,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     jMenu1.setText("Workspace");
 
     loadWorkspaceMenu.setAction(getLoadWorkspaceAction());
+    loadWorkspaceMenu.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
     loadWorkspaceMenu.setText("Load Workspace...");
     jMenu1.add(loadWorkspaceMenu);
 
