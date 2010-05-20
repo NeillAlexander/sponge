@@ -233,6 +233,8 @@ public class SpongeSessionPanel extends javax.swing.JPanel {
       }
     });
 
+    sessionAction.setEnabled(toTrigger.isEnabled());
+
     return sessionAction;
   }
 

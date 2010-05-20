@@ -32,8 +32,8 @@
         title (if-not file "New Session" (.getName file))]
     (str title
          (if (server/running? (current-server session))
-           " [running]"
-           " [stopped]"))))
+           (format " <%s>" @(:port-store session))
+           (format " [%s]" @(:port-store session))))))
 
 (defn set-session-info [session]
   (.setSessionInfo
