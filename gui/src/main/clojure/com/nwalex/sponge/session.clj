@@ -23,7 +23,7 @@
 (defn make-session
   "Create the session data structure"
   [workspace]
-  {:persistence-cookie (persistence/make-cookie workspace)
+  {:persistence-cookie (persistence/make-cookie workspace "Sponge Data Files" "spd")
    :workspace workspace
    :gui-controller (ref nil)
    :action-map (ref nil)

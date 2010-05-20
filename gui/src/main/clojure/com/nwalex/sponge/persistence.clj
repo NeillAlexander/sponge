@@ -11,10 +11,12 @@
    [clojure.contrib.logging :as log]
    [clojure.contrib.duck-streams :as io]))
 
-(defn make-cookie [workspace]
+(defn make-cookie [workspace description file-extension]
   {:directory (ref (System/getProperty "sponge.sessions"))
    :current-file (ref nil)
-   :workspace workspace})
+   :workspace (ref workspace)
+   :extension (ref file-extension)
+   :description (ref description)})
 
 (defn- cookie-value [cookie key]
   @(cookie key))
@@ -33,16 +35,21 @@
   (update-cookie cookie :directory dir))
 
 (defn- init-file-chooser [cookie text]
-  (let [file-chooser (doto (javax.swing.JFileChooser.)
-    (.setApproveButtonText text)
-    (.setCurrentDirectory
-     (java.io.File. (cookie-value cookie :directory))))]
+  (let [filter (javax.swing.filechooser.FileNameExtensionFilter.
+                (cookie-value cookie :description)
+                (into-array [(cookie-value cookie :extension)]))
+        file-chooser (doto (javax.swing.JFileChooser.)
+                       (.setFileFilter filter)
+                       (.setAcceptAllFileFilterUsed false)
+                       (.setApproveButtonText text)
+                       (.setCurrentDirectory
+                        (java.io.File. (cookie-value cookie :directory))))]
     (if (has-file? cookie)
       (.setSelectedFile file-chooser (cookie-value cookie :current-file)))
     file-chooser))
 
 (defn- gui [cookie]
-  @(:gui-frame-store (:workspace cookie)))
+  @(:gui-frame-store (cookie-value cookie :workspace)))
 
 (defn- choose-file
   "Launches JFileChooser. Remembers directory of chosen file for next time"
@@ -56,10 +63,23 @@
         (.getSelectedFile file-chooser)))))
 
 
+(defmulti enforce-extension-on (fn [file cookie] (class file)))
+
+(defmethod enforce-extension-on String [filename cookie]
+  (let [extension (cookie-value cookie :extension)]
+    (log/info (format "Checking if %s has extension %s" filename extension))
+    (if-not (.endsWith filename extension)
+      (str filename "." extension)
+      filename)))
+
+(defmethod enforce-extension-on java.io.File [file cookie]
+  (let [filename (enforce-extension-on (.getAbsolutePath file) cookie)]
+    (java.io.File. filename)))
+
 (defn save-data [cookie data]
-  (let [file (cookie-value cookie :current-file)]
-    (if file
-      (do
+  (let [raw-file (cookie-value cookie :current-file)]
+    (if raw-file
+      (let [file (enforce-extension-on raw-file cookie)]        
         (log/info (format "Ready to save in file %s" file))
         (with-open [out (io/writer (java.io.BufferedOutputStream.
                                     (java.util.zip.GZIPOutputStream.
