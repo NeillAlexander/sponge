@@ -28,6 +28,9 @@
   (dosync
    (ref-set (cookie key) value)))
 
+(defn current-file [cookie]
+  (cookie-value cookie :current-file))
+
 (defn update-current-file! [cookie file]
   (update-cookie cookie :current-file file))
 

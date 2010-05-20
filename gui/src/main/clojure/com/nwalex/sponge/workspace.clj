@@ -8,7 +8,8 @@
    [com.nwalex.sponge.persistence :as persistence]
    [com.nwalex.sponge.session :as session]
    [clojure.contrib.swing-utils :as cl-swing]
-   [clojure.contrib.logging :as log]))
+   [clojure.contrib.logging :as log]
+   [clojure.contrib.java-utils :as util]))
 
 (defn make-workspace
   "The data structure for the app as a whole"
@@ -91,7 +92,7 @@
   (log/info "Ready to load workspace")
   (let [loaded-sessions (persistence/load-data @(:persistence-cookie workspace)
                                                (partial load-data! workspace))]
-    (if (> 0 (count loaded-sessions))
+    (if (> (count loaded-sessions) 0)
       (into-array (map session/gui-controller loaded-sessions))
       (make-array com.nwalex.sponge.gui.SpongeSessionController 0))))
 
@@ -150,13 +151,9 @@
     (getSaveWorkspaceAsAction [] (:save-workspace-as action-map))))
 
 (defn- store-workspace-properties [workspace]
-  (log/info "TODO: Store workspace properties prior to shutdown")
-  ;(util/write-properties
-  ; {"sponge.default.port" ((state/config session) :port)
-  ;  "sponge.default.target" ((state/config session) :target)
-  ;  "sponge.last.session" (session/get-session-file session)}
-  ; (format "%s/config/last.sponge.properties" (System/getProperty "sponge.home")))
-  )
+  (util/write-properties
+   {"sponge.last.workspace" (persistence/current-file (:persistence-cookie workspace))}
+   (format "%s/config/last.sponge.properties" (System/getProperty "sponge.home"))))
 
 (defn- create-shutdown-hook! [workspace]
   (.addShutdownHook (Runtime/getRuntime)

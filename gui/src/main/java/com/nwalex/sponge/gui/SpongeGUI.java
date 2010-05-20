@@ -64,7 +64,8 @@ public class SpongeGUI extends javax.swing.JFrame {
     return new AbstractAction("Load Workspace") {
       @Override
       public void actionPerformed(ActionEvent e) {
-        for (SpongeSessionController spongeSessionController : controller.loadWorkspace()) {
+        SpongeSessionController[] sessionControllers = controller.loadWorkspace();
+        for (SpongeSessionController spongeSessionController : sessionControllers) {
           addSession(spongeSessionController);
         }
       }
