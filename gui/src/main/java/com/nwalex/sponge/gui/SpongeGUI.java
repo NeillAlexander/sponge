@@ -44,6 +44,12 @@ public class SpongeGUI extends javax.swing.JFrame {
     setExtendedState(JFrame.MAXIMIZED_BOTH);
   }
 
+  public void initialize() {
+    for (SpongeSessionController sessionController : controller.initializeWorkspace()) {
+      addSession(sessionController);
+    }
+  }
+
   public void updateSelectedMode(final SpongeSessionController controller) {
     if (sessionMap.containsKey(controller)) {
       sessionMap.get(controller).updateSelectedMode(controller);

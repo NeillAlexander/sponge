@@ -19,6 +19,7 @@ public interface SpongeController {
 
   public SpongeSessionController createNewSession();
   public SpongeSessionController[] loadWorkspace();
+  public SpongeSessionController[] initializeWorkspace();
   
   public void deleteSession(SpongeSessionController spc);
 

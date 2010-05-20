@@ -162,18 +162,6 @@
                                     (partial model/duplicate-rows! session)
                                     table))))
 
-(defn- load-session [session props]
-  (let [do-load-prop (.getProperty props "sponge.reload.previous" "false")]
-    (if (= do-load-prop "true")
-      (let [file (java.io.File. (.getProperty props "sponge.last.session" ""))]
-        (if (and (not (nil? file)) (.exists file))
-          (do
-            (session/load-session-from-file! session file)
-            (.setEnabled (:save (session/action-map session))
-                         (session/is-loaded? session)))
-          (log/info (format "Session file not found: %s" file))))
-      (log/info "sponge.reload.previous not set. Not loading previous session"))))
-
 
 (defn- get-property [props name default]
   (if props    

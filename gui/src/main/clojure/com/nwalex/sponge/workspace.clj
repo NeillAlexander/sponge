@@ -81,20 +81,21 @@
    (catch Exception ex
      (log/warn (format "Failed to load config") ex))))
 
-(defn load-workspace-from-file! [file]
+(defn- convert-loaded-sessions [loaded-sessions]
+  (if (> (count loaded-sessions) 0)
+    (into-array (map session/gui-controller loaded-sessions))
+    (make-array com.nwalex.sponge.gui.SpongeSessionController 0)))
+
+(defn load-workspace-from-file! [workspace file]
   (log/info "Ready to load workspace from file")
-  ;;(persistence/load-data (:persistence-cookie session)
-  ;;                       (partial load-data! session)
-  ;;                       file)
-  )
+  (convert-loaded-sessions (persistence/load-data @(:persistence-cookie workspace)
+                                                  (partial load-data! workspace)
+                                                  file)))
 
 (defn- load-workspace [workspace]
   (log/info "Ready to load workspace")
-  (let [loaded-sessions (persistence/load-data @(:persistence-cookie workspace)
-                                               (partial load-data! workspace))]
-    (if (> (count loaded-sessions) 0)
-      (into-array (map session/gui-controller loaded-sessions))
-      (make-array com.nwalex.sponge.gui.SpongeSessionController 0))))
+  (convert-loaded-sessions (persistence/load-data @(:persistence-cookie workspace)
+                                               (partial load-data! workspace))))
 
 (defn- save-workspace [workspace event]
   (log/info "ready to save workspace")
@@ -139,6 +140,24 @@
               (doall (filter #(still-active? session-controller %1)
                              @active-sessions))))))
 
+(defn- no-previous-workspace-loaded [workspace msg]
+  (log/info msg)
+  (log/info "Initializing empty session...")
+  (convert-loaded-sessions [(create-session workspace)]))
+
+(defn- load-previous-workspace [workspace]
+  (let [props @(:config-props workspace)
+        do-load-prop (.getProperty props "sponge.reload.previous" "false")]
+    (if (= do-load-prop "true")
+      (let [file (java.io.File. (.getProperty props "sponge.last.workspace" ""))]
+        (if (and (not (nil? file)) (.exists file))
+          (do
+            (load-workspace-from-file! workspace file))
+          (no-previous-workspace-loaded workspace
+           (format "Workspace file not found: %s" file))))
+      (no-previous-workspace-loaded workspace
+       "sponge.reload.previous not set. Not loading previous workspace"))))
+
 (defn make-sponge-controller
   "The implementation of SpongeController"
   [workspace action-map]
@@ -146,6 +165,7 @@
     (getStartReplAction [] (:start-repl action-map))
     (createNewSession [] @(:gui-controller (create-session workspace)))
     (deleteSession [controller] (delete-session workspace controller))
+    (initializeWorkspace [] (load-previous-workspace workspace))
     (loadWorkspace [] (load-workspace workspace))
     (getSaveWorkspaceAction [] (:save-workspace action-map))
     (getSaveWorkspaceAsAction [] (:save-workspace-as action-map))))
@@ -164,9 +184,10 @@
   (let [workspace (make-workspace)
         action-map (make-action-map workspace)
         controller (make-sponge-controller workspace action-map)]
+    (load-config! workspace)
+    (create-shutdown-hook! workspace)
     (cl-swing/do-swing
      (state/set-gui! workspace
                      (com.nwalex.sponge.gui.SpongeGUI. controller))
-     (load-config! workspace)
-     (create-shutdown-hook! workspace)
+     (.initialize (state/gui workspace))
      (.setVisible (state/gui workspace) true))))
