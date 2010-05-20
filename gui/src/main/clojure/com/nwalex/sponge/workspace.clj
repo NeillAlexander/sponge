@@ -49,7 +49,6 @@
     (map (partial reload-session workspace) session-data)))
 
 (defn- start-repl [workspace event]
-  (log/info (format "start-repl called with workspace: %s" workspace))
   (let [action-map @(:action-map workspace)]
     (swing/toggle-action (:start-repl action-map))
     (state/repl-started! workspace)

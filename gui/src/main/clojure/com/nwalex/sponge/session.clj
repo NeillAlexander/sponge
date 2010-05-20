@@ -23,7 +23,8 @@
 (defn make-session
   "Create the session data structure"
   [workspace]
-  {:persistence-cookie (persistence/make-cookie workspace "Sponge Data Files" "spd")
+  {:name (ref "New session")
+   :persistence-cookie (persistence/make-cookie workspace "Sponge Data Files" "spd")
    :workspace workspace
    :gui-controller (ref nil)
    :action-map (ref nil)
@@ -66,7 +67,18 @@
 (defn is-loaded? [session]
   (persistence/has-file? (:persistence-cookie session)))
 
+(defn set-name! [session name]
+  (let [current-file (persistence/current-file (:persistence-cookie session))]
+    (log/info (format "ready to set name: '%s' or '%s'" name current-file))
+    (dosync (ref-set (:name session)
+                     (if name
+                       name
+                       (if current-file
+                         (.getName current-file)
+                         "untitled"))))))
+
 (defn load-data! [session persistence-map]
+  (set-name! session (:name persistence-map))
   (state/load-from-persistence-map! session (:gui-state persistence-map))
   (model/load-from-persistence-map! session (:table-model persistence-map))
   (exchange/load-from-persistence-map! session (:exchange persistence-map)))
@@ -75,7 +87,8 @@
   (assoc {}
     :gui-state (state/get-persistence-map session)
     :table-model (model/get-persistence-map session)
-    :exchange (exchange/get-persistence-map session)))
+    :exchange (exchange/get-persistence-map session)
+    :name @(:name session)))
 
 (defn load-session-from-file! [session file]
   (log/info "Ready to load session from file")

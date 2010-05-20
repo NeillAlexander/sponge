@@ -28,12 +28,10 @@
   )
 
 (defn- session-title [session]
-  (let [file @(:current-file (:persistence-cookie session))
-        title (if-not file "New Session" (.getName file))]
-    (str title
-         (if (server/running? (current-server session))
-           (format " <%s>" @(:port-store session))
-           (format " [%s]" @(:port-store session))))))
+  (str @(:name session)
+       (if (server/running? (current-server session))
+         (format " <%s>" @(:port-store session))
+         (format " [%s]" @(:port-store session)))))
 
 (defn set-session-info [session]
   (.setSessionInfo

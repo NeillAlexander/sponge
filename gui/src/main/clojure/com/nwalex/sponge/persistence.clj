@@ -25,6 +25,7 @@
   (not (nil? (cookie-value cookie :current-file))))
 
 (defn- update-cookie [cookie key value]
+  (log/info (format "Setting cookie key %s to %s" key value))
   (dosync
    (ref-set (cookie key) value)))
 
