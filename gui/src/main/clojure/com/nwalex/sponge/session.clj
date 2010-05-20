@@ -71,7 +71,7 @@
   (model/load-from-persistence-map! session (:table-model persistence-map))
   (exchange/load-from-persistence-map! session (:exchange persistence-map)))
 
-(defn- persistence-data [session]
+(defn persistence-data [session]
   (assoc {}
     :gui-state (state/get-persistence-map session)
     :table-model (model/get-persistence-map session)

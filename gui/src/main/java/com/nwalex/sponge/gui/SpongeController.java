@@ -17,11 +17,12 @@ import javax.swing.Action;
  */
 public interface SpongeController {
 
-  public Action getStartReplAction();
   public SpongeSessionController createNewSession();
+  public SpongeSessionController[] loadWorkspace();
+  
   public void deleteSession(SpongeSessionController spc);
 
-  public Action getLoadWorkspaceAction();
+  public Action getStartReplAction();
   public Action getSaveWorkspaceAction();
   public Action getSaveWorkspaceAsAction();
 }

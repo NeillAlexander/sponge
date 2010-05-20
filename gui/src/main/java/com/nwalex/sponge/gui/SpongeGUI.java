@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.util.Map;
 import java.util.WeakHashMap;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 import org.apache.log4j.Logger;
@@ -28,7 +29,6 @@ public class SpongeGUI extends javax.swing.JFrame {
   private final SpongeController controller;
   private HelpManager helper;
   private static final Logger log = Logger.getLogger(SpongeGUI.class);
-  
   private Map<SpongeSessionController, SpongeSessionPanel> sessionMap =
           new WeakHashMap<SpongeSessionController, SpongeSessionPanel>();
   private Map<Component, SpongeSessionController> tabToControllerMap =
@@ -58,6 +58,25 @@ public class SpongeGUI extends javax.swing.JFrame {
     } else {
       log.warn("setSessionInfo called for " + sessionController + " but I don't have a reference to it!");
     }
+  }
+
+  private Action getLoadWorkspaceAction() {
+    return new AbstractAction("Load Workspace") {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        for (SpongeSessionController spongeSessionController : controller.loadWorkspace()) {
+          addSession(spongeSessionController);
+        }
+      }
+    };
+  }
+
+  private void addSession(SpongeSessionController sessionController) {
+    sessionMap.put(sessionController, new SpongeSessionPanel(this, sessionController));
+    sessionTabs.add(sessionMap.get(sessionController), "Session " + (sessionCounter++));
+    tabToControllerMap.put(sessionTabs.getComponentAt(sessionTabs.getTabCount() - 1), sessionController);
+    sessionController.updateSessionInfo();
+    this.validate();
   }
 
   /** This method is called from within the constructor to
@@ -101,8 +120,7 @@ public class SpongeGUI extends javax.swing.JFrame {
 
     jMenu1.setText("Workspace");
 
-    loadWorkspaceMenu.setAction(controller.getLoadWorkspaceAction());
-    loadWorkspaceMenu.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+    loadWorkspaceMenu.setAction(getLoadWorkspaceAction());
     loadWorkspaceMenu.setText("Load Workspace...");
     jMenu1.add(loadWorkspaceMenu);
 
@@ -169,12 +187,7 @@ public class SpongeGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_aboutMenuItemActionPerformed
 
     private void addSession(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSession
-      final SpongeSessionController sessionController = controller.createNewSession();
-      sessionMap.put(sessionController, new SpongeSessionPanel(this, sessionController));
-      sessionTabs.add(sessionMap.get(sessionController), "Session " + (sessionCounter++));
-      tabToControllerMap.put(sessionTabs.getComponentAt(sessionTabs.getTabCount() - 1), sessionController);
-      sessionController.updateSessionInfo();
-      this.validate();
+      addSession(controller.createNewSession());
     }//GEN-LAST:event_addSession
 
     private void displayTabPopup(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayTabPopup
@@ -184,6 +197,7 @@ public class SpongeGUI extends javax.swing.JFrame {
                 sessionTabs.getComponentAt(sessionTabs.indexAtLocation(evt.getX(), evt.getY()));
 
         menu.add(new AbstractAction("Close") {
+
           @Override
           public void actionPerformed(ActionEvent e) {
             sessionTabs.remove(tab);
@@ -192,7 +206,7 @@ public class SpongeGUI extends javax.swing.JFrame {
             tabToControllerMap.remove(tab);
           }
         });
-        
+
         menu.show(sessionTabs, evt.getX(), evt.getY());
       }
     }//GEN-LAST:event_displayTabPopup
@@ -204,7 +218,6 @@ public class SpongeGUI extends javax.swing.JFrame {
     private void sessionTabsMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sessionTabsMouseReleased
       displayTabPopup(evt);
     }//GEN-LAST:event_sessionTabsMouseReleased
-
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JMenuItem aboutMenuItem;
   private javax.swing.JMenu jMenu1;

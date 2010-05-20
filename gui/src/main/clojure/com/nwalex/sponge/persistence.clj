@@ -108,8 +108,8 @@
          (let [data (load-data-from-file cookie file)]
            (if data
              (do
-               (loader-fn data)
-               (update-cookie cookie :current-file file))
+               (update-cookie cookie :current-file file)
+               (loader-fn data))
              (log/info "No data loaded")))
          (log/info "No file chosen")))
   ([cookie loader-fn]

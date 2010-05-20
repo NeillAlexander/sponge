@@ -6,6 +6,7 @@
    [com.nwalex.sponge.core :as core]
    [com.nwalex.sponge.server :as server]
    [com.nwalex.sponge.persistence :as persistence]
+   [com.nwalex.sponge.session :as session]
    [clojure.contrib.swing-utils :as cl-swing]
    [clojure.contrib.logging :as log]))
 
@@ -23,17 +24,24 @@
     ws))
 
 (defn- persistence-data [workspace]
-  {:test 1})
-
-(defn load-data! [workspace persistence-map]
-  (log/info (format "loaded data %s" persistence-map)))
+  {:active-sessions (vec (map session/persistence-data
+                              @(:active-sessions workspace)))})
 
 (defn- create-session [workspace]  
-  (let [session (session-controller/create-session workspace)
-        session-controller @(:gui-controller session)]
+  (let [session (session-controller/create-session workspace)]
     (dosync
      (commute (:active-sessions workspace) conj session))
-    session-controller))
+    session))
+
+(defn- reload-session [workspace data]
+  (let [session (create-session workspace)]
+    (session/load-data! session data)
+    session))
+
+(defn load-data! [workspace persistence-map]
+  (let [session-data (:active-sessions persistence-map)]
+    (log/info (format "%d sessions loaded in workspace" (count session-data)))    
+    (map (partial reload-session workspace) session-data)))
 
 (defn- start-repl [workspace event]
   (log/info (format "start-repl called with workspace: %s" workspace))
@@ -75,10 +83,11 @@
   ;;                       file)
   )
 
-(defn- load-workspace [workspace event]
+(defn- load-workspace [workspace]
   (log/info "Ready to load workspace")
-  (persistence/load-data @(:persistence-cookie workspace)
-                         (partial load-data! workspace)))
+  (let [loaded-sessions (persistence/load-data @(:persistence-cookie workspace)
+                         (partial load-data! workspace))]
+    (into-array (map session/gui-controller loaded-sessions))))
 
 (defn- save-workspace [workspace event]
   (log/info "ready to save workspace")
@@ -95,8 +104,6 @@
         action-map
         {:start-repl (swing/make-safe-action-with-gui gui "Start Repl"
                        (partial start-repl workspace) true)
-         :load-workspace (swing/make-safe-action-with-gui gui "Load Workspace"
-                           (partial load-workspace workspace) true)
          :save-workspace (swing/make-safe-action-with-gui gui "Save Workspace"
                            (partial save-workspace workspace) true)
          :save-workspace-as (swing/make-safe-action-with-gui gui "Save Workspace As"
@@ -130,9 +137,9 @@
   [workspace action-map]
   (proxy [com.nwalex.sponge.gui.SpongeController] []
     (getStartReplAction [] (:start-repl action-map))
-    (createNewSession [] (create-session workspace))
+    (createNewSession [] @(:gui-controller (create-session workspace)))
     (deleteSession [controller] (delete-session workspace controller))
-    (getLoadWorkspaceAction [] (:load-workspace action-map))
+    (loadWorkspace [] (load-workspace workspace))
     (getSaveWorkspaceAction [] (:save-workspace action-map))
     (getSaveWorkspaceAsAction [] (:save-workspace-as action-map))))
 
