@@ -7,6 +7,8 @@
 ; You must not remove this notice, or any other, from this software
 
 (ns com.nwalex.sponge.table-model
+  (:use
+   [com.nwalex.sponge.macros])
   (:require
    [com.nwalex.sponge.soap :as soap]
    [com.nwalex.sponge.exchange :as exchange]
@@ -74,7 +76,7 @@
   [session row key]
   (exchange/get-pretty-printed-body session (get-exchange-for-row session row) key))
 
-(defn- add-entry!
+(defn-dirty add-entry!
   [session exchange]
   ;; only add the id once (on request)
   (dosync 
