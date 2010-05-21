@@ -18,6 +18,7 @@ import java.util.WeakHashMap;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import org.apache.log4j.Logger;
 
@@ -117,6 +118,22 @@ public class SpongeGUI extends javax.swing.JFrame {
     
     sessionController.updateSessionInfo();
     this.validate();
+  }
+
+  private void renameTab(Component tab) {
+    String newTitle = (String)JOptionPane.showInputDialog(
+                        this,
+                        "Name: ",
+                        "Rename Session",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        null,
+                        "");
+
+    if (newTitle != null) {      
+      tabToControllerMap.get(tab).setName(newTitle);
+      tabToControllerMap.get(tab).updateSessionInfo();
+    }
   }
 
   /** This method is called from within the constructor to
@@ -234,8 +251,19 @@ public class SpongeGUI extends javax.swing.JFrame {
     private void displayTabPopup(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_displayTabPopup
       if (evt.isPopupTrigger()) {
         final JPopupMenu menu = new JPopupMenu();
+        int index = sessionTabs.indexAtLocation(evt.getX(), evt.getY());
+
+        if (index < 0) return;
+
         final Component tab =
-                sessionTabs.getComponentAt(sessionTabs.indexAtLocation(evt.getX(), evt.getY()));
+                sessionTabs.getComponentAt(index);
+
+        menu.add(new AbstractAction("Rename") {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            renameTab(tab);
+          }
+        });
 
         menu.add(new AbstractAction("Close") {
           @Override

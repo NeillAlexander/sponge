@@ -27,6 +27,7 @@ public interface SpongeSessionController {
   public static final String REPLAY_OR_FAIL = "Replay or Fail";
   public static final String REPLAY_OR_PROMPT = "Replay or Prompt";
 
+  public void setName(String name);
   public PluginController getPluginController();
   public void updateSessionInfo();
 

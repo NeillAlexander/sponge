@@ -122,7 +122,8 @@
 
 (defn- make-sponge-session-controller
   [session action-map plugin-controller]
-  (proxy [com.nwalex.sponge.gui.SpongeSessionController] []    
+  (proxy [com.nwalex.sponge.gui.SpongeSessionController] []
+    (setName [name] (session/set-name! session name))
     (updateSessionInfo [] (state/set-session-info session))
     (getPluginController [] plugin-controller)
     (getStartServerAction [] (:start-server action-map))
