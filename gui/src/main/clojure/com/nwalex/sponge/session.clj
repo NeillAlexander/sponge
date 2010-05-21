@@ -23,27 +23,32 @@
 (defn make-session
   "Create the session data structure"
   [workspace]
-  {:dirty (ref false)
-   :name (ref "New session")
-   :persistence-cookie (persistence/make-cookie workspace "Sponge Data Files" "spd")
-   :workspace workspace
-   :gui-controller (ref nil)
-   :action-map (ref nil)
-   :default-responses (ref {})
-   :exchange-table-model (ref nil)
-   :plugin-controller (ref nil)
-   :plugin-manager (ref nil)
-   :request-plugins (ref {})
-   :response-plugins (ref {})
-   :data-id-store (ref [])
-   :active-data-id-store (ref [])
-   :exchange-store (ref {})
-   :next-exchange-id (ref (java.util.concurrent.atomic.AtomicLong.))
-   :replay-count (ref {})   
-   :current-server-store (atom nil)   
-   :port-store (ref 8139)
-   :target-store (ref "http://services.aonaware.com")
-   :mode (atom com.nwalex.sponge.gui.SpongeSessionController/REPLAY_OR_FORWARD)})
+  (let [session
+        {:dirty (ref false)
+         :name (ref "New session")
+         :persistence-cookie (persistence/make-cookie workspace
+                                                      "Sponge Data Files" "spd")
+         :workspace workspace
+         :gui-controller (ref nil)
+         :action-map (ref nil)
+         :default-responses (ref {})
+         :exchange-table-model (ref nil)
+         :plugin-controller (ref nil)
+         :plugin-manager (ref nil)
+         :request-plugins (ref {})
+         :response-plugins (ref {})
+         :data-id-store (ref [])
+         :active-data-id-store (ref [])
+         :exchange-store (ref {})
+         :next-exchange-id (ref (java.util.concurrent.atomic.AtomicLong.))
+         :replay-count (ref {})   
+         :current-server-store (atom nil)   
+         :port-store (ref 8139)
+         :target-store (ref "http://services.aonaware.com")
+         :mode (atom com.nwalex.sponge.gui.SpongeSessionController/REPLAY_OR_FORWARD)}]
+    (add-watch (:dirty session) "TODO"
+               (fn [key ref old new] (state/set-session-info session)))
+    session))
 
 ;;----------------------------------------------------
 

@@ -31,7 +31,8 @@
   (str @(:name session)
        (if (server/running? (current-server session))
          (format " <%s>" @(:port-store session))
-         (format " [%s]" @(:port-store session)))))
+         (format " [%s]" @(:port-store session)))
+       (if @(:dirty session) " *" "")))
 
 (defn set-session-info [session]
   (.setSessionInfo
