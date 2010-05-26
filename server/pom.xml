@@ -2,13 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.nwalex</groupId>
   <artifactId>sponge-server</artifactId>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.2.0</version>
   <name>Sponge Server Module</name>
 
   <parent>
     <artifactId>sponge</artifactId>
     <groupId>com.nwalex</groupId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0</version>
   </parent>
   
   <dependencies>
