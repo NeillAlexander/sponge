@@ -1,1 +1,3 @@
 See "http://www.maybetechnology.com/2010/04/sponge-for-when-youre-using-soap.html":http://www.maybetechnology.com/2010/04/sponge-for-when-youre-using-soap.html for an overview of Sponge. There is also built-in documentation under the Help menu.
+
+Sponge 1.2.0 is the latest (and last for now) version of Sponge. I started this project because I wanted to learn Clojure, and because I wanted a tool to help me in my job. I've now left that job, and have no need for this particular tool at the minute. Hence I won't be doing any more development on it for now.
