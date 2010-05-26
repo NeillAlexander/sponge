@@ -76,7 +76,7 @@
   [session row key]
   (exchange/get-pretty-printed-body session (get-exchange-for-row session row) key))
 
-(defn-dirty add-entry!
+(defn add-entry!
   [session exchange]
   ;; only add the id once (on request)
   (dosync 
