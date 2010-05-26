@@ -16,13 +16,17 @@
    :current-file (ref nil)
    :workspace (ref workspace)
    :extension (ref file-extension)
-   :description (ref description)})
+   :description (ref description)
+   :saved (ref false)})
 
 (defn- cookie-value [cookie key]
   @(cookie key))
 
 (defn has-file? [cookie]
   (not (nil? (cookie-value cookie :current-file))))
+
+(defn saved? [cookie]
+  (cookie-value cookie :saved))
 
 (defn- update-cookie [cookie key value]
   (log/info (format "Setting cookie key %s to %s" key value))
@@ -81,6 +85,7 @@
     (java.io.File. filename)))
 
 (defn save-data [cookie data]
+  (update-cookie cookie :saved false)
   (let [raw-file (cookie-value cookie :current-file)]
     (if raw-file
       (let [file (enforce-extension-on raw-file cookie)]        
@@ -91,6 +96,7 @@
           (.write out (str data))
           (.write out "\n"))
         (update-current-file! cookie file)
+        (update-cookie cookie :saved true)
         (log/info "Done"))      
       (log/info "No file chosen"))))
 

@@ -24,7 +24,7 @@
   "Create the session data structure"
   [workspace]
   (let [session
-        {:dirty (ref false)
+        {:dirty (ref true)
          :name (ref "New session")
          :persistence-cookie (persistence/make-cookie workspace
                                                       "Sponge Data Files" "spd")
@@ -106,10 +106,16 @@
   (log/info "Ready to load session...")
   (persistence/load-data (:persistence-cookie session) (partial load-data! session)))
 
+(defn- update-if-saved [session]
+  (if (persistence/saved? (:persistence-cookie session))
+    (dosync (ref-set (:dirty session) false))))
+
 (defn save-session [session event]
   (log/info "Loading session...")
-  (persistence/save-data (:persistence-cookie session) (persistence-data session)))
+  (persistence/save-data (:persistence-cookie session) (persistence-data session))
+  (update-if-saved session))
 
 (defn save-session-as [session event]
   (log/info "Saving session as...")
-  (persistence/save-data-as (:persistence-cookie session) (persistence-data session)))
+  (persistence/save-data-as (:persistence-cookie session) (persistence-data session))
+  (update-if-saved session))
